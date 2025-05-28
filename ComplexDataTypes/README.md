@@ -48,3 +48,85 @@
 
 ---
 
+### Day 4 – Type Annotations & Checkpoint 2
+
+* **Type Safety & Type Annotations**
+
+  * Swift infers types automatically but you can explicitly specify them.
+  * Prevents invalid operations (e.g., adding strings to integers).
+  * Use annotations to clarify and enforce data types.
+
+```swift
+var albums: [String] = []
+let score: Int = 100
+```
+
+* **Invalid Type Annotation Example**
+
+```swift
+let scoreInvalid: Int = "Zero"
+```
+
+This will throw an error of **Cannot convert value of type 'String' to specified type 'Int'**
+
+
+* **Type Inference**
+```swift
+let surnameStr = "Lasso"
+var scoreInt = 0
+var clues = [String]()
+```
+
+* **Example: Working with Arrays and Sets**
+
+```swift
+let faveGames = ["Monster Hunter", "Elden Ring", "Dark Souls", "Dark Souls"]
+
+print("Total items: \(faveGames.count)")
+
+let uniqueGames = Set(faveGames)
+
+print("Unique items: \(uniqueGames.count)")
+```
+
+
+* **Golden Rule**
+
+Whether you use type inference or type annotation, one rule always applies: 
+    
+- Swift must always know the exact data type of every constant and variable.
+ 
+This is a fundamental part of Swift being a type-safe language as it prevents
+invalid code like '5 + true', where the types don’t make sense together.
+
+
+### ✅ Checkpoint 2 – Practice Task
+
+Here’s a small challenge using what I’ve learned about arrays and sets:
+
+ - Create an array of strings (faveGames).
+ 
+ ```swift
+    let faveGames = ["Monster Hunters", "Elden Ring", "Dark Souls: Remastered", "Dark Souls: Remastered"]
+ ```
+
+ - Print the total number of items with faveGames.count.
+ 
+  
+ ```swift
+    print("Total items: \(faveGames.count)")
+ ```
+
+ - Convert the array to a Set to get unique items.
+ 
+   
+ ```swift
+    let uniqueItems = Set(faveGames)
+ ```
+
+ - Get the count of unique items with uniqueItems.count.
+
+ ```swift
+    print("Unique items: \(uniqueItems.count)")
+ ```
+

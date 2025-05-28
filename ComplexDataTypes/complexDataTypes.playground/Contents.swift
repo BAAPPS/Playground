@@ -285,3 +285,118 @@ days = .friday
  when we say Weekday.monday Swift is likely to store that using a single integer such as 0,
  Which is much more efficient to store and check than the letters M, o, n, d, a, y.
 */
+
+/* MARK: - Type Annotations */
+
+/*
+ Swift can usually determine the type of a constant or variable based on the value you assign to it.
+ However, there are times when you don’t assign a value right away, or when you want to specify a different type than what Swift would infer.
+ In those cases, you can use type annotations to explicitly declare the type.
+ */
+
+// explicitly telling the compiler that cities is of type [String]
+// Even though we're also initializing it with an empty array (which would be enough for Swift to infer the type on its own)
+var cities: [String] = []
+
+/* MARK: Explicit Data Types */
+
+// Type annotations let us be explicit about what data types we want
+let surnameAnnon: String = "Lasso"
+var scoreAnnon: Int = 0
+var scoreDouble: Double = 0
+
+// String holds text
+let playerName: String = "Roy"
+
+// Int holds whole numbers
+var luckyNumber: Int = 13
+
+// Double holds decimal numbers:
+let pi: Double = 3.141
+
+// Bool holds either true or false:
+var isAuthenticated: Bool = true
+
+ 
+// Array holds lots of different values, all in the order you add them.
+// This must be specialized, such as [String]
+var albumsAnnon: [String] = ["Red", "Fearless"]
+
+// Dictionary holds lots of different values, where you get to decide how data should be accessed.
+// This must be specialized, such as [String: Int]
+var user: [String: String] = ["id": "@twostraws"]
+
+// Set holds lots of different values, but stores them in an order that’s optimized for checking what it contains.
+// This must be specialized, such as Set<String>
+var books: Set<String> = Set(["The Bluest Eye", "Foundation", "Girl, Woman, Other"])
+
+
+// If you wanted to create an empty array of strings, you’d need to know the type:
+var teams: [String] = [String]()
+
+/* MARK: Invalid Type Annotation Example */
+
+// Type annotations let us override Swift’s type inference,
+// but the code must still be valid.
+// The following line will cause an error:
+// Error: Cannot convert value of type 'String' to specified type 'Int'
+// let scoreInvalid: Int = "Zero"
+
+
+/* MARK: - Type Inference*/
+
+// Swift infers that `surname` is a `String` because it’s assigned a piece of text, and it infers that `score` is an `Int` because it’s assigned a whole number.
+let surnameStr = "Lasso"
+var scoreInt = 0
+
+// Swift infers that clues is of type [String] (an array of strings) based on the initializer [] and the explicit element type String provided in [String]().
+var clues = [String]()
+
+
+
+/* MARK: - Golden Rule */
+
+/*
+ Whether you use type inference or type annotation, one rule always applies: Swift must always know the exact data type of every constant and variable.
+ This is a fundamental part of Swift being a type-safe language
+ It will prevents us from writing invalid code like '5 + true', where the types don’t make sense together.
+ */
+
+/* MARK: - Summary */
+
+/*
+ Arrays, dictionaries, and sets are Swift’s main ways to store collections of values, each with its own use case:
+
+    - Arrays hold ordered values of a single type, accessed by integer indices, and provide handy methods like count, append(), and contains().
+
+    - Dictionaries store values paired with unique keys, requiring a specific type for keys and values, and offer similar functionality to arrays.
+
+    - Sets hold unique values without a defined order and are optimized for quickly checking membership.
+
+ Enums let us define custom types with a fixed set of possible values, useful for representing things like user actions, file types, or notifications.
+
+ Swift requires knowing the type of every constant or variable, mostly using type inference based on assigned values, but you can also specify types explicitly with type annotations.
+
+ In practice, we'll use arrays most often, followed by dictionaries, with sets being more specialized but valuable when needed.
+*/
+
+
+/* MARK: Checkpoint 2 */
+
+/*
+ Create an array of strings (faveGames).
+
+ Print the total number of items with faveGames.count.
+
+ Convert the array to a Set to get unique items.
+
+ Get the count of unique items with uniqueItems.count.
+*/
+
+let faveGames = ["Monster Hunters", "Elden Ring", "Dark Souls: Remastered", "Dark Souls: Remastered"]
+
+print("Total items: \(faveGames.count)")
+
+let uniqueItems = Set(faveGames)
+
+print("Unique items: \(uniqueItems.count)")
