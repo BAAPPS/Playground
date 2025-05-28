@@ -14,9 +14,9 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 
 ### ✅ Days 1–3 Completed
 
-- **Day 1** – Variables, constants, strings, and numbers  [Swift Fundamental 1](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
-- **Day 2** – Booleans, string interpolation, and checkpoint 1  [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
-- **Day 3** – Arrays, dictionaries, sets, and enums   [Swift Fundamental 3](https://github.com/BAAPPS/Playgrounds/blob/main/complexDataTypes.playground/Contents.swift)
+- **Day 1** – Variables, constants, strings, and numbers: [Swift Fundamental 1](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
+- **Day 2** – Booleans, string interpolation, and checkpoint 1:  [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
+- **Day 3** – Arrays, dictionaries, sets, and enums:  [Swift Fundamental 3](https://github.com/BAAPPS/Playgrounds/blob/main/complexDataTypes.playground/Contents.swift)
 
 ---
 
@@ -40,15 +40,19 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 ---
 
-## 📑 What I Learned
+## 📑 Summary of What I Learned
 
 ### Day 1 – Variables, Constants, and Strings
 
+[Variables, Constants, and Strings](https://github.com/BAAPPS/Playground/blob/main/Basic/README.md)
 
 ### Day 2 – Numbers and Booleans
 
+[Numbers and Booleans](https://github.com/BAAPPS/Playground/blob/main/Basic/README.md)
 
 ### Day 3 — Swift Collections & Enums
+
+[Swift Collections & Enums](https://github.com/BAAPPS/Playground/blob/main/ComplexDataTypes/README.md)
 
 ---
 
