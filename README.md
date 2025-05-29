@@ -15,10 +15,14 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 ### ✅ Days 1–3 Completed
 
 - **Day 1** – Variables, constants, strings, and numbers: [Swift Fundamental 1](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
-- **Day 2** – Booleans, string interpolation, and checkpoint 1:  [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
-- **Day 3** – Arrays, dictionaries, sets, and enums:  [Swift Fundamental 3](https://github.com/BAAPPS/Playgrounds/blob/main/complexDataTypes.playground/Contents.swift)
+- **Day 2** – Booleans, string interpolation, and checkpoint 1: [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
+- **Day 3** – Arrays, dictionaries, sets, and enums (Complex data types): [Swift Fundamental 3](https://github.com/BAAPPS/Playgrounds/blob/main/complexDataTypes.playground/Contents.swift)
+- **Day 4** – Type annotations and checkpoint 2 (Complex data types): [Swift Fundamental 4](https://github.com/BAAPPS/Playgrounds/blob/main/complexDataTypes.playground/Contents.swift)
+- **Day 5** – If, switch, and the ternary operator (Conditions): [Swift Fundamental 5](https://github.com/BAAPPS/Playground/blob/main/Conditions/Conditions.playground/Contents.swift)
+- **Day 6** – Loops, summary, and checkpoint 3: [Swift Fundamental 6](https://github.com/BAAPPS/Playground/blob/main/Loops/Loops.playground/Contents.swift)
 
 ---
+
 
 ## 🛠 Requirements
 
@@ -53,6 +57,18 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 ### Day 3 — Swift Collections & Enums
 
 [Swift Collections & Enums](https://github.com/BAAPPS/Playground/blob/main/ComplexDataTypes/README.md)
+
+### Day 4 - Type Annotations
+
+[Type Annotations](https://github.com/BAAPPS/Playground/blob/main/ComplexDataTypes/README.md)
+
+### Day 5 - If, switch, and the ternary operator
+
+[If, switch, and the ternary operator ](https://github.com/BAAPPS/Playground/blob/main/Conditions/README.md)
+
+### Day 6 – Loops, summary, and checkpoint 3
+
+[Loops](https://github.com/BAAPPS/Playground/blob/main/Loops/README.md)
 
 ---
 
