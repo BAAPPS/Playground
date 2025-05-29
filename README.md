@@ -12,7 +12,7 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 
 ## 📚 Topics Covered
 
-### ✅ Days 1–3 Completed
+### ✅ Days 1–6 Completed
 
 - **Day 1** – Variables, constants, strings, and numbers: [Swift Fundamental 1](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
 - **Day 2** – Booleans, string interpolation, and checkpoint 1: [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
