@@ -329,7 +329,7 @@ Swift requires explicit error handling to avoid runtime crashes. The process inv
    enum PasswordError: Error {
        case short, obvious
    }
-````
+  ```
 
 2. **Throwing Errors**
    Write functions marked with `throws` that can throw errors using `throw`:
