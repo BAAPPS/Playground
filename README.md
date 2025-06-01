@@ -12,7 +12,7 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 
 ## 📚 Topics Covered
 
-### ✅ Days 1–6 Completed
+### ✅ Days 1–8 Completed
 
 - **Day 1** – Variables, constants, strings, and numbers: [Swift Fundamental 1](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
 - **Day 2** – Booleans, string interpolation, and checkpoint 1: [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
@@ -20,6 +20,8 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 4** – Type annotations and checkpoint 2 (Complex data types): [Swift Fundamental 4](https://github.com/BAAPPS/Playgrounds/blob/main/complexDataTypes.playground/Contents.swift)
 - **Day 5** – If, switch, and the ternary operator (Conditions): [Swift Fundamental 5](https://github.com/BAAPPS/Playground/blob/main/Conditions/Conditions.playground/Contents.swift)
 - **Day 6** – Loops, summary, and checkpoint 3: [Swift Fundamental 6](https://github.com/BAAPPS/Playground/blob/main/Loops/Loops.playground/Contents.swift)
+- **Day 7** – Functions, parameters, and return values: [Swift Fundamental 7](https://github.com/BAAPPS/Playground/blob/main/Functions/Functions.playground/Contents.swift)
+- **Day 8** – Default values, throwing functions, and checkpoint 4: [Swift Fundamental 8](https://github.com/BAAPPS/Playground/blob/main/Functions/Functions.playground/Contents.swift)
 
 ---
 
@@ -64,11 +66,20 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 ### Day 5 - If, switch, and the ternary operator
 
-[If, switch, and the ternary operator ](https://github.com/BAAPPS/Playground/blob/main/Conditions/README.md)
+[If, switch, and Ternary Operator ](https://github.com/BAAPPS/Playground/blob/main/Conditions/README.md)
 
 ### Day 6 – Loops, summary, and checkpoint 3
 
 [Loops](https://github.com/BAAPPS/Playground/blob/main/Loops/README.md)
+
+### Day 7 – Functions, parameters, and return values
+
+[Functions, and Parameters](https://github.com/BAAPPS/Playground/blob/main/Functions/README.md)
+
+### Day 8 – Default values, throwing functions, and checkpoint 4 
+
+[Functions, and Error Handling](https://github.com/BAAPPS/Playground/blob/main/Functions/README.md)
+
 
 ---
 
