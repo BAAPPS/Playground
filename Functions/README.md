@@ -325,12 +325,13 @@ Swift requires explicit error handling to avoid runtime crashes. The process inv
 
 1. **Defining Errors**  
    Create an `enum` conforming to `Error` listing possible errors:
+   
    ```swift
    enum PasswordError: Error {
        case short, obvious
    }
-  ```
-
+   ```
+   
 2. **Throwing Errors**
    Write functions marked with `throws` that can throw errors using `throw`:
 
@@ -345,7 +346,7 @@ Swift requires explicit error handling to avoid runtime crashes. The process inv
        // Return password strength otherwise
    }
    ```
-
+   
 3. **Handling Errors**
    Call throwing functions with `try` inside a `do` block, and handle errors using `catch`:
 
