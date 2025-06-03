@@ -12,7 +12,7 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 
 ## 📚 Topics Covered
 
-### ✅ Days 1–9 Completed
+### ✅ Days 1–12 Completed
 
 - **Day 1** – Variables, constants, strings, and numbers: [Swift Fundamental 1](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
 - **Day 2** – Booleans, string interpolation, and checkpoint 1: [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
@@ -23,9 +23,13 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 7** – Functions, parameters, and return values: [Swift Fundamental 7](https://github.com/BAAPPS/Playground/blob/main/Functions/Functions.playground/Contents.swift)
 - **Day 8** – Default values, throwing functions, and checkpoint 4: [Swift Fundamental 8](https://github.com/BAAPPS/Playground/blob/main/Functions/Functions.playground/Contents.swift)
 - **Day 9** – Closures, passing functions into functions, and checkpoint 5: [Swift Fundamental 9](https://github.com/BAAPPS/Playground/blob/main/Closures/Closures.playground/Contents.swift)
+- **Day 10** – Structs, computed properties, and property observers: [Swift Fundamental 10](https://github.com/BAAPPS/Playground/blob/main/Structs/Structs.playground/Contents.swift)
+- **Day 11** – Access control, static properties and methods, and checkpoint 6: [Swift Fundamental 11](https://github.com/BAAPPS/Playground/blob/main/Structs/Structs.playground/Contents.swift)
+- **Day 12** – Classes, inheritance, and checkpoint 7: [Swift Fundamental 12](https://github.com/BAAPPS/Playground/blob/main/Classes/Classes.playground/Contents.swift)
+
+
 
 ---
-
 
 ## 🛠 Requirements
 
@@ -84,6 +88,18 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 ### Day 9 – Closures, passing functions into functions, and checkpoint 5
 
 [Closures](https://github.com/BAAPPS/Playground/blob/main/Closures/README.md)
+
+### Day 10 – Structs, computed properties, and property observers
+
+[Structs Basic](https://github.com/BAAPPS/Playground/blob/main/Structs/README.md)
+
+### Day 11 – Access control, static properties and methods, and checkpoint 6
+
+[Structs Advanced](https://github.com/BAAPPS/Playground/blob/main/Structs/README.md)
+
+### Day 12 - Classes, inheritance, and checkpoint 7 
+
+[Classes](https://github.com/BAAPPS/Playground/blob/main/Classes/README.md)
 
 ---
 
