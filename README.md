@@ -12,7 +12,7 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 
 ## 📚 Topics Covered
 
-### ✅ Days 1–12 Completed
+### ✅ Days 1–13 Completed
 
 - **Day 1** – Variables, constants, strings, and numbers: [Swift Fundamental 1](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
 - **Day 2** – Booleans, string interpolation, and checkpoint 1: [Swift Fundamental 2](https://github.com/BAAPPS/Playgrounds/blob/main/Basics.playground/Contents.swift)
@@ -26,8 +26,7 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 10** – Structs, computed properties, and property observers: [Swift Fundamental 10](https://github.com/BAAPPS/Playground/blob/main/Structs/Structs.playground/Contents.swift)
 - **Day 11** – Access control, static properties and methods, and checkpoint 6: [Swift Fundamental 11](https://github.com/BAAPPS/Playground/blob/main/Structs/Structs.playground/Contents.swift)
 - **Day 12** – Classes, inheritance, and checkpoint 7: [Swift Fundamental 12](https://github.com/BAAPPS/Playground/blob/main/Classes/Classes.playground/Contents.swift)
-
-
+- **Day 13** – Protocols, extensions, and checkpoint 8: [Swift Fundamental 13](https://github.com/BAAPPS/Playground/blob/main/Protocols%20and%20Extensions/Protocols%20and%20Extensions.playground/Contents.swift)
 
 ---
 
@@ -100,6 +99,10 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 ### Day 12 - Classes, inheritance, and checkpoint 7 
 
 [Classes](https://github.com/BAAPPS/Playground/blob/main/Classes/README.md)
+
+### Day 13 – Protocols, extensions, and checkpoint 8
+
+[Protocols Extensions, Protocol-Oriented Programming, and Advanced Type Features](https://github.com/BAAPPS/Playground/blob/main/Protocols%20and%20Extensions/README.md)
 
 ---
 
