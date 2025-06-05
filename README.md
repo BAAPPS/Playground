@@ -31,6 +31,7 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 
 ### Days 16-24: Starting SwiftUI (Incomplete ❌)
 
+- **Day 16-18** – Project 1, parts one to three: [WeSplit](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_1/WeSplit/WeSplit/ContentView.swift)
 
 ---
 
@@ -116,6 +117,9 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 ### Days 16-24: Starting SwiftUI (Incomplete ❌)
 
+#### Day 16-18 – Project 1, parts one to three
+
+[WeSplit](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_1/WeSplit/README.md)
 
 ---
 
