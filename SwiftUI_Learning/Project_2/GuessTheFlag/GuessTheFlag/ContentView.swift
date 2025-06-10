@@ -7,6 +7,36 @@
 
 import SwiftUI
 
+struct Title: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.largeTitle)
+            .foregroundStyle(.white)
+            .padding()
+            .background(.blue)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+extension View {
+    func titleStyle() -> some View {
+        modifier(Title())
+    }
+}
+
+struct FlagImage:View{
+    let name: String
+    var body: some View{
+        Image(name)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 100, height: 60)
+            .clipShape(Rectangle())
+            .shadow(radius: 5)
+    }
+}
+
+
 struct ContentView: View {
     
     @State private var showingScore = false
@@ -68,8 +98,7 @@ struct ContentView: View {
             
             VStack {
                 Text("Guess the Flag")
-                    .font(.largeTitle.weight(.bold))
-                    .foregroundStyle(.white)
+                    .titleStyle()
                 Spacer()
                 Text("Score: \(userScore)")
                     .foregroundStyle(.white)
@@ -91,12 +120,7 @@ struct ContentView: View {
                             Button{
                                 flagTapped(index)
                             }label:{
-                                Image(countries[index])
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 60)
-                                    .clipShape(.rect)
-                                    .shadow(radius: 5)
+                                FlagImage(name:countries[index])
                             }
                         }
                     }

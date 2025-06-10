@@ -47,14 +47,14 @@ struct ContentView: View {
                     .pickerStyle(.menu)
                 }
                 
-//                Section("How much tip do you want to leave"){
-//                    Picker("Tip Percentage", selection: $tipPercentage){
-//                        ForEach(tipPercentages, id: \.self){
-//                            Text($0, format: .percent)
-//                        }
-//                    }
-//                    .pickerStyle(.segmented)
-//                }
+                //                Section("How much tip do you want to leave"){
+                //                    Picker("Tip Percentage", selection: $tipPercentage){
+                //                        ForEach(tipPercentages, id: \.self){
+                //                            Text($0, format: .percent)
+                //                        }
+                //                    }
+                //                    .pickerStyle(.segmented)
+                //                }
                 
                 Section("How much tip do you want to leave"){
                     Picker("Tip Percentage", selection: $tipPercentage){
@@ -70,9 +70,16 @@ struct ContentView: View {
                 }
                 
                 Section("Total Check Amount") {
-                    Text(totalCheckAmount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                    ZStack {
+                        (tipPercentage == 0 ? Color.red : Color.green)
+                                   .frame(maxWidth: .infinity)
+                        Text(totalCheckAmount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                            .foregroundColor(.white)
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                    }
+                    .listRowInsets(EdgeInsets())
                 }
-
             }
             .navigationTitle("WeSplit")
             .navigationBarTitleDisplayMode(.inline)
