@@ -4,7 +4,7 @@
 
 ## Day 32 – Project 6, part one
 
---
+---
 
 ## Implicit Animations in SwiftUI
 
