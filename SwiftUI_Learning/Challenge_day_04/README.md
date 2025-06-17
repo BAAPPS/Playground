@@ -45,25 +45,25 @@ This project helps you build deeper SwiftUI skills like:
 
 ## Project Structure
 
-* `**TitleScreen.swift**`: The launch screen of the app. Features:
+* `TitleScreen.swift`: The launch screen of the app. Features:
 
   * Animated “Play Game” button with scaling and color change on press.
   * Overlapping **gradient-filled circles** using `HalfCircleScreen` for a custom background.
   * Uses `.fullScreenCover` to present the main game.
   * `HalfCircleScreen`: Helper view for the background gradient circles on the title screen.
 
-* `**GameScreen**`: Core game logic and UI:
+* `GameScreen`: Core game logic and UI:
 
   * Tracks moves, score, and current sum.
   * Displays target sum in a toolbar.
   * Animates and removes cards once flipped.
   * Triggers a congratulatory alert when the target is reached.
 
-* `**FlipCardView.swift**`: Reusable card view with:
+* `FlipCardView.swift`: Reusable card view with:
   * Tap gesture handling.
   * Smooth **3D flip animation** using `.rotation3DEffect`.
 
-* `**Card** and GameData`: Logic layer:
+* `Card and GameData`: Logic layer:
 
   * `Card`: Struct holding card value and flipped state.
   * `GameData`: Handles random card generation and ensures target is always achievable by summing two cards.
