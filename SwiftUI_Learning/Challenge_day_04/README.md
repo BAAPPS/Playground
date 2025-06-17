@@ -1,59 +1,86 @@
-# Flip & Sum - Guess the Card Sum Value 
 
-A fun and interactive SwiftUI game where you're challenged to match a randomly generated target value by selecting cards with hidden values from a deck. 
+# Flip & Sum – Guess the Card Sum Value
 
-The goal is to find the right combination using the fewest moves possible.
+**Flip & Sum** is an interactive SwiftUI game where your goal is to reach a randomly generated target sum by flipping hidden-value cards from a stacked deck. But there’s a twist — every flip counts as a move, and points 
+above the target get added to your score!
 
 ---
 
 ## What You’ll Build
 
-A SwiftUI-based card game where players:
+A fun and animated card game built entirely with SwiftUI where players:
 
-* Are given a **target number**.
-* Choose from a stack of hidden **cards** (each with a random value).
-* Try to match the **target sum** using the fewest possible selections.
-* Experience **smooth animations** when cards are selected.
-* Get instant feedback if the selected sum is too low, too high, or a match.
+* Are shown a **Target Sum** at the top.
+* Flip cards to **reveal hidden values**.
+* Try to match or exceed the target using **as few moves as possible**.
+* Track **Current Sum**, **Moves**, and **Score**.
+* See **instant feedback** through animations and a congratulatory alert once the target is reached.
 
-Features include:
+---
 
-* Interactive UI with dynamic value feedback.
-* Shuffle/reset options from the toolbar.
-* Score tracking.
-* Animations for card flips and match success.
-* Progress tracking with rounds or limited turns.
+## Features
+
+* Random deck of cards generated each round.
+* A guaranteed reachable **Target Sum**, based on two of the generated cards.
+* Smooth **card flip animations** with 3D effects and offset stacking.
+* **Current Sum**, **Move Counter**, and **Score Tracker** updated in real-time.
+* **Alert** when the target is reached, including bonus points for overshooting the target.
+* **Reset Button** regenerates a new deck, target, and resets all game stats.
 
 ---
 
 ## What You’ll Learn
 
-By completing this project, you'll gain experience in:
+This project helps you build deeper SwiftUI skills like:
 
-* **@State**: Property wrappers to manage state and enable two-way binding.
-* **Toolbar integration** with SwiftUI’s `.toolbar()` modifier.
-* **Animations**: Custom transitions and flip effects for card interactions.
-* **Custom ViewModifiers** for card appearance and feedback styling.
-* **Custom containers**: Using custom stacks or layout structs for card grids or piles.
-* **Game logic structuring** in SwiftUI: separating logic from view state.
-* **Random number generation** and logic control using `Int.random(in:)`.
-* **Modular SwiftUI views** with reusable components and data binding.
+* Using `@State` to manage UI-driven game logic (moves, sum, cards, score).
+* Smooth animations with `.rotation3DEffect`, `.offset`, and `.spring()`.
+* Creating reusable components like `FlipCardView` with **callback closures**.
+* Displaying conditional `.alert` messages with `isPresented`.
+* Structuring your code with **data models** like `Card` and `GameData` to separate logic from view state.
+* Performing logic after animations using `DispatchQueue.main.asyncAfter`.
 
 ---
 
+
 ## Project Structure
 
+* `**TitleScreen.swift**`: The launch screen of the app. Features:
 
+  * Animated “Play Game” button with scaling and color change on press.
+  * Overlapping **gradient-filled circles** using `HalfCircleScreen` for a custom background.
+  * Uses `.fullScreenCover` to present the main game.
+  * `HalfCircleScreen`: Helper view for the background gradient circles on the title screen.
 
-## Final Thought
+* `**GameScreen**`: Core game logic and UI:
 
-This project is perfect for SwiftUI learners who want to apply practical app-building skills while learning deeper topics like data flow, animations, layout control, and custom modifiers. 
+  * Tracks moves, score, and current sum.
+  * Displays target sum in a toolbar.
+  * Animates and removes cards once flipped.
+  * Triggers a congratulatory alert when the target is reached.
 
-You’ll walk away with a better understanding of SwiftUI’s powerful declarative tools and how to structure a fun, interactive app.
+* `**FlipCardView.swift**`: Reusable card view with:
+  * Tap gesture handling.
+  * Smooth **3D flip animation** using `.rotation3DEffect`.
 
-It’s not just about matching numbers — it’s about building intuition for how SwiftUI apps come together.
+* `**Card** and GameData`: Logic layer:
 
-> Challenge yourself to reduce the turn count. Can you win in the least moves possible?
+  * `Card`: Struct holding card value and flipped state.
+  * `GameData`: Handles random card generation and ensures target is always achievable by summing two cards.
+
+---
+
+## Final Thoughts
+
+This project is great for SwiftUI learners who want to explore animations, state management, and basic game logic in a fun and visually rewarding way.
+
+You’ll finish with:
+
+* A deeper understanding of **SwiftUI's data flow**.
+* Confidence using `@State`, closures, and custom views.
+* A fun project that’s easy to expand — add a timer, lives, levels, or multiplayer mode!
+
+> Can you beat your best score using the fewest possible moves? Flip smart!
 
 ---
 
