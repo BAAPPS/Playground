@@ -492,3 +492,604 @@ if let data = UserDefaults.standard.data(forKey: "UserData") {
 ## Day 37 – Project 7, part two
 
 ---
+
+## iExpense: Expense Tracker with SwiftUI
+
+This project introduces a more scalable way of managing and persisting a list of expenses using a class powered by `@Observable` and tracked in the UI using `@State`.
+
+Rather than using a simple array inside a view, we'll separate data concerns into a dedicated model, which allows us to store, modify, and eventually persist expenses cleanly.
+
+
+### Data Model
+
+#### `ExpenseItem`
+
+Represents a single expense.
+
+```swift
+struct ExpenseItem {
+    let name: String
+    let type: String
+    let amount: Double
+}
+````
+
+### `Expenses`
+
+An observable class that holds an array of `ExpenseItem` entries.
+
+```swift
+@Observable
+class Expenses {
+    var items = [ExpenseItem]()
+}
+```
+
+> Marking `Expenses` as `@Observable` allows SwiftUI to update the UI whenever `items` changes.
+
+
+### SwiftUI View: Listing Expenses
+
+We store an instance of `Expenses` in our view using `@State`:
+
+```swift
+@State private var expenses = Expenses()
+```
+
+> `@State` ensures the reference to the class stays alive.
+> `@Observable` ensures SwiftUI re-renders when `items` is changed.
+
+### Displaying the List
+
+```swift
+NavigationStack {
+    List {
+        ForEach(expenses.items, id: \.name) { item in
+            Text(item.name)
+        }
+        .onDelete(perform: removeItems)
+    }
+    .navigationTitle("iExpense")
+    .toolbar {
+        Button("Add Expense", systemImage: "plus") {
+            let expense = ExpenseItem(name: "Test", type: "Personal", amount: 5)
+            expenses.items.append(expense)
+        }
+    }
+}
+```
+
+### Deleting Items
+
+To support swipe-to-delete functionality, we implement this function:
+
+```swift
+func removeItems(at offsets: IndexSet) {
+    expenses.items.remove(atOffsets: offsets)
+}
+```
+
+Attach it using `.onDelete(perform:)` after `ForEach` loop:
+
+```swift
+.onDelete(perform: removeItems)
+```
+
+### ⚠️ About `id: \.name`
+
+Using `.name` as the unique identifier may cause problems if multiple items have the same name:
+
+```swift
+ForEach(expenses.items, id: \.name)
+```
+
+> ⚠️ This can lead to broken animations or bugs.
+> ✅ In a real-world app, prefer using a unique identifier like `UUID`.
+
+### Recap
+
+| Feature                    | Usage Example                              |
+| -------------------------- | ------------------------------------------ |
+| Define item model          | `struct ExpenseItem { ... }`               |
+| Track items with a class   | `@Observable class Expenses`               |
+| Hold data in view          | `@State private var expenses = Expenses()` |
+| Display list with deletion | `List → ForEach → .onDelete()`             |
+| Add items dynamically      | `.toolbar` with button and append          |
+
+---
+
+## Ensuring Uniqueness in Dynamic Lists
+
+When building dynamic views in SwiftUI using `List` and `ForEach`, it's crucial that SwiftUI can uniquely identify each row. This helps it animate changes, update UI efficiently, and avoid strange bugs.
+
+### The Problem
+
+Previously, we wrote:
+
+```swift
+ForEach(expenses.items, id: \.name) { item in
+    Text(item.name)
+}
+````
+
+However, we were adding test data like this:
+
+```swift
+let expense = ExpenseItem(name: "Test", type: "Personal", amount: 5)
+```
+
+Since the `name` value was the same (`"Test"`), the list items weren’t actually unique. This confused SwiftUI, leading to unreliable UI behavior when deleting or updating rows.
+
+### The Solution: Use `UUID()`
+
+We updated our `ExpenseItem` to include a universally unique identifier (UUID):
+
+```swift
+struct ExpenseItem {
+    let id = UUID()
+    let name: String
+    let type: String
+    let amount: Double
+}
+```
+
+This guarantees that each item has a truly unique identifier.
+
+Then, we updated `ForEach` to:
+
+```swift
+ForEach(expenses.items, id: \.id) { item in
+    Text(item.name)
+}
+```
+
+This ensures SwiftUI always knows exactly which item changed.
+
+
+###  Even Better: Conform to `Identifiable`
+
+We further improved the code by conforming to the `Identifiable` protocol:
+
+```swift
+struct ExpenseItem: Identifiable {
+    let id = UUID()
+    let name: String
+    let type: String
+    let amount: Double
+}
+```
+
+> The `Identifiable` protocol only requires one thing: an `id` property that’s unique.
+
+With that in place, SwiftUI automatically knows how to identify each item.
+
+We can now simplify our `ForEach` even more:
+
+```swift
+ForEach(expenses.items) { item in
+    Text(item.name)
+}
+```
+
+This is cleaner, less error-prone, and more SwiftUI-native.
+
+###  Why This Matters
+
+* Ensures correct animations and UI behavior when items change.
+* Prevents logical bugs caused by duplicate identifiers.
+* Keeps your code clean and future-proof with `Identifiable`.
+
+### Recap
+
+| Issue                            | Fix                                        |
+| -------------------------------- | ------------------------------------------ |
+| Duplicate `id` keys in `ForEach` | Use `UUID()` in your model                 |
+| Manual `id` in `ForEach`         | Conform model to `Identifiable`            |
+| Verbose `ForEach` code           | Let SwiftUI infer `id` with `Identifiable` |
+
+Now your list is dynamic, reliable, and SwiftUI-optimized! ✅
+
+---
+
+## Adding New Expense Items with Shared Data
+
+To allow users to add new expenses, we’ll create a separate view (`AddView`) that shares the same data model (`Expenses`) with our main view (`ContentView`). This step introduces SwiftUI sheets, shared state management using `@Observable`, and view composition.
+
+### Why `@Observable` Matters
+
+Classes marked with `@Observable` (or `@StateObject`/`@ObservedObject`) allow data to be shared between views. When properties of the class change, **only views that use those properties will update** — making SwiftUI efficient and reactive.
+
+### Step-by-Step: Creating `AddView.swift`
+
+We start by creating a new SwiftUI view to collect user input for a new expense:
+
+```swift
+struct AddView: View {
+    @State private var name = ""
+    @State private var type = "Personal"
+    @State private var amount = 0.0
+
+    let types = ["Business", "Personal"]
+
+    var expenses: Expenses
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                TextField("Name", text: $name)
+
+                Picker("Type", selection: $type) {
+                    ForEach(types, id: \.self) {
+                        Text($0)
+                    }
+                }
+
+                TextField("Amount", value: $amount, format: .currency(code: "USD"))
+                    .keyboardType(.decimalPad)
+            }
+            .navigationTitle("Add new expense")
+        }
+    }
+}
+````
+
+> You'll need to localize the currency code in a future challenge.
+
+### Presenting `AddView` in `ContentView`
+
+We use a `sheet()` to display `AddView` modally from `ContentView`.
+
+#### 1. Track Sheet State
+
+Add a Boolean to control sheet visibility:
+
+```swift
+@State private var showingAddExpense = false
+```
+
+#### 2. Present the Sheet with Shared Data
+
+Attach a `.sheet()` modifier to your view and pass in the shared `expenses`:
+
+```swift
+.sheet(isPresented: $showingAddExpense) {
+    AddView(expenses: expenses)
+}
+```
+
+#### 3. Toggle the Sheet with a Button
+
+Update the “+” button to toggle the sheet state:
+
+```swift
+Button("Add Expense", systemImage: "plus") {
+    showingAddExpense = true
+}
+```
+
+### Fixing the Preview
+
+Since `AddView` now requires an `Expenses` instance, update the preview code to provide a dummy value:
+
+```swift
+#Preview {
+    AddView(expenses: Expenses())
+}
+```
+
+### Result
+
+You now have a shared data model (`Expenses`) passed between `ContentView` and `AddView`. When the user taps the “+” button:
+
+1. A sheet appears (`AddView`)
+2. The user fills out the form
+3. When data is saved (to be implemented next), `Expenses` updates
+4. SwiftUI automatically refreshes `ContentView`
+
+### Recap
+
+| Feature                         | Role                                          |
+| ------------------------------- | --------------------------------------------- |
+| `@Observable` or `@StateObject` | Enables shared and reactive data across views |
+| `.sheet()`                      | Presents modals in SwiftUI                    |
+| Data passed via initializer     | Keeps both views in sync with the same object |
+| `@State` inside `AddView`       | Stores user input locally until it’s saved    |
+
+This is the foundation for adding, editing, and saving expenses in a modern, responsive SwiftUI app.
+
+--- 
+
+## Saving and Loading Expense Data
+
+Now that the UI is functional — we can add and delete expenses, and launch a sheet — it’s time to actually **store the user’s data** and make sure it persists across app launches.
+
+### What We’ll Solve
+
+- Capture the user’s input in `AddView`
+- Save expense items to `UserDefaults` using `Codable`
+- Load saved items when the app launches
+- Sync both views with shared `Expenses` data
+
+
+### Step 1: Save New Expense Items
+
+In `AddView`, add a **Save** button inside a `.toolbar` modifier:
+
+```swift
+.toolbar {
+    Button("Save") {
+        let item = ExpenseItem(name: name, type: type, amount: amount)
+        expenses.items.append(item)
+    }
+}
+````
+
+> This works because `expenses` is a reference to the shared `Expenses` class from `ContentView`.
+
+
+### Step 2: Make `ExpenseItem` Codable
+
+To save and load our data, Swift needs to convert it to and from JSON. We do this by conforming `ExpenseItem` to `Codable`:
+
+```swift
+struct ExpenseItem: Identifiable, Codable {
+    var id = UUID()
+    let name: String
+    let type: String
+    let amount: Double
+}
+```
+
+> ⚠️ We use `var` for `id` to silence a Swift decoding warning. It still works as intended.
+
+### Step 3: Save Changes Automatically
+
+Use a `didSet` observer on the `items` array inside the `Expenses` class. This will save every change to `UserDefaults` as soon as it happens:
+
+```swift
+var items = [ExpenseItem]() {
+    didSet {
+        if let encoded = try? JSONEncoder().encode(items) {
+            UserDefaults.standard.set(encoded, forKey: "Items")
+        }
+    }
+}
+```
+
+> `JSONEncoder().encode(items)` transforms our Swift array into a JSON `Data` object ready for storage.
+
+### Step 4: Load Saved Items on App Launch
+
+Create a custom `init()` inside `Expenses` to load saved data from `UserDefaults` using `JSONDecoder`:
+
+```swift
+init() {
+    if let savedItems = UserDefaults.standard.data(forKey: "Items") {
+        if let decodedItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems) {
+            items = decodedItems
+            return
+        }
+    }
+
+    items = []
+}
+```
+
+> `.self` tells Swift we’re referencing the type itself — in this case, the array type `[ExpenseItem]`.
+
+
+### Final Result
+
+1. User enters expense in `AddView`
+2. Expense is added to shared `Expenses.items`
+3. `didSet` saves new state to `UserDefaults`
+4. Next launch, `init()` loads data from disk
+5. App shows correct data automatically
+
+### Recap
+
+| Feature                | Role                                    |
+| ---------------------- | --------------------------------------- |
+| `Codable`              | Enables easy archiving and unarchiving  |
+| `UserDefaults`         | Stores user data persistently           |
+| `didSet` on `items`    | Auto-saves whenever changes occur       |
+| `init()` in `Expenses` | Loads data when app starts              |
+| `AddView.toolbar Save` | Creates and appends a new `ExpenseItem` |
+
+With this structure, your app now **persists expenses across launches** and keeps all views in sync using a shared observable model. This is a huge step toward a complete SwiftUI app.
+
+---
+
+## Final Polish: Dismiss Sheet & Display Expense Details
+
+Before wrapping up the iExpense project, we took care of two final issues that affect the user experience:
+
+
+### Problems We Solved
+
+1. **AddView doesn’t dismiss after saving**
+2. **Expense list shows only the name — no type or amount**
+
+Let’s walk through the fixes.
+
+
+### 1. Automatically Dismiss `AddView`
+
+When users save an expense, they should be returned to the main view. SwiftUI handles this using an environment value called `dismiss`.
+
+**Step 1:** Add this property to `AddView`:
+
+```swift
+@Environment(\.dismiss) var dismiss
+````
+
+> This lets SwiftUI handle dismissing the view by setting the related `.sheet` binding back to `false`.
+
+**Step 2:** Call `dismiss()` after saving the new item:
+
+```swift
+Button("Save") {
+    let item = ExpenseItem(name: name, type: type, amount: amount)
+    expenses.items.append(item)
+    dismiss()
+}
+```
+
+> Now when a user saves, `AddView` disappears automatically.
+
+### 2. Show Expense Type and Amount
+
+We want the main list to show more detail than just the name. A typical iOS layout includes:
+
+* Title (bold)
+* Subtitle (secondary info)
+* Right-aligned metadata (like price)
+
+Replace the old list code with a full stack-based layout:
+
+```swift
+ForEach(expenses.items) { item in
+    HStack {
+        VStack(alignment: .leading) {
+            Text(item.name)
+                .font(.headline)
+            Text(item.type)
+        }
+
+        Spacer()
+
+        Text(item.amount, format: .currency(code: "USD"))
+    }
+}
+```
+
+> We used a `VStack` inside an `HStack`, with a `Spacer()` to push the amount to the right — a very common layout in iOS apps.
+
+### Recap
+
+| Feature                   | Benefit                                                |
+| ------------------------- | ------------------------------------------------------ |
+| `@Environment(\.dismiss)` | Cleanly exits `AddView` after saving                   |
+| Improved `ForEach` layout | Displays type and amount in a structured, readable way |
+| `.currency(code: "USD")`  | Formats values using system currency conventions       |
+
+
+---
+
+## Challenges & Solutions
+
+### Challenge 1: Use the User’s Preferred Currency
+
+**Problem**: The app originally formatted amounts in hard-coded US dollars (`USD`), regardless of the user’s locale.
+
+**Solution**:
+Used `Locale.current.currency?.identifier` to retrieve the user's preferred currency and used a fallback to USD when not available.
+
+```swift
+Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+````
+
+---
+
+### Challenge 2: Conditional Styling Based on Expense Amount
+
+**Problem**: Style list items differently depending on how expensive they are:
+
+* Under $10 → one style
+* Under $100 → another
+* Over $100 → a third
+
+**Solution**:
+Extended `ExpenseItem` to return a color based on amount and applied it to `.listRowBackground`.
+
+```swift
+extension ExpenseItem {
+    var amountColor: Color {
+        switch amount {
+        case ..<10:
+            return .green
+        case ..<100:
+            return .orange
+        default:
+            return .blue
+        }
+    }
+}
+```
+
+Applied it like so:
+
+```swift
+.listRowBackground(item.amountColor)
+```
+
+---
+
+### Challenge 3: Split List Into Personal and Business Sections
+
+**Problem**: All expenses were displayed in a single list without category separation, making it harder to navigate.
+
+**Solution**:
+Grouped expenses into two `Section` views by filtering items:
+
+```swift
+List {
+    Section("Personal") {
+        ForEach(expenses.items.filter { $0.type == "Personal" }) { item in
+            ExpenseRow(item: item)
+        }
+    }
+
+    Section("Business") {
+        ForEach(expenses.items.filter { $0.type == "Business" }) { item in
+            ExpenseRow(item: item)
+        }
+    }
+}
+```
+
+Used a reusable view `ExpenseRow` for clean and readable code:
+
+```swift
+struct ExpenseRow: View {
+    let item: ExpenseItem
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(item.name)
+                    .font(.headline)
+                Text(item.type)
+            }
+            Spacer()
+            Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .listRowBackground(item.amountColor)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .foregroundColor(.white)
+    }
+}
+```
+
+### Concepts Practiced
+
+* `Locale` and currency formatting
+* Ternary and `switch`-based conditional styling
+* SwiftUI list sectioning
+* Reusable view components
+* `.listRowBackground` and styling customization
+
+---
+
+### Recap
+
+These challenges pushed practical understanding of SwiftUI layout, logic, and UI separation. 
+
+By completing them, I gained hands-on experience with:
+
+* Environment-aware formatting
+* Dynamic styling
+* Data categorization
+* SwiftUI best practices for clean UI
+
