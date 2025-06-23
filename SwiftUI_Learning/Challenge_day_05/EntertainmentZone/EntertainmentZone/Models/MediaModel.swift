@@ -11,7 +11,7 @@ struct Media: Codable, Identifiable {
     let id: Int
     let title: String
     let mediaType: String
-    let releaseDate: String
+    let releaseDate: Date?
     let description: String
     let imageUrl: String
     let castIds: [Int]

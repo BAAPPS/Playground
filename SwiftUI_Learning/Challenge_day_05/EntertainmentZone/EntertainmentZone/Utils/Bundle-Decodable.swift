@@ -22,6 +22,10 @@ extension Bundle {
         // decoding strategy when decoding JSON with "_" as a key
         // castIds -> cast_ids
         decoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        decoder.dateDecodingStrategy = .formatted(formatter)
 
         do {
             return try decoder.decode(T.self, from: data)

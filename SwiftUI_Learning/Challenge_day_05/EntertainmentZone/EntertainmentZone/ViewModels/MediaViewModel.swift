@@ -14,6 +14,10 @@ class MediaViewModel: Identifiable{
     
     var id: Int {media.id}
     
+    var releaseDateFormatted: String {
+        media.releaseDate?.formatted(date: .abbreviated, time: .omitted) ?? "N/A"
+    }
+    
     init(media: Media, allCast: [Cast]){
         self.media = media
         // Filter cast members whose id is in media.castIds

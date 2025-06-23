@@ -16,50 +16,11 @@ struct ContentView: View {
         media.map{MediaViewModel(media: $0, allCast: cast)}
     }
     
+    @State private var showMediaDetails = false
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack {
-                    Text("Cast count: \(cast.count)")
-                    Text("Media count: \(media.count)")
-                    Text("MediaViewModels count: \(mediaViewModel.count)")
-                    
-                    ForEach(mediaViewModel) { mediaVM in
-                        VStack{
-                            Text(mediaVM.media.title)
-                                .font(.headline)
-                            
-                            if let url = URL(string: mediaVM.media.imageUrl){
-                                AsyncImage(url:url) { phase in
-                                    
-                                    switch phase {
-                                    case .empty:
-                                        ProgressView()
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 200)
-                                    case .failure:
-                                        Image(systemName: "photo")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 200)
-                                    @unknown default:
-                                        EmptyView()
-                                    }
-                                    
-                                }
-                            }
-                            
-                        }
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Entertainment Zone")
-            .navigationBarTitleDisplayMode(.inline)
+            FullScreenMediaView(mediaViewModel: mediaViewModel)
         }
     }
 }
