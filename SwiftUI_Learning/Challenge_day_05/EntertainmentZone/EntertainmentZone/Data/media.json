@@ -1,0 +1,210 @@
+[
+    {
+      "id": 1,
+      "title": "Breaking Bad",
+      "media_type": "tv",
+      "release_date": "2008-01-20",
+      "description": "A high school chemistry teacher turned methamphetamine producer navigates the dangers of the drug trade.",
+      "image_url": "https://image.tmdb.org/t/p/original/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+      "cast_ids": [101, 102, 103, 104, 105]
+    },
+    {
+      "id": 2,
+      "title": "Stranger Things",
+      "media_type": "tv",
+      "release_date": "2016-07-15",
+      "description": "A group of kids uncover supernatural forces and secret experiments in their small town.",
+      "image_url": "https://image.tmdb.org/t/p/w500/x2LSRK2Cm7MZhjluni1msVJ3wDF.jpg",
+      "cast_ids": [201, 202, 203, 204, 205]
+    },
+    {
+      "id": 3,
+      "title": "Game of Thrones",
+      "media_type": "tv",
+      "release_date": "2011-04-17",
+      "description": "Noble families vie for control of the Iron Throne in a land full of betrayal and magic.",
+      "image_url": "https://image.tmdb.org/t/p/w500/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg",
+      "cast_ids": [301, 302, 303, 304, 305]
+    },
+    {
+      "id": 4,
+      "title": "The Mandalorian",
+      "media_type": "tv",
+      "release_date": "2019-11-12",
+      "description": "A lone bounty hunter in the outer reaches of the galaxy protects a mysterious child.",
+      "image_url": "https://image.tmdb.org/t/p/w500/sWgBv7LV2PRoQgkxwlibdGXKz1S.jpg",
+      "cast_ids": [401, 402, 403, 404]
+    },
+    {
+      "id": 5,
+      "title": "The Witcher",
+      "media_type": "tv",
+      "release_date": "2019-12-20",
+      "description": "Geralt of Rivia, a monster hunter, struggles to find his place in a world where people often prove worse than beasts.",
+      "image_url": "https://image.tmdb.org/t/p/w500/zrPpUlehQaBf8YX2NrVrKK8IEpf.jpg",
+      "cast_ids": [501, 502, 503, 504, 505]
+    },
+    {
+      "id": 6,
+      "title": "Friends",
+      "media_type": "tv",
+      "release_date": "1994-09-22",
+      "description": "Follows the lives of six friends living in New York City as they navigate love and careers.",
+      "image_url": "https://image.tmdb.org/t/p/w500/iUjhVYf23hXF1EyqdhKSjQNT7uo.jpg",
+      "cast_ids": [601, 602, 603, 604, 605, 606]
+    },
+    {
+      "id": 7,
+      "title": "The Office",
+      "media_type": "tv",
+      "release_date": "2005-03-24",
+      "description": "A mockumentary on a group of typical office workers, where the workday consists of ego clashes, inappropriate behavior, and tedium.",
+      "image_url": "https://image.tmdb.org/t/p/w500/qWnJzyZhyy74gjpSjIXWmuk0ifX.jpg",
+      "cast_ids": [701, 702, 703, 704, 705]
+    },
+    {
+      "id": 8,
+      "title": "Narcos",
+      "media_type": "tv",
+      "release_date": "2015-08-28",
+      "description": "The true story of Colombia's infamously violent and powerful drug cartels.",
+      "image_url": "https://image.tmdb.org/t/p/w500/isHoM9LQOYi6VrF4SWrghWCR5H9.jpg",
+      "cast_ids": [801, 802, 803, 804, 805]
+    },
+    {
+      "id": 9,
+      "title": "Black Mirror",
+      "media_type": "tv",
+      "release_date": "2011-12-04",
+      "description": "An anthology series exploring a twisted, high-tech multiverse where humanity's greatest innovations and darkest instincts collide.",
+      "image_url": "https://image.tmdb.org/t/p/w500/hi3bz1FraEjNA4PWASMA8nmSwT4.jpg",
+      "cast_ids": [901, 902, 903, 904]
+    },
+    {
+      "id": 10,
+      "title": "Westworld",
+      "media_type": "tv",
+      "release_date": "2016-10-02",
+      "description": "Set in a futuristic amusement park staffed by android hosts, where guests can live out their fantasies.",
+      "image_url": "https://image.tmdb.org/t/p/w500/ALlSU9du9iRiKIIoY1sREGNqQ5.jpg",
+      "cast_ids": [1001, 1002, 1003, 1004]
+    },
+    {
+      "id": 11,
+      "title": "Parks and Recreation",
+      "media_type": "tv",
+      "release_date": "2009-04-09",
+      "description": "The absurd antics of an Indiana town's public officials as they pursue sundry projects to make their city a better place.",
+      "image_url": "https://image.tmdb.org/t/p/w500/6KrY1WOj8UaCtrEAIW9rLh0UtD6.jpg",
+      "cast_ids": [1101, 1102, 1103, 1104, 1105]
+    },
+    {
+      "id": 12,
+      "title": "Money Heist",
+      "media_type": "tv",
+      "release_date": "2017-05-02",
+      "description": "A group of robbers assault the Royal Mint of Spain to print billions of euros.",
+      "image_url": "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
+      "cast_ids": [1201, 1202, 1203, 1204]
+    },
+    {
+      "id": 13,
+      "title": "The Crown",
+      "media_type": "tv",
+      "release_date": "2016-11-04",
+      "description": "Follows the political rivalries and romance of Queen Elizabeth II's reign.",
+      "image_url": "https://image.tmdb.org/t/p/w500/1M876KPjulVwppEpldhdc8V4o68.jpg",
+      "cast_ids": [1301, 1302, 1303, 1304]
+    },
+    {
+      "id": 14,
+      "title": "The Boys",
+      "media_type": "tv",
+      "release_date": "2019-07-26",
+      "description": "A group of vigilantes set out to take down corrupt superheroes.",
+      "image_url": "https://image.tmdb.org/t/p/w500/2zmTngn1tYC1AvfnrFLhxeD82hz.jpg",
+      "cast_ids": [1401, 1402, 1403, 1404]
+    },
+    {
+      "id": 15,
+      "title": "Better Call Saul",
+      "media_type": "tv",
+      "release_date": "2015-02-08",
+      "description": "The trials and tribulations of criminal lawyer Jimmy McGill before his transformation into Saul Goodman.",
+      "image_url": "https://image.tmdb.org/t/p/w500/zjg4jpK1Wp2kiRvtt5ND0kznako.jpg",
+      "cast_ids": [1501, 1502, 1503, 1504]
+    },
+    {
+      "id": 16,
+      "title": "Dexter",
+      "media_type": "tv",
+      "release_date": "2006-10-01",
+      "description": "A blood spatter analyst for the Miami Metro Police who moonlights as a serial killer targeting criminals.",
+      "image_url": "https://media.themoviedb.org/t/p/w500/q8dWfc4JwQuv3HayIZeO84jAXED.jpg",
+      "cast_ids": [1601, 1602, 1603, 1604]
+    },
+    {
+      "id": 17,
+      "title": "House of Cards",
+      "media_type": "tv",
+      "release_date": "2013-02-01",
+      "description": "A ruthless politician manipulates his way to the presidency of the United States.",
+      "image_url": "https://media.themoviedb.org/t/p/w500/4PUWhM8KPmRgjSeandtmABx8ii.jpg",
+      "cast_ids": [1701, 1702, 1703, 1704]
+    },
+    {
+      "id": 18,
+      "title": "Sherlock",
+      "media_type": "tv",
+      "release_date": "2010-07-25",
+      "description": "Modern update finds the famous sleuth and his doctor partner solving crime in 21st century London.",
+      "image_url": "https://media.themoviedb.org/t/p/w500/cIfGAkpvWD2zxHrXzhv3uptYbyV.jpg",
+      "cast_ids": [1801, 1802, 1803, 1804]
+    },
+    {
+      "id": 19,
+      "title": "Vikings",
+      "media_type": "tv",
+      "release_date": "2013-03-03",
+      "description": "The adventures of Ragnar Lothbrok, a legendary Norse hero.",
+      "image_url": "https://image.tmdb.org/t/p/w500/bQLrHIRNEkE3PdIWQrZHynQZazu.jpg",
+      "cast_ids": [1901, 1902, 1903, 1904]
+    },
+    {
+      "id": 20,
+      "title": "The Flash",
+      "media_type": "tv",
+      "release_date": "2014-10-07",
+      "description": "After being struck by lightning, Barry Allen becomes the fastest man alive.",
+      "image_url": "https://image.tmdb.org/t/p/w500/yZevl2vHQgmosfwUdVNzviIfaWS.jpg",
+      "cast_ids": [2001, 2002, 2003, 2004]
+    },
+    {
+      "id": 21,
+      "title": "Power",
+      "media_type": "tv",
+      "release_date": "2014-06-07",
+      "description": "A drug dealer doubles as a nightclub owner trying to leave his criminal past behind.",
+      "image_url": "https://image.tmdb.org/t/p/w500/qba4wN6O9X2OkvzqUgboO3Gg38c.jpg",
+      "cast_ids": [2101, 2102, 2103, 2104, 2105]
+    },
+    {
+      "id": 22,
+      "title": "Power Book II: Ghost",
+      "media_type": "tv",
+      "release_date": "2020-09-06",
+      "description": "Following the events of Power, Tariq St. Patrick must juggle his new life as a college student and the family legacy.",
+      "image_url": "https://image.tmdb.org/t/p/w500/irSC7eRh9I7xOVx83YXXyNUieOo.jpg",
+      "cast_ids": [2201, 2202, 2203, 2204]
+    },
+    {
+      "id": 23,
+      "title": "Power Book III: Raising Kanan",
+      "media_type": "tv",
+      "release_date": "2021-07-18",
+      "description": "The story of Kanan Stark's teenage years and the origins of the Power universe.",
+      "image_url": "https://image.tmdb.org/t/p/w500/cZwgcJMptOdlsOTWgkFaGfwZuVi.jpg",
+      "cast_ids": [2301, 2302, 2303, 2304]
+    }
+  ]
+
