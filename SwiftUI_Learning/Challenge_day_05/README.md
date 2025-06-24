@@ -60,15 +60,28 @@ EntertainmentZone/
 │   └── Bundle-Decodable.swift
 ├── ViewModels/
 │   └── MediaViewModel.swift
+|   └── NavigationPathViewModel.swift
 ├── Views/
 │   └── ContentView.swift
+│   └── FullScreenMediaView.swift
+│   └── ListScreenMediaView.swift
+│   └── MediaDetailView.swift
+│   └── OverlayEffectView.swift
+│   └── SnapPagingView.swift
 ├── Assets.xcassets/
 ```
 
 ---
 
 ## Final Thoughts
+This project was a meaningful step forward in reinforcing how to structure SwiftUI apps with real-world data modeling. By working with linked JSON files, I learned how to connect separate datasets through ID matching and 
+present that information clearly using the MVVM architecture.
 
+Implementing NavigationStack and NavigationPath added another level of realism, allowing for flexible and scalable navigation in a multi-view app. Integrating features like view toggles, detail navigation, and remote image 
+loading with AsyncImage made this project feel both dynamic and production-ready.
+
+Overall, EntertainmentZone helped solidify key SwiftUI concepts—data flow with bindings and state, MVVM structure, and decoding complex data relationships—while also offering 
+a fun and visual way to explore media content.
 
 ---
 
