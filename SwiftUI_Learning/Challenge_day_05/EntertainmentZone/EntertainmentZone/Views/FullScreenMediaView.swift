@@ -14,6 +14,10 @@ struct FullScreenMediaView: View {
     @State private var selectedMedia: MediaViewModel? = nil
     @State private var showDetails = false
     
+    @Binding var showingList: Bool
+    
+    @Binding var path: NavigationPath
+    
     var body: some View {
         SnapPagingView(pageCount: mediaViewModel.count, currentPage: $currentPage) { width, height in
             VStack(spacing: 0) {
@@ -50,17 +54,32 @@ struct FullScreenMediaView: View {
                             HStack{
                                 Spacer()
                                 Button{
-                                    selectedMedia = mediaVM
-                                    showDetails = true
+                                    path.append(mediaVM.media)
                                 } label:{
                                     Image(systemName:"info.circle.fill")
-                                        .font(.title)
+                                        .font(.title2)
                                         .foregroundColor(.white)
                                         .padding()
                                         .background(.red.opacity(0.5))
                                         .clipShape(Circle())
                                 }
+                                HStack{
+                                    Spacer()
+                                    Button{
+                                        withAnimation{
+                                            showingList = true
+                                        }
+                                    } label:{
+                                        Image(systemName: "list.bullet")
+                                            .font(.title2)
+                                            .foregroundColor(.white)
+                                            .padding()
+                                            .background(.red.opacity(0.5))
+                                            .clipShape(Circle())
+                                    }
+                                }
                             }
+                            
                         }
                         .padding(.top, 50)
                         .padding(.trailing, 20)
@@ -86,24 +105,17 @@ struct FullScreenMediaView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .navigationDestination(isPresented: $showDetails){
-            if let media = selectedMedia {
-                MediaDetailView(mediaViewModel: media)
-            }else {
-                Text("No Media Selected")
-            }
-        }
-        .navigationBarHidden(true)
     }
 }
 
 #Preview {
+    @Previewable @State var pathStore = PathStore()
     let media: [Media] = Bundle.main.decode("media.json")
     let cast: [Cast] = Bundle.main.decode("cast.json")
     let mediaVMs = media.map { MediaViewModel(media: $0, allCast: cast) }
     
-    NavigationStack { 
-        FullScreenMediaView(mediaViewModel: mediaVMs)
+    NavigationStack {
+        FullScreenMediaView(mediaViewModel: mediaVMs, showingList: .constant(true), path: $pathStore.path)
     }
     
 }

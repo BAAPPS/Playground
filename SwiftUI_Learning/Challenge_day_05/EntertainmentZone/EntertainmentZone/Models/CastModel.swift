@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Cast: Codable, Identifiable {
+struct Cast: Codable, Identifiable, Hashable {
     let id: Int
     let name: String
     let character: String

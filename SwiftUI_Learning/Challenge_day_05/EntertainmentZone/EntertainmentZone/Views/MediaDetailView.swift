@@ -12,7 +12,9 @@ struct MediaDetailView: View {
     
     let columns = [GridItem(.adaptive(minimum: 200))]
     
-
+    @Binding var pathStore: PathStore
+    
+    
     
     var body: some View {
         ZStack {
@@ -53,7 +55,6 @@ struct MediaDetailView: View {
                     LazyVGrid(columns: columns) {
                         ForEach(mediaViewModel.cast, id:\.id){ cast in
                             VStack{
-                                
                                 if let url = URL(string: cast.profileUrl) {
                                     AsyncImage(url: url) { phase in
                                         switch phase {
@@ -64,9 +65,8 @@ struct MediaDetailView: View {
                                             image
                                                 .resizable()
                                                 .scaledToFill()
-                                                .frame(width: 150, height: 150)
-                                                .clipShape(Circle())
-                                                .padding()
+                                                .frame(width: .infinity, height: .infinity)
+                                                .clipShape(Rectangle())
                                             
                                         case .failure:
                                             Image(systemName: "photo")
@@ -79,25 +79,32 @@ struct MediaDetailView: View {
                                         }
                                     }
                                 }
-                                VStack{
+                                VStack(alignment:.leading){
                                     HStack{
-                                        Text("Starring:")
+                                        Image(systemName: "person.fill")
                                             .foregroundColor(.blue)
-                                            .font(.title2)
+                                        
                                         Text(cast.name)
                                             .foregroundColor(.white)
                                             .font(.title3)
                                     }
                                     HStack{
-                                        Text("Role:")
+                                        Image(systemName: "theatermasks.fill")
                                             .foregroundColor(.blue)
-                                            .font(.title2)
+                                        
                                         Text(cast.character)
                                             .foregroundColor(.white)
                                             .font(.title3)
                                     }
                                 }
+                                .padding()
                             }
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(.white.opacity(0.5))
+                            )
+                            .padding()
                         }
                     }
                     
@@ -110,6 +117,17 @@ struct MediaDetailView: View {
                 .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
                 .toolbarColorScheme(.dark, for: .navigationBar)
+                .navigationBarBackButtonHidden(true)
+                .toolbar{
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            pathStore.path = NavigationPath()
+                        }){
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.white)
+                        }
+                    }
+                }
             }
         }
     }
@@ -117,10 +135,11 @@ struct MediaDetailView: View {
 
 
 #Preview {
+    @Previewable @State var pathStore = PathStore()
     let media: [Media] = Bundle.main.decode("media.json")
     let cast: [Cast] = Bundle.main.decode("cast.json")
     let mediaVM = MediaViewModel(media: media[media.count-1], allCast: cast)
     NavigationStack{
-        MediaDetailView(mediaViewModel:mediaVM )
+        MediaDetailView(mediaViewModel:mediaVM, pathStore:$pathStore)
     }
 }

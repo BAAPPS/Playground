@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Media: Codable, Identifiable {
+struct Media: Codable, Identifiable, Hashable {
     let id: Int
     let title: String
     let mediaType: String

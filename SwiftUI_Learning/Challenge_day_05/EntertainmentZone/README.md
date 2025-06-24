@@ -140,5 +140,123 @@ ZStack(alignment: .bottom) {
 By ensuring all views in the `ZStack` — including the image and text — were framed with the same explicit width and height, the layout remained stable. 
 The text no longer shifted to the right and consistently appeared bottom-centered.
 
----
+
+### 7. **Managing NavigationPath State Across Views in SwiftUI**
+
+In a SwiftUI app using `NavigationStack`, I wanted to:
+
+* Manage the navigation path (`NavigationPath`) in a centralized, observable way.
+* Pass the path state down to multiple views so navigation could be programmatically controlled (e.g., resetting path on back).
+* Persist the navigation path between app launches by saving/loading it.
+
+Initial issues:
+
+* **How to share `NavigationPath` state between views properly?**
+  Using just `@State` or `@Binding` was tricky since `NavigationPath` is a complex type and not directly observable.
+
+* **Passing down navigation state to views:**
+  Using `@ObservedObject` or `@StateObject` with an observable wrapper class is necessary, but passing it correctly as a binding caused confusion.
+
+* **Persisting `NavigationPath`:**
+  Need to encode/decode `NavigationPath.CodableRepresentation` to save the path to disk and restore it.
+
+* **Navigation does not update properly if views don’t observe or bind the path correctly.**
+
+
+#### Solution
+
+1. **Create an Observable PathStore class**
+
+```swift
+@Observable
+class PathStore {
+    var path: NavigationPath {
+        didSet {
+            save()
+        }
+    }
+
+    private let savePath = URL.documentsDirectory.appending(path: "SavedPath")
+
+    init() {
+        if let data = try? Data(contentsOf: savePath),
+           let decoded = try? JSONDecoder().decode(NavigationPath.CodableRepresentation.self, from: data) {
+            path = NavigationPath(decoded)
+        } else {
+            path = NavigationPath()
+        }
+    }
+
+    func save() {
+        guard let representation = path.codable else { return }
+        do {
+            let data = try JSONEncoder().encode(representation)
+            try data.write(to: savePath)
+        } catch {
+            print("Failed to save navigation data")
+        }
+    }
+}
+```
+
+* This class wraps `NavigationPath` as a property.
+* Automatically saves the path to disk on every change.
+* Loads saved path on init.
+
+2. **Hold a `@State` instance of PathStore in the root view (e.g. ContentView):**
+
+```swift
+@State private var pathStore = PathStore()
+```
+
+3. **Bind `pathStore.path` to the NavigationStack:**
+
+```swift
+NavigationStack(path: $pathStore.path) {
+    // ...
+}
+```
+
+4. **Pass the pathStore instance down as a `@Binding` to child views:**
+
+```swift
+FullScreenMediaView(mediaViewModel: mediaViewModel, showingList: $showingList, pathStore: $pathStore)
+```
+
+and in the child view:
+
+```swift
+@Binding var pathStore: PathStore
+```
+
+5. **Use the bound `pathStore.path` to control navigation programmatically:**
+
+For example, resetting navigation on back button tap:
+
+```swift
+Button {
+    pathStore.path = NavigationPath()
+} label: {
+    Image(systemName: "chevron.left")
+}
+```
+
+6. **Use `.navigationDestination(for:)` to declare destinations, driven by the shared navigation path.**
+
+
+### Why this worked
+
+* `@Observable` makes `PathStore` publish changes when `path` changes.
+* `@State` in root view keeps the source of truth for navigation path.
+* Passing `@Binding` of the whole `PathStore` lets child views read/write path state, triggering UI updates.
+* Persisting `NavigationPath` enables restoring navigation state after app restarts.
+* Using `.navigationDestination(for:)` ensures navigation links correspond to path elements.
+
+### Final Result
+
+By wrapping `NavigationPath` in a custom observable class and sharing it via `@State` + `@Binding` throughout the view hierarchy, I gained full control over navigation state, enabling:
+
+* Smooth programmatic navigation
+* Persistence of navigation state
+* Coordinated navigation updates across multiple views
 
