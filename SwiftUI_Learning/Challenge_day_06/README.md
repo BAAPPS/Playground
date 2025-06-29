@@ -27,7 +27,18 @@ detailed album contents, and enjoy a seamless navigation experience — all whil
 
 ```text
 HKPopTracks/
+├── Models/
+│   └── ArtistDetailModel.swift 
+│   └── ArtistModel.swift 
+├── Utils/
+│   └──NetworkFetcher.swift 
+├── ViewModels/
+│   └── ArtistDetailViewModel.swift 
+│   └── ArtistViewModel.swift 
 ├── Views/
+│   └── ArtistDetailView.swift 
+│   └── ArtistRowView.swift 
+│   └── ArtistView.swift 
 │   └── ContentView.swift           
 ├── Assets.xcassets/              
 ````
