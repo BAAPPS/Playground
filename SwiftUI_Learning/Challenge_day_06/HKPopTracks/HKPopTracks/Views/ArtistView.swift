@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ArtistView: View {
-    @State private var viewDetailModel = ArtistDetailtViewModel()
+    @State private var viewDetailModel = ArtistDetailViewModel()
     @Bindable var viewModel: ArtistViewModel
     
     var body: some View {

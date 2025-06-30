@@ -68,9 +68,9 @@ extension ArtistDetailModel {
     }
 }
 
-extension ArtistDetailtViewModel {
-    static var mock: ArtistDetailtViewModel {
-        let vm = ArtistDetailtViewModel()
+extension ArtistDetailViewModel {
+    static var mock: ArtistDetailViewModel {
+        let vm = ArtistDetailViewModel()
         vm.artistDetailsById[19345683] = [
             ArtistDetailModel(
                 artistId: 19345683,

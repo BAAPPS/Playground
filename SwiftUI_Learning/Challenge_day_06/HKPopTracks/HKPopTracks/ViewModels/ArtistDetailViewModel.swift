@@ -9,7 +9,7 @@ import Foundation
 
 
 @Observable
-class ArtistDetailtViewModel: Identifiable{
+class ArtistDetailViewModel: Identifiable{
     var artistDetailsById: [Int: [ArtistDetailModel]] = [:]
     var isLoading = false
     var errorMessage: String?

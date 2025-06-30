@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ArtistDetailView: View {
     let artistId: Int
-    @Bindable var detailVM: ArtistDetailtViewModel
+    @Bindable var detailVM: ArtistDetailViewModel
     
     var body: some View {
         let tracks = detailVM.getDetails(for: artistId).filter { $0.wrapperType == "track" }
@@ -57,7 +57,7 @@ struct ArtistDetailView: View {
 
 
 #Preview {
-    @Previewable @State var detailVM = ArtistDetailtViewModel()
+    @Previewable @State var detailVM = ArtistDetailViewModel()
     // andy lau
     NavigationView {
         ArtistDetailView(artistId: 19345683, detailVM: .mock)
