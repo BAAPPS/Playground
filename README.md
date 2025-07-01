@@ -29,9 +29,29 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 13** – Protocols, extensions, and checkpoint 8: [Swift Fundamental 13](https://github.com/BAAPPS/Playground/blob/main/Protocols%20and%20Extensions/Protocols%20and%20Extensions.playground/Contents.swift)
 - **Day 14** – Optionals, nil coalescing, and checkpoint 9: [Swift Fundamental 14](https://github.com/BAAPPS/Playground/blob/main/Optionals/Optionals.playground/Contents.swift)
 
-### Days 16-24: Starting SwiftUI (Incomplete ❌)
+### Days 16-24: Starting SwiftUI (Completed ✅) 
 
 - **Day 16-18** – Project 1, parts one to three: [WeSplit](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_1/WeSplit/WeSplit/ContentView.swift)
+- **Day 19** - Challenge Day: [Unit Converter](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Challenge_day)
+- **Day 20-22** - Project 2, parts one to three: [Guess the Flag](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_02)
+- **Day 23-24** - Project 3, parts one to two: [ViewsAndModifiers](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_03)
+
+### Days 26-34: Expanding your skills (Completed ✅)
+
+- **Day 26-28** - Project 4, parts one to three: [BetterRest](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_04)
+- **Day 29-31** - Project 5, parts one to three: [Word Scramble](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_05)
+- **Day 32-34** - Project 6, parts one to three: [Animations](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_06)
+
+### Days 36-46: Scaling up to bigger apps (Completed ✅)
+
+- **Day 36-38** - Project 7, parts one to three: [iExpense](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_07)
+- **Day 39-42** - Project 8, parts one to four: [Moonshot](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_08)
+- **Day 43-46** - Project 9, parts one to four: [Navigation](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_09)
+
+### Days 49-59: Focus on data (Incomplete ❌)
+
+- **Day 49-52** - Project 10, parts one to four: [Cupcake Corner](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_10)
+- **Day 53-56** - Project 11, parts one to four: [BookWormm](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_11)
 
 ---
 
@@ -120,6 +140,55 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 #### Day 16-18 – Project 1, parts one to three
 
 [WeSplit](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_1/WeSplit/README.md)
+
+#### Day 19 Challenge Day
+
+[Unit Converter](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Challenge_day/UnitConverter/README.md)
+
+#### Day 20-22 - Project 2, parts one to three
+
+[Guess the Flag](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_02/GuessTheFlag/README.md)
+
+#### Day 23-24 - Project 3, parts one to two
+
+[ViewsAndModifiers](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_03/ViewsAndModifiers/README.md)
+
+
+#### Day 26-28 - Project 4, parts one to three
+
+[BetterRest](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_04/BetterRest/README.md)
+
+#### Day 29-31 - Project 5, parts one to three
+
+[Word Scramble](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_05/WordScramble/README.md)
+
+#### Day 29-31 - Project 5, parts one to three
+
+[Word Scramble](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_05/WordScramble/README.md)
+
+#### Day 32-34 - Project 6, parts one to three
+
+[Animations](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_06/Animations/README.md)
+
+#### Day 36-38 - Project 7, parts one to three
+
+[iExpense](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_07/iExpense/README.md)
+
+#### Day 39-42 - Project 8, parts one to four
+
+[Moonshot](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_08/Moonshot/README.md)
+
+#### Day 43-46 - Project 9, parts one to four
+
+[Navigation](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_09/Navigation/README.md)
+
+#### Day 49-52 - Project 10, parts one to four
+
+[Cupcake Corner](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_10/CupcakeCorner/README.md)
+
+#### Day 53-56 - Project 11, parts one to four
+
+[BookWormm](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_10/BookWormm/README.md)
 
 ---
 
