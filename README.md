@@ -153,6 +153,7 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 [ViewsAndModifiers](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_03/ViewsAndModifiers/README.md)
 
+### Days 26-34: Expanding your skills (Completed ✅)
 
 #### Day 26-28 - Project 4, parts one to three
 
