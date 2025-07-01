@@ -135,7 +135,7 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 [Optionals](https://github.com/BAAPPS/Playground/blob/main/Optionals/README.md)
 
-### Days 16-24: Starting SwiftUI (Incomplete ❌)
+### Days 16-24: Starting SwiftUI (Completed ✅) 
 
 #### Day 16-18 – Project 1, parts one to three
 
@@ -170,6 +170,8 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 [Animations](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_06/Animations/README.md)
 
+### Days 36-46: Scaling up to bigger apps (Completed ✅)
+
 #### Day 36-38 - Project 7, parts one to three
 
 [iExpense](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_07/iExpense/README.md)
@@ -181,6 +183,8 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 #### Day 43-46 - Project 9, parts one to four
 
 [Navigation](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_09/Navigation/README.md)
+
+### Days 49-59: Focus on data (Incomplete ❌)
 
 #### Day 49-52 - Project 10, parts one to four
 
