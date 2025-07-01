@@ -102,3 +102,35 @@ By completing this challenge, I'll gain practical experience in building scalabl
 
 > ✅ **Key Lesson:** Always ensure `id` values in `Identifiable` models are truly unique within lists. Reusing IDs causes SwiftUI to incorrectly recycle views, leading to UI bugs and duplicated content.
 
+
+### **6. Image Load Failures Using `AsyncImage` with iTunes API**
+
+* Some artwork images failed to load in the UI, even though the URLs worked when tested in Postman or a browser.
+
+* **Problem:** `AsyncImage` uses the system's default `URLSession` without custom headers, notably lacking a `User-Agent`. Apple's CDN (e.g., `mzstatic.com`) may reject or block requests without a valid `User-Agent` or other expected headers, leading to silent failures in SwiftUI.
+
+* **Solution:**
+
+  * Replaced `AsyncImage` with the [**Kingfisher**](https://github.com/onevcat/Kingfisher) package, which:
+
+    * Adds appropriate headers automatically (like `User-Agent`)
+    * Provides better error handling and retry support
+    * Includes caching and placeholder customization out of the box
+
+  * Switched to using `KFImage` from Kingfisher to load and cache images reliably:
+
+    ```swift
+    KFImage(URL(string: detail.artworkUrl100 ?? ""))
+        .resizable()
+        .scaledToFit()
+        .placeholder {
+            Image(systemName: "photo")
+        }
+        .onFailure { error in
+            Image(systemName: "exclamationmark.triangle")
+        }
+    ```
+
+> ✅ **Key Lesson:** For production-grade image loading, use libraries like **Kingfisher** that offer robust networking, header configuration, caching, and failure recovery. Native `AsyncImage` is convenient, but may break 
+under real-world API constraints.
+

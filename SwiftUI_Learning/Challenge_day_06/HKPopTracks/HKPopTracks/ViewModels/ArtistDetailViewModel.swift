@@ -14,7 +14,13 @@ class ArtistDetailViewModel: Identifiable{
     var isLoading = false
     var errorMessage: String?
     
-    
+    func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium  // e.g. Jan 1, 2025
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+
     func fetchArtistDetailsById(for artistId: Int) async {
         isLoading = true
         errorMessage = nil
@@ -29,6 +35,8 @@ class ArtistDetailViewModel: Identifiable{
             
             let tracks = response.results.filter { $0.wrapperType == "track" }
             print("Fetched \(tracks.count) tracks for artistId: \(artistId): \(tracks.map { $0.trackName ?? "Unknown" })")
+            
+            
             
         } catch {
             errorMessage = error.localizedDescription

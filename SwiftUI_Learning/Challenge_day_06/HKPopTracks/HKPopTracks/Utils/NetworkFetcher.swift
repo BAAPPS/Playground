@@ -30,7 +30,7 @@ enum NetworkFetcherError: Error, LocalizedError {
 }
 
 final class NetworkFetcher {
-    static func fetchAsync<T: Decodable>(from urlString: String, dateFormat: String? = nil) async throws -> T {
+    static func fetchAsync<T: Decodable>(from urlString: String, useISO8601DateDecoding: Bool = true) async throws -> T {
         guard let url = URL(string: urlString) else {
             throw NetworkFetcherError.badURL
         }
@@ -43,6 +43,11 @@ final class NetworkFetcher {
         }
         
         let decoder = JSONDecoder()
+        
+        // Date format:  "yyyy-MM-dd'T'HH:mm:ssZ" (ISO 8601 format)
+        if useISO8601DateDecoding {
+            decoder.dateDecodingStrategy = .iso8601
+        }
         
         do {
             return try decoder.decode(T.self, from: data)

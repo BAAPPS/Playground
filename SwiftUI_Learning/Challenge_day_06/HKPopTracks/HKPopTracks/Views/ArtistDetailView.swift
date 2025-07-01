@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import Kingfisher
+
 
 struct ArtistDetailView: View {
     let artistId: Int
@@ -25,20 +27,34 @@ struct ArtistDetailView: View {
                                 .padding(.bottom, 2)
                             Text(detail.primaryGenreName ?? "Unknown")
                                 .font(.subheadline)
+                            
+                            Text(detail.releaseDate != nil ? detailVM.formattedDate(detail.releaseDate!) : "Unknown")
+                                .font(.subheadline)
+
+                            Text(detail.trackExplicitness ?? "Unknown")
+                                .font(.subheadline)
+                                .padding(.top, 2)
+                                .foregroundColor(.black.opacity(0.7))
+                        
                         }
+                        
+                        
                         Spacer()
-                        AsyncImage(url: URL(string: detail.artworkUrl100 ?? "")) { image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                        } placeholder: {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .scaledToFit()
-                                .foregroundColor(.gray)
-                                .opacity(0.5)
-                        }
-                        .frame(width: 100, height: 100)
+                        KFImage(URL(string: detail.artworkUrl100 ?? ""))
+                            .placeholder {
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .foregroundColor(.gray)
+                                    .opacity(0.5)
+                            }
+                            .onFailure { error in
+                                print("Kingfisher failed to load image: \(error)")
+                            }
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                        
                         
                     }
                 }
