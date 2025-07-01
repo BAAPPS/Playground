@@ -1,6 +1,6 @@
-# Bookworm
+# Bookies
 
-**Bookworm** is an iOS app that helps you track the books you've read and record your thoughts. This project is built as a continuation of prior learning, combining core SwiftUI techniques with powerful new tools like 
+**Bookies** is an iOS app that helps you track the books you've read and record your thoughts. This project is built as a continuation of prior learning, combining core SwiftUI techniques with powerful new tools like 
 **SwiftData** and **custom UI components**.
 
 ---
@@ -26,13 +26,11 @@
 ## Project Structure
 
 ```text
-Bookworm/
+Bookies/
 ├── Views/
 │   └── ContentView.swift
 ├── Assets.xcassets/
-├── BookwormApp.swift
-└── Models/
-    └── Book.swift
+├── BookiesApp.swift
 ```
 
 ---
