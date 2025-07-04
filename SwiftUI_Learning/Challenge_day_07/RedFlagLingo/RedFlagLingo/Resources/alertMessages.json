@@ -1,0 +1,11 @@
+{
+  "financial_scam": "This message contains financial scam keywords. Be cautious with your investments.",
+  "phishing": "This message contains signs of a phishing scam. Never click suspicious links or share credentials.",
+  "lottery_scam": "This message shows typical lottery scam language. Do not share personal info.",
+  "romance_scam": "Potential romance scam detected. Be careful with requests for money or personal info.",
+  "pig_butchering_scam": "This message matches patterns of a pig butchering scam, a dangerous crypto fraud.",
+  "gift_card_scam": "Message indicates gift card scam behavior. Never send gift card codes to strangers.",
+  "advance_fee_scam": "Possible advance fee scam detected. Avoid paying upfront fees to unknown parties.",
+  "job_offer_scam": "Job offer scam indicators found. Verify legitimacy before sharing personal info."
+}
+

@@ -1,0 +1,97 @@
+{
+  "financial_scam": {
+    "severity": "high",
+    "keywords": [
+      "bitcoin",
+      "crypto",
+      "investment",
+      "double your money",
+      "forex",
+      "guaranteed return",
+      "limited time offer",
+      "exclusive deal"
+    ]
+  },
+  "phishing": {
+    "severity": "high",
+    "keywords": [
+      "verify your account",
+      "click here",
+      "urgent",
+      "login to your bank",
+      "reset your password",
+      "account suspended",
+      "confirm your identity"
+    ]
+  },
+  "lottery_scam": {
+    "severity": "medium",
+    "keywords": [
+      "you won",
+      "lottery",
+      "congratulations",
+      "claim your prize",
+      "winner",
+      "jackpot"
+    ]
+  },
+  "romance_scam": {
+    "severity": "high",
+    "keywords": [
+      "i need money",
+      "i love you",
+      "send money",
+      "my phone is broken",
+      "help me get home",
+      "trust me",
+      "long distance"
+    ]
+  },
+  "pig_butchering_scam": {
+    "severity": "high",
+    "keywords": [
+      "crypto investment opportunity",
+      "safe investment",
+      "download this app",
+      "let me show you how to trade",
+      "this is how i became rich",
+      "trading strategy",
+      "financial freedom"
+    ]
+  },
+  "gift_card_scam": {
+    "severity": "medium",
+    "keywords": [
+      "gift cards",
+      "itunes cards",
+      "walmart cards",
+      "steam cards",
+      "target gift card",
+      "send the code",
+      "scratch the back"
+    ]
+  },
+  "advance_fee_scam": {
+    "severity": "medium",
+    "keywords": [
+      "processing fee",
+      "pay now",
+      "transfer fee",
+      "upfront payment",
+      "activation charge",
+      "small fee to release funds"
+    ]
+  },
+  "job_offer_scam": {
+    "severity": "low",
+    "keywords": [
+      "easy money",
+      "work from home",
+      "no experience needed",
+      "quick cash",
+      "guaranteed income",
+      "training deposit"
+    ]
+  }
+}
+
