@@ -1,4 +1,4 @@
-# Challenge Day 6 - RedFlagLingo
+# Challenge Day 7 - RedFlagLingo
 
 **RedFlagLingo** is a SwiftUI + SwiftData learning challenge where the goal is to detect scam-related keywords in user-entered messages. The app parses text input, flags potential scams, and alerts the user based on a 
 categorized keyword system, complete with severity levels. It also saves messages locally using SwiftData for review and analysis.
