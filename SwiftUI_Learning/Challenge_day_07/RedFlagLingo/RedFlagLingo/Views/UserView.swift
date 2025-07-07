@@ -10,6 +10,9 @@ import SwiftData
 
 struct UserView: View {
     @Environment(\.modelContext) var modelContext
+    @Query(sort: \MessageModel.date, order: .forward)
+    private var allMessages: [MessageModel]
+
     
     @Bindable var user: UserModel
     
@@ -34,87 +37,84 @@ struct UserView: View {
             user.receivedMessages = updatedUser.receivedMessages
         }
     }
-    
-    func chatMessages(with otherUser: UserModel?) -> [MessageModel] {
-        guard let otherUser else { return [] }
-        
-        let userId = user.id
-        let otherUserId = otherUser.id
-        
-        let fetch = FetchDescriptor<MessageModel>(
-            predicate: #Predicate { message in
-                ((message.sender?.id == userId) && (message.receiver?.id == otherUserId)) ||
-                ((message.sender?.id == otherUserId) && (message.receiver?.id == userId))
-            },
-            sortBy: [SortDescriptor(\.date)]
-        )
-        
-        
-        do {
-            return try modelContext.fetch(fetch)
-        } catch {
-            print("⚠️ Failed to fetch chat messages: \(error.localizedDescription)")
-            return []
-        }
-    }
-    
+ 
     var conversationPartners: [UserModel] {
         let sentToUsers = Set(user.sentMessages.compactMap { $0.receiver })
         let receivedFromUsers = Set(user.receivedMessages.compactMap { $0.sender })
         return Array(sentToUsers.union(receivedFromUsers))
     }
     
-    
-    
+
     var body: some View {
-        VStack{
-            Text("Welcome, \(user.username)")
-                .font(.title)
+        ZStack {
             
-            List{
-                Section(header: Text("Conversations")) {
-                    ForEach(conversationPartners) { partner in
-                        NavigationLink {
-                            MessageView(messages: chatMessages(with: partner))
-                        } label: {
-                            let messages = chatMessages(with: partner)
-                            let lastMessage = messages.last
-                            
-                            HStack {
-                                Text(partner.username)
-                                    .font(.headline)
-                                Spacer()
-                                Text(lastMessage?.content ?? "")
-                                    .font(.subheadline)
-                                    .foregroundColor(lastMessage?.isFlagged == true ? .red : .secondary)
-                                    .lineLimit(1)
+            
+            Color(hex: "#90a1b9")
+                .ignoresSafeArea()
+            
+            VStack{
+                Text("Welcome, \(user.username)")
+                    .font(.title)
+                    .foregroundColor(.white)
+                
+                List{
+                    Section(header: Text("Conversations")) {
+                        ForEach(conversationPartners) { partner in
+                            NavigationLink {
+                                MessageView(currentUser: user, chatPartner:partner)
+                            } label: {
+                                let lastMessage = allMessages
+                                    .filter {
+                                        ($0.sender?.id == user.id && $0.receiver?.id == partner.id) ||
+                                        ($0.sender?.id == partner.id && $0.receiver?.id == user.id)
+                                    }
+                                    .sorted { $0.date < $1.date }
+                                    .last
+                                
+                                
+                                HStack {
+                                    Text(partner.username)
+                                        .font(.headline)
+                                    Spacer()
+                                    Text(lastMessage?.content ?? "")
+                                        .font(.subheadline)
+                                        .foregroundColor(lastMessage?.isFlagged == true ? .red : .secondary)
+                                        .lineLimit(1)
+                                }
                             }
                         }
                     }
+                    
                 }
+                .scrollContentBackground(.hidden)
+                .background(Color(hex: "#90a1b9"))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .listRowBackground(Color(hex: "#2c313a"))
+                
+                Form{
+                    Section("Send to") {
+                        Picker("Recipient", selection: $selectedRecipient){
+                            ForEach(userVM.users.filter{$0.id != user.id}) {otherUser in
+                                Text(otherUser.username).tag(otherUser as UserModel?)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                    }
+                    Section {
+                        TextField("Write a message",text:$message)
+                            .textInputAutocapitalization(.never)
+                            .padding()
+                        Button("Send"){
+                            sendMessage()
+                        }
+                        .frame(maxWidth:.infinity, alignment: .bottomTrailing)
+                    }
+                }
+                .padding(.bottom, 20)
+                .scrollContentBackground(.hidden)
+                .background(Color(hex: "#90a1b9"))
                 
             }
-            
-            Form{
-                Section("Send to") {
-                    Picker("Recipient", selection: $selectedRecipient){
-                        ForEach(userVM.users.filter{$0.id != user.id}) {otherUser in
-                            Text(otherUser.username).tag(otherUser as UserModel?)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                }
-                Section {
-                    TextField("Write a message",text:$message)
-                        .textInputAutocapitalization(.never)
-                        .padding()
-                    Button("Send"){
-                        sendMessage()
-                    }
-                }
-            }
-            .padding(.bottom, 20)
-            
         }
         
     }

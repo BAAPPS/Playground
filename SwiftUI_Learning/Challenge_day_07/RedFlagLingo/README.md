@@ -186,3 +186,124 @@ context.insert(newMessage)
 ```
 
 With this change, all messages were persisted individually and could be fetched in order, restoring full chat history.
+
+### 🛑 3. **App Crashed When Deleting Messages**
+
+Using `.onDelete(perform:)` in `MessageView` caused crashes during message deletion in Edit Mode.
+
+#### 🔍 Cause
+
+* `.onDelete` was applied to a **derived array** like `nonFlaggedMessages`.
+* Inside `deleteNonScamMessages(at:)`, the code used `messages[index]`, which didn’t match the filtered array’s structure.
+* This caused **index mismatches** and **out-of-bounds errors**.
+
+Also, the `messages` array was a computed property backed by `chatMessages(with:)` — a **manual fetch**:
+```swift
+ let messages:[MessageModel]
+```
+
+```swift
+    
+    func chatMessages(with otherUser: UserModel?) -> [MessageModel] {
+        guard let otherUser else { return [] }
+        
+        let userId = user.id
+        let otherUserId = otherUser.id
+        
+        let fetch = FetchDescriptor<MessageModel>(
+            predicate: #Predicate { message in
+                ((message.sender?.id == userId) && (message.receiver?.id == otherUserId)) ||
+                ((message.sender?.id == otherUserId) && (message.receiver?.id == userId))
+            },
+            sortBy: [SortDescriptor(\.date)]
+        )
+        
+        
+        do {
+            return try modelContext.fetch(fetch)
+        } catch {
+            print("⚠️ Failed to fetch chat messages: \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+```
+
+But this wasn’t reactive — it didn’t update when the model context changed, making the view fragile.
+
+#### ✅ Solution
+
+Moved to SwiftData’s `@Query`:
+
+```swift
+@Query(sort: \.date) private var allMessages: [MessageModel]
+```
+
+Filtered the relevant ones dynamically:
+
+```swift
+var messages: [MessageModel] {
+    allMessages.filter {
+        ($0.sender?.id == currentUser.id && $0.receiver?.id == chatPartner.id) ||
+        ($0.sender?.id == chatPartner.id && $0.receiver?.id == currentUser.id)
+    }
+}
+```
+
+And deleted messages using the correct filtered array:
+
+```swift
+func deleteNonScamMessages(at offsets: IndexSet) {
+    let messagesToDelete = offsets.map { nonFlaggedMessages[$0] }
+    for message in messagesToDelete {
+        modelContext.delete(message)
+    }
+    try? modelContext.save()
+}
+```
+
+### 🛑 4. **Preview Didn’t Show Messages**
+
+In `MessageView`'s `#Preview`, no messages appeared at first.
+
+#### 🔍 Cause
+
+You created two users — `user` and `partner` — but both `MessageModel`s used the same user for `sender` and `receiver`:
+
+```swift
+sender: user,
+receiver: user
+```
+
+So in the live filtering logic:
+
+```swift
+($0.sender?.id == currentUser.id && $0.receiver?.id == chatPartner.id)
+```
+
+...none of the messages matched!
+
+#### ✅ Solution
+
+Update the preview to set the `receiver` properly:
+
+```swift
+let safeMessage = MessageModel(
+    content: "Hello",
+    date: ...,
+    isFlagged: false,
+    sender: user,
+    receiver: partner
+)
+
+let flaggedMessage = MessageModel(
+    content: "Scam",
+    date: ...,
+    isFlagged: true,
+    sender: partner,
+    receiver: user,
+    scamAlertMessage: ...
+)
+```
+
+

@@ -14,6 +14,7 @@ struct ContentView: View {
         NavigationView {
             UserListView()
         }
+        .tint(.white)
     }
 }
 

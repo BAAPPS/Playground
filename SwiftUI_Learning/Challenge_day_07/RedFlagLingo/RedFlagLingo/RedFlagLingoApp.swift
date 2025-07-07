@@ -10,6 +10,9 @@ import SwiftData
 
 @main
 struct RedFlagLingoApp: App {
+    init() {
+        setupNavigationBarAppearance()
+    }
     var body: some Scene {
         WindowGroup {
             ContentView()
