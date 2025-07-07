@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 class ScamAlertModel: Identifiable {
-    var id: UUID
+    var id = UUID()
     var scamType: String
     var severity: String
     var matchedKeywords: [String]
@@ -21,8 +21,7 @@ class ScamAlertModel: Identifiable {
     @Relationship(deleteRule: .cascade)
     var message: MessageModel
     
-    init(id: UUID, scamType: String, severity: String, matchedKeywords: [String], alertMessage: String, message: MessageModel) {
-        self.id = id
+    init(scamType: String, severity: String, matchedKeywords: [String], alertMessage: String, message: MessageModel) {
         self.scamType = scamType
         self.severity = severity
         self.matchedKeywords = matchedKeywords

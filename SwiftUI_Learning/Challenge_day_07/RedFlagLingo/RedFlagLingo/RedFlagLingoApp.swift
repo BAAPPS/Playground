@@ -14,6 +14,6 @@ struct RedFlagLingoApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [MessageModel.self, ScamAlertModel.self])
+        .modelContainer(for: [MessageModel.self, ScamAlertModel.self, UserModel.self])
     }
 }
