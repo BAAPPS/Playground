@@ -67,6 +67,8 @@ RedFlagLingo/
 │   └── scamKeywords.json    
 ├── Utils/
 │   └── Bundle-Decodeable.swift 
+│   └── HexColor.swift 
+│   └── setupNavigationBarAppearance.swift
 ├── ViewModels/
 │   └── MessageViewModel.swift  
 │   └── ScamScannerViewModel.swift   
