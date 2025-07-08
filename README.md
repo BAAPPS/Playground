@@ -48,10 +48,14 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 39-42** - Project 8, parts one to four: [Moonshot](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_08)
 - **Day 43-46** - Project 9, parts one to four: [Navigation](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_09)
 
-### Days 49-59: Focus on data (Incomplete ❌)
+### Days 49-59: Focus on data (Completed ✅)
 
 - **Day 49-52** - Project 10, parts one to four: [Cupcake Corner](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_10)
 - **Day 53-56** - Project 11, parts one to four: [BookWormm](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_11)
+- **Day 57-59** - Project 12, parts one to three: [SwiftData](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_12)
+
+### Days 62-76: Filters, maps, and more (Incomplete ❌)
+
 
 ---
 
@@ -185,7 +189,7 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 [Navigation](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_09/Navigation/README.md)
 
-### Days 49-59: Focus on data (Incomplete ❌)
+### Days 49-59: Focus on data (Completed ✅)
 
 #### Day 49-52 - Project 10, parts one to four
 
@@ -193,7 +197,14 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 #### Day 53-56 - Project 11, parts one to four
 
-[BookWormm](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_10/BookWormm/README.md)
+[BookWormm](https://github.com/BAAPPS/Playground/blob/main/SwiftUI_Learning/Project_11/BookWormm/README.md)
+
+#### Day 57-59 - Project 12, parts one to three
+
+[SwiftData](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_12/SwiftData/README.md)
+
+### Days 62-76: Filters, maps, and more (Incomplete ❌)
+
 
 ---
 
