@@ -27,8 +27,11 @@ This app serves as a sandbox for testing and demonstrating SwiftData concepts. I
 
 ```text
 SwiftDataProject/
+├── Models/
+│   └── User.swift
 ├── Views/
 │   └── ContentView.swift
+│   └── EditUserView.swift
 ├── Assets.xcassets/
 ├── SwiftDataProjectApp.swift
 ```
@@ -37,5 +40,12 @@ SwiftDataProject/
 
 ## Final Thoughts
 
-SwiftData is a powerful tool, but like many SwiftUI features, it benefits from understanding what’s happening behind the scenes. This project will help you gain that deeper insight by walking through setup, usage, and edge 
-cases manually.
+Working with SwiftData in this project has been a great way to deepen my understanding of how data and UI stay in sync in SwiftUI apps. By using **predicates** and **sort descriptors**, I learned how to efficiently filter 
+and sort data directly within the SwiftData query system, which keeps the UI reactive and performant.
+
+This experience emphasized how SwiftData leverages SwiftUI’s observation system, allowing changes in the data model to automatically update the views without extra boilerplate. It also showed me the power of combining 
+Swift’s type-safe features like key paths with expressive query tools such as predicates.
+
+Overall, the project reinforced the importance of understanding not just the APIs, but also the underlying mechanisms of data flow and state management in SwiftUI. This deeper insight will help me build more robust, 
+scalable apps that feel seamless and responsive.
+
