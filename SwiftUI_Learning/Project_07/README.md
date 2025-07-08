@@ -43,9 +43,10 @@ iExpense/
 │   └── ExpenseItem.swift      // Defines the ExpenseItem struct conforming to Codable & Identifiable
 │
 ├── Views/
-│   └── ContentView\.swift      // Main UI showing expense list & toolbar
-│   └── AddView\.swift          // Modal sheet to add new expenses
-│   └── ExpenseRow\.swift       // Reusable view for styling each row
+│   └── AddView.swift          // Modal sheet to add new expenses
+│   └── ContentView.swift      // Main UI showing expense list & toolbar
+│   └── ExpenseListView.swift  // Reusable view for expense list
+│   └── ExpenseRow.swift       // Reusable view for styling each row
 │
 ├── Assets.xcassets   
 │  

@@ -6,52 +6,92 @@
 //
 
 import SwiftUI
+import SwiftData
+
+import SwiftUI
+
+enum FilterType: String, CaseIterable, Identifiable {
+    case all = "All"
+    case personal = "Personal"
+    case business = "Business"
+    
+    var id: String { rawValue }
+    
+    var predicate: Predicate<ExpenseItem>? {
+        switch self {
+        case .all:
+            return nil
+        case .personal:
+            return #Predicate<ExpenseItem> { $0.type == "Personal" }
+        case .business:
+            return #Predicate<ExpenseItem> { $0.type == "Business" }
+        }
+    }
+}
+enum SortType: String, CaseIterable, Identifiable {
+    case name = "Name"
+    case amount = "Amount"
+    
+    var id: String { rawValue }
+    
+    var descriptors: [SortDescriptor<ExpenseItem>] {
+        switch self {
+        case .name:
+            return [SortDescriptor(\ExpenseItem.name)]
+        case .amount:
+            return [SortDescriptor(\ExpenseItem.amount)]
+        }
+    }
+}
+
+
 
 struct ContentView: View {
     
-    @State private var expenses = Expenses()
-    @State private var showAddExpenseView = false
+    @State private var filterType: FilterType = .all
+    @State private var sortType: SortType = .name
     
-    func removeItems(at offset: IndexSet){
-        expenses.items.remove(atOffsets: offset)
-    }
     
     var body: some View {
-        NavigationStack{
-            List{
-                Section("Personal"){
-                    ForEach(expenses.items.filter {$0.type == "Personal"}){ item in
-                        ExpenseRow(item: item)
+        NavigationStack {
+            ExpenseListView(predicate: filterType.predicate, sortOrder: sortType.descriptors)
+  
+                .navigationTitle("iExpense")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    
+                    
+                    ToolbarItem(placement: .topBarLeading) {
+                        NavigationLink(destination: AddView()) {
+                            Label("Add Expenses", systemImage: "plus")
+                        }
                     }
-                    .onDelete(perform: removeItems)
-                }
-                
-                Section("Business"){
-                    ForEach(expenses.items.filter {$0.type == "Business"}){
-                        item in
-                        ExpenseRow(item: item)
+                    
+                    ToolbarItem(placement: .automatic) {
+                        Menu("Filter", systemImage:"line.horizontal.3.decrease.circle") {
+                            Picker("Filter", selection: $filterType) {
+                                ForEach(FilterType.allCases) { type in
+                                    Text(type.rawValue).tag(type)
+                                }
+                            }
+                        }
                     }
-                    .onDelete(perform: removeItems)
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                            Picker("Sort by", selection: $sortType) {
+                                ForEach(SortType.allCases){sort in
+                                    Text(sort.rawValue).tag(sort)
+                                }
+                                
+                            }
+                        }
+                    }
                 }
-            }
-            
-            
-            .navigationTitle("iExpense")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar{
-                NavigationLink(destination: AddView(expenses: expenses)){
-                    Label("Add Expenses", systemImage: "plus")
-                }
-                
-            }
         }
-        //        .sheet(isPresented: $showAddExpenseView){
-        //            AddView(expenses: expenses)
-        //        }
     }
-    
 }
 
 #Preview {
     ContentView()
+        .modelContainer(for: ExpenseItem.self)
 }
