@@ -8,14 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var authVM = SupabaseAuthViewModel()
+    
     var body: some View {
-        VStack {
-            Text("UserBoard")
-                .font(.system(size: 50))
-                .fontWeight(.bold)
-                .foregroundColor(.indigo)
+        NavigationView {
+            Group{
+                if authVM.currentUser == nil {
+                    AuthView(authVM: authVM)
+                }else{
+                    UsersListView(authVM: authVM)
+                }
+            }
         }
-        .padding()
     }
 }
 
