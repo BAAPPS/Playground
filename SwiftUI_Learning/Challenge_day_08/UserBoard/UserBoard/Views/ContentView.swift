@@ -8,15 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var authVM = SupabaseAuthViewModel()
+    @State var authVM: SupabaseAuthViewModel
     
     var body: some View {
         NavigationView {
-            Group{
-                if authVM.currentUser == nil {
-                    AuthView(authVM: authVM)
-                }else{
-                    UsersListView(authVM: authVM)
+            VStack(spacing:0){
+                Group{
+                    if authVM.currentUser == nil {
+                        CustomHeaderView(title:"Userboard")
+                        AuthView(authVM: authVM)
+                    }else{
+                        UsersListView(authVM: authVM)
+                    }
                 }
             }
         }
@@ -24,5 +27,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(authVM: SupabaseAuthViewModel())
 }

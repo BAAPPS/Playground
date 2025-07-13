@@ -9,19 +9,21 @@ import Foundation
 
 import Supabase
 import Observation
+import SwiftData
 
 @Observable
 class PublicUserViewModel {
     
     var users: [PublicUserModel] = []
-     var errorMessage: String?
-     var isLoading = false
+    var errorMessage: String?
+    var isLoading = false
     
     private let client = SupabaseManager.shared.client
     
-    func fetchRecentUsers() async {
+    func fetchRecentUsers(context: ModelContext) async {
         isLoading = true
         errorMessage = nil
+        defer {isLoading = false}
         
         do {
             let response = try await client
@@ -32,9 +34,28 @@ class PublicUserViewModel {
                 .execute()
             
             let data = response.data
+            let newUsers = try JSONDecoder().decodeSupabase([PublicUserModel].self, from: data)
             
-            users = try JSONDecoder().decodeSupabase([PublicUserModel].self, from: data)
-           
+            // Only assign when successful
+            users = newUsers
+            for user in users {
+                let fetchRequest = FetchDescriptor<UserProfile>(
+                    predicate: #Predicate { $0.id == user.id }
+                )
+                do {
+                    let existing = try context.fetch(fetchRequest)
+                    if existing.isEmpty {
+                        let cached = UserProfile(id: user.id, username: user.username, created_at: user.createdAt)
+                        context.insert(cached)
+                    }
+                } catch {
+                    print("⚠️ Failed to fetch existing user: \(error.localizedDescription)")
+                }
+            }
+            
+            
+            try context.save()
+            
         }
         catch {
             errorMessage = error.localizedDescription

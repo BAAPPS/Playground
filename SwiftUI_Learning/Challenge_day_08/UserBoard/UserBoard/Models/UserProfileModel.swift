@@ -9,14 +9,19 @@ import Foundation
 import SwiftData
 
 @Model
-class UserProfile {
-    var id: String
+class UserProfile: Identifiable {
+    @Attribute(.unique) var id: UUID
     var username: String
     var created_at: Date
     
-    init(id: String, username: String, created_at: Date) {
+    var createdAt: Date { created_at }
+
+
+    init(id: UUID, username: String, created_at: Date) {
         self.id = id
         self.username = username
         self.created_at = created_at
     }
 }
+
+extension UserProfile: UserDisplayable {}

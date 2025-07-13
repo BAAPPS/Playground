@@ -17,3 +17,5 @@ struct PublicUserModel: Codable, Identifiable {
         case createdAt = "created_at"
     }
 }
+
+extension PublicUserModel: UserDisplayable {}
