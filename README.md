@@ -56,6 +56,7 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 
 ### Days 62-76: Filters, maps, and more (Incomplete ❌)
 
+- **Day 62-67** – Project 13, part one to six: [Instafilter](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_13)
 
 ---
 
@@ -204,6 +205,10 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 [SwiftData](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_12/SwiftData/README.md)
 
 ### Days 62-76: Filters, maps, and more (Incomplete ❌)
+
+#### Day 62-67 – Project 13, part one to six
+
+[Instafilter](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_13/Instafilter/README.md)
 
 
 ---
