@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct SplashEditApp: App {
+    @State private var authVM = SupabaseAuthViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-        }
+            ContentView(authVM: authVM)
+        }.modelContainer(for:UsersModel.self)
     }
 }

@@ -34,11 +34,22 @@ You’ll develop an iOS app that allows users to:
 ```text
 SplashEdit/       
 ├── Models/                  # SwiftData & Supabase data models
-│   └── 
+|   └── SupabaseClientModel.swift 
+|   └── SupabaseUserModel.swift 
+├── Utils/
+|   └── HexColor.swift 
+|   └── ReusableViews.swift
+|   └── Supabase-JSONDecoder.swift
 ├── ViewModels/              # Handles filtering, syncing, and auth logic
-│   └── 
+|   └── SupabaseAuthViewModel.swift 
+|   └── SupabaseManager.swift 
 ├── Views/                   # All SwiftUI views
+│   └── AuthSwicherView.swift
 │   └── ContentView.swift
+│   └── LoggedInView.swift
+│   └── LoginAuthView.swift
+│   └── SignUpAuthView.swift
+│   └── TogglePromptView.swift
 ├── Assets.xcassets/         
 └── SplashEditApp.swift      # App entry point
 ```
