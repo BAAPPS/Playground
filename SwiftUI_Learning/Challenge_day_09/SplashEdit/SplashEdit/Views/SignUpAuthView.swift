@@ -33,6 +33,20 @@ struct SignUpAuthView: View {
                 ReusableTaskButton(name:"Sign Up") {
                     await authVM.signUp(email: email, password: password, username: username)
                 }
+                
+                VStack{
+                    if authVM.isLoading {
+                        ProgressView()
+                    }
+                    
+                    if let error = authVM.errorMessage {
+                        Text(error)
+                            .foregroundStyle(Color(hex: "#d3e0e4"))
+                    }
+                    
+                }
+                .padding(.top, 10)
+                
                 Spacer()
                 
                 HStack {

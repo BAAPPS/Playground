@@ -27,5 +27,7 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(authVM: SupabaseAuthViewModel())
+    let vm = SupabaseAuthViewModel()
+    vm.currentUser = SupabaseUsersModel(id: UUID(), username: "MockUser", created_at: Date())
+    return ContentView(authVM: vm)
 }

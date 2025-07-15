@@ -11,14 +11,20 @@ struct LoggedInView: View {
     @Bindable var authVM: SupabaseAuthViewModel
     
     var body: some View {
-        VStack {
-            Text("Welcome, \(authVM.currentUser?.username ?? "Unknown User")")
-                .font(.largeTitle)
-                .padding()
+        ZStack {
+                Color(hex: "#edf2f4")
+                    .ignoresSafeArea()
+            VStack {
+                
+            }
         }
+        .navigationTitle("Welcome, \(authVM.currentUser?.username ?? "Unknown User")")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    LoggedInView(authVM: SupabaseAuthViewModel())
+    NavigationView {
+        LoggedInView(authVM: SupabaseAuthViewModel())
+    }
 }

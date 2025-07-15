@@ -34,8 +34,10 @@ You’ll develop an iOS app that allows users to:
 ```text
 SplashEdit/       
 ├── Models/                  # SwiftData & Supabase data models
+|   └── NetworkMonitorModel.swift 
 |   └── SupabaseClientModel.swift 
-|   └── SupabaseUserModel.swift 
+|   └── SupabaseUserModel.swift
+|   └── UsersModel.swift 
 ├── Utils/
 |   └── HexColor.swift 
 |   └── ReusableViews.swift

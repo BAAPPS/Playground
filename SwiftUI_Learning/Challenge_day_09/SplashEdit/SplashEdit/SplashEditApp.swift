@@ -15,6 +15,9 @@ struct SplashEditApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(authVM: authVM)
+                .task{
+                    await authVM.restoreSession()
+                }
         }.modelContainer(for:UsersModel.self)
     }
 }

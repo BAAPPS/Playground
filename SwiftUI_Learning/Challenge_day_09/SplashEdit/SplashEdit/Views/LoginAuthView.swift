@@ -28,9 +28,25 @@ struct LoginAuthView: View {
                 CustomTextField(name:"email", text: $email, keyboardType: .emailAddress)
                 PasswordTextField(name: "Password", text: $password)
                     .padding(.vertical, 10)
+                
+                
                 ReusableTaskButton(name:"Log in") {
                     await authVM.signIn(email: email, password: password)
                 }
+                
+                VStack{
+                    if authVM.isLoading {
+                        ProgressView()
+                    }
+                    
+                    if let error = authVM.errorMessage {
+                        Text(error)
+                            .foregroundStyle(Color(hex: "#d3e0e4"))
+                    }
+                    
+                }
+                .padding(.top, 10)
+                
                 Spacer()
                 
                 HStack {
