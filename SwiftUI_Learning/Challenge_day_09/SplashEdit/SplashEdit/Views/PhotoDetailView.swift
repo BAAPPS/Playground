@@ -31,8 +31,10 @@ struct PhotoDetailView: View {
                                             .foregroundColor(.white)
                                             .background(Color.black.opacity(0.6))
                                             .clipShape(Circle())
-                                    }.padding()
-                                        .padding(.trailing, 20)
+                                    }
+                                    .padding()
+                                    .padding(.trailing, 10)
+                                    .offset(y: 40)
                                     Spacer()
                                 }
                             }

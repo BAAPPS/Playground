@@ -269,3 +269,82 @@ ZStack {
 * `.zIndex(Double(index))` makes sure cards are layered from bottom to top in the order they appear.
 * Overlay logic is now bound to the actual top card, regardless of dynamic data changes.
 
+
+### 4. Timeout and Compilation Issues When Using `Task {}` with Complex Async Expressions
+
+**Problem:**
+When wrapping a complex async call inside a single `Task {}` block—especially one that includes creating model instances, calling async API methods, and updating state all inline—the Swift compiler either failed to build 
+due to a timeout or reported *“The compiler is unable to type-check this expression in reasonable time”* errors.
+
+This caused significant delays and blocked development progress.
+
+**Root Cause:**
+Swift’s type checker can struggle with very complex closures or expressions inside async contexts like `Task {}` if too many operations are chained or nested inline. This is because the compiler tries to infer types and 
+control flow all at once, and heavy chaining or embedding causes it to exceed its heuristics or time limits.
+
+**Solution:**
+The solution was to **break the complex expression into smaller, simpler sub-expressions** or separate async functions. For example, instead of writing everything inside one `Task {}` block in a button action, the 
+asynchronous logic was moved into a dedicated async method. Then, the button action simply called that method inside a minimal `Task {}` block.
+
+This reduces the complexity inside the compiler’s type-checking scope and drastically improves compile time and stability.
+
+**Example Before (Problematic):**
+
+```swift
+Button {
+    Task {
+        let photo = photos[currentIndex]
+        let liked = await authVM.toggleLike(for: PhotoModel(
+            id: UUID(),
+            user_id: authVM.currentUser?.id ?? UUID(),
+            unsplash_id: photo.unsplash_id,
+            original_url: photo.urls.regular,
+            created_at: nil
+        ))
+        await MainActor.run {
+            isLiked = liked
+            showHeartOverlay = liked
+        }
+        try? await Task.sleep(nanoseconds: 700_000_000)
+        await MainActor.run {
+            showHeartOverlay = false
+        }
+    }
+} label: {
+    // Button label
+}
+```
+
+**Example After (Fixed):**
+
+```swift
+Button {
+    Task {
+        await likeCurrentPhotoAsync()
+    }
+} label: {
+    // Button label
+}
+
+func likeCurrentPhotoAsync() async {
+    guard currentIndex >= 0 && currentIndex < photos.count else { return }
+    let photo = photos[currentIndex]
+    let photoModel = PhotoModel(
+        id: nil,
+        user_id: authVM.currentUser?.id ?? UUID(),
+        unsplash_id: photo.unsplash_id,
+        original_url: photo.urls.regular,
+        created_at: nil
+    )
+    let liked = await authVM.toggleLike(for: photoModel)
+    await MainActor.run {
+        isLiked = liked
+        showHeartOverlay = liked
+    }
+    try? await Task.sleep(nanoseconds: 700_000_000)
+    await MainActor.run {
+        showHeartOverlay = false
+    }
+}
+```
+

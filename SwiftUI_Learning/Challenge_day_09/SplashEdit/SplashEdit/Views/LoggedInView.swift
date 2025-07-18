@@ -40,7 +40,7 @@ struct LoggedInView: View {
                         }
                         .frame(width: geometry.size.width, height: geometry.size.height)
                     } else {
-                        TinderStackView(photos: $photoVM.photos, parentSize: geometry.size)
+                        TinderStackView(authVM: authVM, photos: $photoVM.photos, parentSize: geometry.size)
                     }
                 }
             }
