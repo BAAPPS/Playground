@@ -157,3 +157,115 @@ func restoreSession() async {
 With these improvements, the app gracefully handles offline scenarios by showing the cached user state and only attempts token refresh when the network is available. It also properly resets the session and cleans up tokens 
 on authentication failure, improving reliability and user experience.
 
+### 3. Info Button Missing on Swipe Cards
+
+**Problem:**
+
+In the Tinder-style swipe stack (`TinderStackView`), an `info.circle` button was intended to appear only on the topmost photo card. However, the button was inconsistently missing, even when a photo was visually on top — 
+especially after swiping some cards away.
+
+This broke the expected user experience and made it unclear how to access the photo's details.
+
+### Root Cause:
+
+The code used to determine which photo was the top card relied on this logic:
+
+```swift
+let isTopPhoto = index == photos.count - 1
+```
+
+This assumption works **only if**:
+
+* The stack is static, and
+* No cards are removed
+
+But in a dynamic swipe view where photos are constantly removed (`remove(photo)`), the indices shift, and the logic can fail to mark the **visually top card** as the top one in data. This causes the button to disappear from the card currently on top of the screen.
+
+Moreover, SwiftUI doesn’t automatically guarantee Z-stack layering by `ForEach` order — without explicit `zIndex()` management, view stacking becomes inconsistent.
+
+---
+
+### 🔴 Before: Problematic Code (Broken Overlay Logic)
+
+```swift
+ZStack {
+    ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
+        let isTopPhoto = index == photos.count - 1 // ❌ not reliable after removal
+
+        PhotoSwipeView(photo: photo) {
+            remove(photo)
+        }
+        .overlay(
+            isTopPhoto ?
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        selectedPhoto = photo
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.title)
+                            .padding()
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Circle())
+                            .foregroundColor(.white)
+                    }
+                    .padding()
+                }
+                Spacer()
+            }
+            .offset(x: -100)
+            : nil // ❌ overlay disappears when top photo is misidentified
+        )
+        .frame(width: parentSize.width, height: parentSize.height)
+        // ⚠️ No zIndex set – view layering not controlled
+    }
+}
+```
+
+### ✅ After: Fixed Solution with `zIndex` + ID Match
+
+```swift
+ZStack {
+    ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
+        let isTopPhoto = photo.id == photos.last?.id // ✅ safe comparison
+
+        PhotoSwipeView(photo: photo) {
+            remove(photo)
+        }
+        .overlay(
+            isTopPhoto ?
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        selectedPhoto = photo
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.title)
+                            .padding()
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Circle())
+                            .foregroundColor(.white)
+                    }
+                    .padding()
+                }
+                Spacer()
+            }
+            .offset(x: -100)
+            : nil
+        )
+        .frame(width: parentSize.width, height: parentSize.height)
+        .zIndex(Double(index)) // ✅ force visual order
+    }
+}
+```
+
+---
+
+### Why This Fix Works
+
+* `photo.id == photos.last?.id` directly compares the photo object to the **last item in the array**, which always represents the top visual card.
+* `.zIndex(Double(index))` makes sure cards are layered from bottom to top in the order they appear.
+* Overlay logic is now bound to the actual top card, regardless of dynamic data changes.
+

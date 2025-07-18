@@ -61,3 +61,29 @@ struct ReusableTaskButton: View{
         }
     }
 }
+
+struct AsyncImageLoader: View {
+    let urlString:String
+    var cornerRadius: CGFloat = 16
+     var shadowRadius: CGFloat = 5
+     var contentMode: ContentMode = .fit
+    
+    var body: some View {
+        AsyncImage(url: URL(string: urlString)) { phase in
+            switch phase {
+            case .empty:
+                ProgressView()
+            case .success(let image):
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: contentMode)
+                    .cornerRadius(cornerRadius)
+                    .shadow(radius: shadowRadius)
+            case .failure:
+                EmptyView()
+            @unknown default:
+                EmptyView()
+            }
+        }
+    }
+}
