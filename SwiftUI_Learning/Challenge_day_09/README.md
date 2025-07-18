@@ -35,8 +35,10 @@ You’ll develop an iOS app that allows users to:
 SplashEdit/       
 ├── Models/                  # SwiftData & Supabase data models
 |   └── NetworkMonitorModel.swift 
+|   └── PhotoModel.swift 
 |   └── SupabaseClientModel.swift 
 |   └── SupabaseUserModel.swift
+|   └── UnsplashPhotosModel.swift 
 |   └── UsersModel.swift 
 ├── Utils/
 |   └── HexColor.swift 
