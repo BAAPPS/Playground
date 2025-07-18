@@ -40,17 +40,25 @@ SplashEdit/
 |   └── UsersModel.swift 
 ├── Utils/
 |   └── HexColor.swift 
+|   └── MockData.swift
+|   └── NetworkFetcher.swift
 |   └── ReusableViews.swift
+|   └── SecretsManager.swift
 |   └── Supabase-JSONDecoder.swift
 ├── ViewModels/              # Handles filtering, syncing, and auth logic
 |   └── SupabaseAuthViewModel.swift 
 |   └── SupabaseManager.swift 
+|   └── UnsplashPhotosVM.swift 
 ├── Views/                   # All SwiftUI views
 │   └── AuthSwicherView.swift
 │   └── ContentView.swift
 │   └── LoggedInView.swift
 │   └── LoginAuthView.swift
+│   └── PhotoDetailView.swift
+│   └── PhotoSwipeView.swift
+│   └── PreviewBindingsView.swift
 │   └── SignUpAuthView.swift
+│   └── TinderStackView.swift
 │   └── TogglePromptView.swift
 ├── Assets.xcassets/         
 └── SplashEditApp.swift      # App entry point
