@@ -49,7 +49,8 @@ SplashEdit/
 |   └── Supabase-JSONDecoder.swift
 ├── ViewModels/              # Handles filtering, syncing, and auth logic
 |   └── SupabaseAuthViewModel.swift 
-|   └── SupabaseManager.swift 
+|   └── SupabaseManager.swift
+|   └── TinderStackButtonsVM.swift  
 |   └── UnsplashPhotosVM.swift 
 ├── Views/                   # All SwiftUI views
 │   └── AuthSwicherView.swift
@@ -60,6 +61,7 @@ SplashEdit/
 │   └── PhotoSwipeView.swift
 │   └── PreviewBindingsView.swift
 │   └── SignUpAuthView.swift
+│   └── TinderStackButtonsView.swift
 │   └── TinderStackView.swift
 │   └── TogglePromptView.swift
 ├── Assets.xcassets/         
