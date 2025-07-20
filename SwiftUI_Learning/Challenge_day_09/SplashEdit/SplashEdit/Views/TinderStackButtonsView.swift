@@ -9,10 +9,14 @@ import SwiftUI
 
 struct TinderStackButtonsView: View {
     
+    var authVM: SupabaseAuthViewModel
+    
     @Bindable var buttonsVM:TinderStackButtonsVM
     @Binding var selectedPhoto:UnsplashPhotosModel?
     
     var photos: [UnsplashPhotosModel]
+    
+    @State private var showUserProfile = false
     
     
     var likeButton: some View {
@@ -22,7 +26,7 @@ struct TinderStackButtonsView: View {
         ){
             await buttonsVM.likeCurrentPhotoAsync()
         }
-
+        
     }
     
     var infoButton: some View {
@@ -31,6 +35,13 @@ struct TinderStackButtonsView: View {
         }
     }
     
+    var userProfileViewButton: some View {
+        ReusableAsyncImageButton(systemImageName: "person.circle") {
+            showUserProfile.toggle()
+        }
+    }
+    
+    
     
     var body: some View {
         VStack {
@@ -38,6 +49,7 @@ struct TinderStackButtonsView: View {
             HStack {
                 Spacer()
                 VStack{
+                    userProfileViewButton
                     likeButton
                     infoButton
                 }
@@ -46,6 +58,9 @@ struct TinderStackButtonsView: View {
             }
         }
         .offset(x: 10)
+        .navigationDestination(isPresented: $showUserProfile) {
+            UserProfileView(authVM: authVM)
+        }
     }
 }
 
@@ -56,6 +71,7 @@ struct TinderStackButtonsView: View {
         
         var body: some View {
             TinderStackButtonsView(
+                authVM: SupabaseAuthViewModel(),
                 buttonsVM: TinderStackButtonsVM(
                     authVM: SupabaseAuthViewModel(),
                     photos: mockPhotos

@@ -26,7 +26,7 @@ class SupabaseAuthViewModel {
     
     
     var currentUser: SupabaseUsersModel?
-    
+ 
     func cachedCurrentUser(_ profile: SupabaseUsersModel) {
         let data = try? JSONEncoder().encode(profile)
         UserDefaults.standard.set(data, forKey: userDefaultKey)

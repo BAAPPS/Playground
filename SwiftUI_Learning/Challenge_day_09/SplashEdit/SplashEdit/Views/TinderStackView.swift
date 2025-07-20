@@ -30,54 +30,55 @@ struct TinderStackView: View {
     }
     
     
- 
-    
-    
     var body: some View {
-        ZStack {
-            ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
-                if buttonsVM.currentIndex >= 0 && buttonsVM.currentIndex < photos.count {
-                    PhotoSwipeView(photo: photos[buttonsVM.currentIndex]) { direction in
-                        Task{
-                            
-                            if direction == .left{
-                                await buttonsVM.moveToNextPhoto()
-                            } else if direction == .right{
-                                await buttonsVM.moveToPreviousPhoto()
+        NavigationStack {
+            ZStack {
+                ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
+                    if buttonsVM.currentIndex >= 0 && buttonsVM.currentIndex < photos.count {
+                        PhotoSwipeView(photo: photos[buttonsVM.currentIndex]) { direction in
+                            Task{
+                                
+                                if direction == .left{
+                                    await buttonsVM.moveToNextPhoto()
+                                } else if direction == .right{
+                                    await buttonsVM.moveToPreviousPhoto()
+                                }
                             }
                         }
-                    }
-                    .frame(width: parentSize.width, height: parentSize.height)
-                    .zIndex(Double(index))
-                    .overlay(
-                        index == photos.indices.last ?
-                        TinderStackButtonsView(buttonsVM: buttonsVM, selectedPhoto: $selectedPhoto, photos:photos)
-                        : nil
-                    )
-                    .overlay {
-                        if buttonsVM.showHeartOverlay {
-                            Image(systemName: "heart.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 150, height: 150)
-                                .foregroundColor(.red)
-                                .opacity(0.8)
-                                .transition(.scale)
+                        .frame(width: parentSize.width, height: parentSize.height)
+                        .zIndex(Double(index))
+                        .overlay(
+                            index == photos.indices.last ?
+                            
+                            TinderStackButtonsView(authVM:authVM, buttonsVM: buttonsVM, selectedPhoto: $selectedPhoto, photos:photos)
+                            
+                            : nil
+                        )
+                        .overlay {
+                            if buttonsVM.showHeartOverlay {
+                                Image(systemName: "heart.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 150, height: 150)
+                                    .foregroundColor(.red)
+                                    .opacity(0.8)
+                                    .transition(.scale)
+                            }
                         }
+                        
+                    } else {
+                        Text("No more photos")
                     }
-                    
-                } else {
-                    Text("No more photos")
                 }
             }
-        }
-        .task{
-            await buttonsVM.updateLikeStatus()
-        }
-        // Present full screen modal when selectedPhoto is set
-        .fullScreenCover(item: $selectedPhoto) { photo in
-            PhotoDetailView(photo: photo)
-            
+            .task{
+                await buttonsVM.updateLikeStatus()
+            }
+            // Present full screen modal when selectedPhoto is set
+            .fullScreenCover(item: $selectedPhoto) { photo in
+                PhotoDetailView(photo: photo)
+                
+            }
         }
         
     }
