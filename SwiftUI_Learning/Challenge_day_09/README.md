@@ -61,6 +61,7 @@ SplashEdit/
 │   └── PhotoDetailView.swift
 │   └── PhotoSwipeView.swift
 │   └── PreviewBindingsView.swift
+│   └── ProflleSettingView.swift
 │   └── SignUpAuthView.swift
 │   └── TinderStackButtonsView.swift
 │   └── TinderStackView.swift
