@@ -62,6 +62,37 @@ struct ReusableTaskButton: View{
     }
 }
 
+
+struct ReusableAsyncImageButton: View {
+    let systemImageName: String
+    var fontSize: CGFloat = 28
+    var bgColor = Color(hex: "#364f56")
+    var fgColor = Color.white
+    var shadowRadius: CGFloat = 4
+    var shadowOpacity: Double = 0.3
+    var offsetX: CGFloat = 0
+    var offsetY: CGFloat = 0
+    let action: () async -> Void
+
+    var body: some View {
+        Button {
+            Task {
+                await action()
+            }
+        } label: {
+            Image(systemName: systemImageName)
+                .font(.system(size: fontSize))
+                .padding()
+                .background(bgColor)
+                .clipShape(Circle())
+                .foregroundColor(fgColor)
+                .shadow(color: Color.black.opacity(shadowOpacity), radius: shadowRadius, x: 0, y: 3)
+                .offset(x: offsetX, y: offsetY)
+        }
+    }
+}
+
+
 struct AsyncImageLoader: View {
     let urlString:String
     var cornerRadius: CGFloat = 16
