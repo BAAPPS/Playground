@@ -16,11 +16,14 @@ enum ProfileTab: String, CaseIterable, Identifiable {
 
 struct UserProfileView: View {
     
-    var authVM: SupabaseAuthViewModel
+    @Bindable var authVM: SupabaseAuthViewModel
     
     @State private var selectedTab:ProfileTab = .liked
     
+    @State private var showProfileSetting = false
+    
     @State var photoVM = PhotoViewModel()
+    
     
     func photosForSelectedTab() -> [PhotoModel] {
           switch selectedTab {
@@ -64,8 +67,21 @@ struct UserProfileView: View {
         }
         .navigationTitle(authVM.currentUser?.username ?? "Unknown User")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar{
+            ToolbarItem(placement: .topBarTrailing){
+                Button{
+                    showProfileSetting.toggle()
+                } label:{
+                    Image(systemName:"gearshape.fill")
+                        .foregroundColor(Color(hex:"#5f8d98"))
+                }
+            }
+        }
         .task{
             await photoVM.fetchLikedPhoto()
+        }
+        .sheet(isPresented: $showProfileSetting){
+            ProflleSettingView(authVM: authVM, showProfileSetting: $showProfileSetting)
         }
     }
 }

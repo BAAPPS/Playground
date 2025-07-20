@@ -11,7 +11,7 @@ import SwiftUI
 
 
 struct TinderStackView: View {
-    var authVM: SupabaseAuthViewModel
+    @Bindable var authVM: SupabaseAuthViewModel
     
     @Binding var photos: [UnsplashPhotosModel]
     let parentSize: CGSize

@@ -185,6 +185,39 @@ class SupabaseAuthViewModel {
         isLoading = false
     }
     
+    func updateUsername(username: String) async -> Bool {
+        guard let user = currentUser else {
+            errorMessage = "no current user to update"
+            return false
+        }
+        guard networkMonitor.isConnected else {
+            errorMessage = "No internet connection. Cannot update profile"
+                     return false
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let updateProfile = SupabaseUsersModel(id: user.id, username: username, created_at: user.created_at)
+            
+            try await client
+                .from("users")
+                .update(updateProfile)
+                .eq("id", value: user.id.uuidString)
+                .execute()
+            currentUser = updateProfile
+            cachedCurrentUser(updateProfile)
+            isLoading = false
+            return true
+        } catch {
+            errorMessage = "Failed to update username: \(error.localizedDescription)"
+        }
+        isLoading = false
+        
+        return true
+    }
+    
     
     func toggleLike(for photo: PhotoModel) async -> Bool {
         guard let userId = client.auth.currentUser?.id else {

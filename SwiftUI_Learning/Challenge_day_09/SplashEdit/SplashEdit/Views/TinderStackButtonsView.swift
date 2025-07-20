@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TinderStackButtonsView: View {
     
-    var authVM: SupabaseAuthViewModel
+    @Bindable var authVM: SupabaseAuthViewModel
     
     @Bindable var buttonsVM:TinderStackButtonsVM
     @Binding var selectedPhoto:UnsplashPhotosModel?
