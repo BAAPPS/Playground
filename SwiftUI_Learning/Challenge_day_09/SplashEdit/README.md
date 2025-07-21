@@ -1,9 +1,34 @@
-# Challenge Day 9 – SplashEdit
+## Challenge Day 9 – SplashEdit
 
-SplashEdit is a full-stack SwiftUI challenge project that blends creative image editing with modern backend integration and robust offline-first architecture. Users can explore photos from Unsplash, apply stunning Core 
-Image filters, and save both filtered and original images locally with SwiftData. All content is securely synced to the cloud using Supabase, complete with user authentication, secure access policies, and personalized 
-features like favorites and collections. Whether online or offline, SplashEdit delivers a seamless experience that combines artistry, data management, and scalable cloud connectivity — making it the perfect real-world 
-challenge to level up your iOS development skills.
+A full-stack iOS photo editing app built with SwiftUI, Supabase, and Core Image
+
+---
+
+## Project Overview
+SplashEdit is a creative image editing app that lets users explore high-quality photos from Unsplash, apply stunning Core Image filters, and save both the original and edited versions. All edits and likes are synced to the 
+cloud using Supabase, with secure user authentication and personalized features like collections.
+
+This project challenged me to go beyond local development and build a production-style, full-stack iOS app with real-time cloud sync, user-specific data, and custom UI interactions — all while learning to manage state, 
+security, and scalability.
+
+
+---
+
+## Technologies Used
+
+- SwiftUI
+
+- Supabase (Auth, Postgres, Storage, RLS)
+
+- Unsplash API
+
+- Core Image
+
+- SwiftData (**partially implemented**)
+
+- Async/Await + Structured Concurrency
+
+- @Observable ViewModels
 
 ---
 
@@ -15,36 +40,54 @@ challenge to level up your iOS development skills.
 * Display of signed-in user's **username**, **email**, and **sign-in timestamp**
 * **Unsplash API integration** to fetch high-quality, searchable images
 * Apply **Core Image filters** with real-time preview and save both filtered and original versions
-* Store images and metadata **locally with SwiftData** using `@Model` and `@Query`
-* Sync saved images and metadata to **Supabase Storage** and **Postgres**
+* Upload and sync filtered images and metadata to **Supabase Storage** and **Postgres**
 * Save **likes** and create a **personal collection** of favorites across sessions
 * View and manage liked photos in a dedicated **"My Collection"** screen
-* **Offline-first design**: all data is available offline, syncing resumes when network is restored
 * Real-time **user count** and global data view using Supabase queries
 * **Reactive UI** architecture using `@Observable` view models and **SwiftUI**
-* Filtering and sorting of local photo data with **predicates** and **sort descriptors**
-* Automatic **profile updates** across views via **NotificationCenter** broadcasting
-* **Network monitoring** to dynamically adapt between online and offline states
 
 ---
 
 ## Why This Challenge?
 
-This challenge goes beyond local app development — it introduces real-world skills like:
+This challenge focuses on building a real-world app experience by integrating:
 
-* Building **offline-resilient apps**
-* Creating **photo editing tools** using Core Image
-* Syncing between **local and cloud storage**
-* Working with **RESTful APIs** (Unsplash) and **Postgres SQL** (Supabase)
-* Designing for **user personalization** (likes, filtered versions, collections)
-* Managing **authentication, secure access**, and **live user data**
+* **Cloud-based photo editing tools** using Core Image and Supabase
+* **RESTful APIs** (Unsplash) and **Postgres SQL** (Supabase)
+* **User personalization** with persistent likes, collections, and uploaded edits
+* **Authentication, secure access**, and **live user data dashboards**
 
-It’s not just a coding exercise — it’s a real app foundation.
+It’s not just a coding exercise — it’s a production-style foundation for cloud-native SwiftUI apps.
 
 ---
 
 ## What I Learned
 
+During the SplashEdit challenge, I gained hands-on experience building a **production-style SwiftUI app** that integrates cloud services, image processing, and personalized user data. Key takeaways include:
+
+### Building a Full-Stack SwiftUI App
+
+* Architected a **modular, reactive UI** using `@Observable` view models.
+* Connected to the **Unsplash API** for fetching, searching, and displaying dynamic photo content.
+* Implemented real-time image filtering with **Core Image** and saved both original and edited versions.
+
+### Supabase Authentication and Secure Cloud Sync
+
+* Used **Supabase Auth** for email-based sign-in and session handling.
+* Secured cloud data with **Row Level Security (RLS)** policies.
+* Synced filtered image data and metadata to **Supabase Storage** and **Postgres**.
+
+### State Management and SwiftUI Best Practices
+
+* Solved layout challenges like vertically centering content in `ScrollView` using `VStack` and `ZStack`.
+* Managed sheet presentation flow cleanly with `enum`-based `.fullScreenCover` logic.
+* Avoided compiler timeout errors by simplifying async closures and isolating async logic into separate functions.
+
+### Debugging and Performance Fixes
+
+* Resolved dynamic view layering bugs in a Tinder-style swipe stack using `.zIndex` and stable ID comparison.
+* Fixed filename collision issues by appending user IDs and fallback prefixes to saved image names.
+* Improved session handling by decoupling refresh logic from UI state and introducing network-aware restore flows.
 
 ---
 
@@ -476,4 +519,26 @@ struct SomeView: View {
 * Leverages Swift’s enums with associated values for clean modal data passing.
 * Simplifies modal management to a single state property.
 * Easily extensible for new modal types.
+
+---
+
+## What I Would Do Differently
+
+Initially, I intended to implement **offline-first functionality** using **SwiftData** so users could view and edit photos without a network connection. However, as I focused on integrating Supabase for user auth, cloud 
+syncing, and real-time features, offline support was unintentionally sidelined.
+
+### Reflection
+
+In hindsight, building an offline-capable app requires **planning for local-first architecture from day one** — not as a post-launch enhancement. While Supabase added powerful cloud functionality, it also introduced tight 
+coupling to network availability, which limited offline usability.
+
+### Moving Forward
+
+In future projects, I’ll make offline support a **foundational requirement**, not an afterthought. This means:
+
+* Prioritizing **local persistence** and designing sync logic around **network reachability**
+* Using tools like **SwiftData** or **Realm** to store user edits and metadata locally
+* Syncing to the cloud only when a connection is available, with **conflict resolution strategies** in place
+
+This taught me that **user experience doesn’t stop at feature parity** — reliability and responsiveness offline are just as critical.
 
