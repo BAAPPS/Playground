@@ -8,6 +8,17 @@
 import SwiftUI
 
 
+enum ActiveModal: Identifiable {
+    case photoDetail(UnsplashPhotosModel)
+    case filterPhoto(UnsplashPhotosModel)
+    
+    var id: String {
+        switch self {
+        case .photoDetail(let photo): return "detail-\(photo.id)"
+        case .filterPhoto(let photo): return "filter-\(photo.id)"
+        }
+    }
+}
 
 
 struct TinderStackView: View {
@@ -20,6 +31,9 @@ struct TinderStackView: View {
     @State private var selectedPhoto: UnsplashPhotosModel? = nil
     
     @State private var buttonsVM:TinderStackButtonsVM
+    
+    @State private var activeModal: ActiveModal? = nil
+
     
     
     init(authVM: SupabaseAuthViewModel, photos: Binding<[UnsplashPhotosModel]>, parentSize: CGSize) {
@@ -50,7 +64,7 @@ struct TinderStackView: View {
                         .overlay(
                             index == photos.indices.last ?
                             
-                            TinderStackButtonsView(authVM:authVM, buttonsVM: buttonsVM, selectedPhoto: $selectedPhoto, photos:photos)
+                            TinderStackButtonsView(authVM:authVM, buttonsVM: buttonsVM, activeModal: $activeModal, photos:photos)
                             
                             : nil
                         )
@@ -75,10 +89,15 @@ struct TinderStackView: View {
                 await buttonsVM.updateLikeStatus()
             }
             // Present full screen modal when selectedPhoto is set
-            .fullScreenCover(item: $selectedPhoto) { photo in
-                PhotoDetailView(photo: photo)
-                
+            .fullScreenCover(item: $activeModal) { modal in
+                switch modal {
+                case .photoDetail(let photo):
+                    PhotoDetailView(photo: photo)
+                case .filterPhoto(let photo):
+                    FilterPhotoView(authVM: authVM, photo: photo)
+                }
             }
+
         }
         
     }

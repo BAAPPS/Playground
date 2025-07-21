@@ -348,3 +348,132 @@ func likeCurrentPhotoAsync() async {
 }
 ```
 
+### 5. Filename Clashing When Saving Filtered Photos
+
+**Problem:**
+When multiple users applied filters to the same photo, filtered images were saved using filenames constructed only from the `likedPhotoID` and filter name. This caused filename clashes because users filtering the same 
+photo generated identical filenames, leading to overwriting or upload failures.
+
+**Problematic Code Example:**
+
+```swift
+// Filename constructed only with likedPhotoID and filter name
+let fileName = "\(likedPhotoID.uuidString)_\(safeFilterName).jpg"
+try await uploadFilteredImage(data: imageData, fileName: fileName)
+```
+
+This assumes `likedPhotoID` always exists and uniquely identifies the filtered image, but when a photo is *not liked* yet, this causes issues. Also, multiple users filtering the same liked photo produce duplicate filenames.
+
+**Root Cause:**
+Using only the `likedPhotoID` to construct the filename does not uniquely identify the file per user, so if multiple users like or filter the same photo, filenames collide.
+
+**Solution:**
+Add a fallback to use the photo ID combined with the user ID if there is *no liked photo ID*, ensuring uniqueness across users and photos:
+
+```swift
+let prefix: String
+if let likedID = likedPhotoID {
+    prefix = likedID.uuidString
+} else {
+    prefix = "nolikedphoto_\(photo.id)_\(userID.uuidString)"
+}
+let fileName = "\(prefix)_\(safeFilterName).jpg"
+try await uploadFilteredImage(data: imageData, fileName: fileName)
+```
+
+This way:
+
+* If the photo is liked, the filename uses the liked photo UUID.
+* If not liked, it uses the photo ID plus the user ID prefixed with `"nolikedphoto_"` to avoid collisions.
+
+**Why it Works:**
+UUIDs (both liked photo ID and user ID) are unique. Combining them with the photo ID and an explicit prefix for non-liked photos guarantees unique filenames per user per photo, preventing collisions and overwriting.
+
+### 6. Handling Multiple `.fullScreenCover` Presentations
+
+**Problem:**
+Presenting multiple `.fullScreenCover` modifiers independently from different buttons led to the runtime error:
+
+> *"Currently, only presenting a single sheet is supported. The next sheet will be presented when the currently presented sheet gets dismissed."*
+
+**Root Cause:**
+SwiftUI only allows one sheet or full screen cover to be active at a time per view hierarchy. Using separate `.fullScreenCover` modifiers for each modal causes conflicts if multiple are triggered.
+
+#### Problematic Code Example
+
+```swift
+struct SomeView: View {
+    @State private var showPhotoDetail = false
+    @State private var showFilterPhoto = false
+    let photo: UnsplashPhotosModel
+
+    var body: some View {
+        VStack {
+            Button("Show Photo Detail") {
+                showPhotoDetail = true
+            }
+            Button("Show Filter Photo") {
+                showFilterPhoto = true
+            }
+        }
+        .fullScreenCover(isPresented: $showPhotoDetail) {
+            PhotoDetailView(photo: photo)
+        }
+        .fullScreenCover(isPresented: $showFilterPhoto) {
+            FilterPhotoView(photo: photo)
+        }
+    }
+}
+```
+
+This causes crashes if both booleans become true close together, since multiple sheets cannot be presented simultaneously.
+
+
+#### Improved Solution: Use an Enum with Associated Values to Track Active Modal
+
+```swift
+enum ActiveModal: Identifiable {
+    case photoDetail(UnsplashPhotosModel)
+    case filterPhoto(UnsplashPhotosModel)
+
+    var id: String {
+        switch self {
+        case .photoDetail(let photo): return "detail-\(photo.id)"
+        case .filterPhoto(let photo): return "filter-\(photo.id)"
+        }
+    }
+}
+
+struct SomeView: View {
+    @State private var activeModal: ActiveModal?
+    let authVM: SupabaseAuthViewModel
+    let photo: UnsplashPhotosModel
+
+    var body: some View {
+        VStack {
+            Button("Show Photo Detail") {
+                activeModal = .photoDetail(photo)
+            }
+            Button("Show Filter Photo") {
+                activeModal = .filterPhoto(photo)
+            }
+        }
+        .fullScreenCover(item: $activeModal) { modal in
+            switch modal {
+            case .photoDetail(let photo):
+                PhotoDetailView(photo: photo)
+            case .filterPhoto(let photo):
+                FilterPhotoView(authVM: authVM, photo: photo)
+            }
+        }
+    }
+}
+```
+
+#### Benefits
+
+* Ensures only one `.fullScreenCover` is active at once, preventing SwiftUI errors.
+* Leverages Swift’s enums with associated values for clean modal data passing.
+* Simplifies modal management to a single state property.
+* Easily extensible for new modal types.
+

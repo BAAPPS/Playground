@@ -12,7 +12,9 @@ struct TinderStackButtonsView: View {
     @Bindable var authVM: SupabaseAuthViewModel
     
     @Bindable var buttonsVM:TinderStackButtonsVM
-    @Binding var selectedPhoto:UnsplashPhotosModel?
+//    @Binding var selectedPhoto:UnsplashPhotosModel?
+    @Binding var activeModal: ActiveModal?
+    
     
     var photos: [UnsplashPhotosModel]
     
@@ -31,16 +33,22 @@ struct TinderStackButtonsView: View {
     
     var infoButton: some View {
         ReusableAsyncImageButton(systemImageName: "info.circle") {
-            selectedPhoto = photos[buttonsVM.currentIndex]
+            activeModal = .photoDetail(photos[buttonsVM.currentIndex])
         }
     }
+
+    var filterViewButton: some View {
+        ReusableAsyncImageButton(systemImageName: "camera.filters") {
+            activeModal = .filterPhoto(photos[buttonsVM.currentIndex])
+        }
+    }
+
     
     var userProfileViewButton: some View {
         ReusableAsyncImageButton(systemImageName: "person.circle") {
             showUserProfile.toggle()
         }
     }
-    
     
     
     var body: some View {
@@ -50,6 +58,7 @@ struct TinderStackButtonsView: View {
                 Spacer()
                 VStack{
                     userProfileViewButton
+                    filterViewButton
                     likeButton
                     infoButton
                 }
@@ -66,8 +75,9 @@ struct TinderStackButtonsView: View {
 
 #Preview {
     struct PreviewWrapper: View {
-        @State private var selectedPhoto: UnsplashPhotosModel? = nil
+//        @State private var selectedPhoto: UnsplashPhotosModel? = nil
         @State private var mockPhotos = MockData.mockPhotos
+        @State private var activeModal: ActiveModal? = nil
         
         var body: some View {
             TinderStackButtonsView(
@@ -76,7 +86,8 @@ struct TinderStackButtonsView: View {
                     authVM: SupabaseAuthViewModel(),
                     photos: mockPhotos
                 ),
-                selectedPhoto: $selectedPhoto,
+//                selectedPhoto: $selectedPhoto,
+                activeModal: $activeModal,
                 photos: mockPhotos
             )
         }

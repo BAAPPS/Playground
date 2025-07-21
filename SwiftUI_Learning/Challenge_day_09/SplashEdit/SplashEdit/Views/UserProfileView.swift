@@ -24,15 +24,7 @@ struct UserProfileView: View {
     
     @State var photoVM = PhotoViewModel()
     
-    
-    func photosForSelectedTab() -> [PhotoModel] {
-          switch selectedTab {
-          case .liked:
-              return photoVM.likedPhotos
-          case .filtered:
-              return [] // later implement filtered photos
-          }
-      }
+    @State var filteredVM = FilteredPhotoVM()
     
     
     var body: some View {
@@ -57,11 +49,18 @@ struct UserProfileView: View {
             
             ScrollView{
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing:10) {
-                    ForEach(photosForSelectedTab(), id:\.id){photo in
-                        AsyncImageLoader(urlString: photo.original_url)
+                    if selectedTab == .liked {
+                        ForEach(photoVM.likedPhotos, id: \.id) { photo in
+                            AsyncImageLoader(urlString: photo.original_url)
+                        }
+                    } else {
+                        ForEach(filteredVM.filteredPhotos, id: \.id) { filtered in
+                            AsyncImageLoader(urlString: filtered.filtered_url)
+                        }
                     }
-                    .padding(.horizontal)
+                    
                 }
+                .padding(.horizontal)
             }
             
         }
@@ -77,9 +76,11 @@ struct UserProfileView: View {
                 }
             }
         }
-        .task{
+        .task {
             await photoVM.fetchLikedPhoto()
+            await filteredVM.fetchFilteredPhoto()
         }
+        
         .sheet(isPresented: $showProfileSetting){
             ProflleSettingView(authVM: authVM, showProfileSetting: $showProfileSetting)
         }
