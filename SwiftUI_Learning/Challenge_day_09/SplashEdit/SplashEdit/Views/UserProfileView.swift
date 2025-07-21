@@ -69,6 +69,16 @@ struct UserProfileView: View {
         .toolbar{
             ToolbarItem(placement: .topBarTrailing){
                 Button{
+                    Task{
+                        await authVM.logout()
+                    }
+                } label:{
+                    Image(systemName: "door.left.hand.open")                        .foregroundColor(Color(hex:"#5f8d98"))
+                }
+            }
+            
+            ToolbarItem(placement: .topBarTrailing){
+                Button{
                     showProfileSetting.toggle()
                 } label:{
                     Image(systemName:"gearshape.fill")

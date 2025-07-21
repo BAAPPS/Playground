@@ -221,6 +221,7 @@ struct FilterPhotoView: View {
                         Button("Save") {
                             Task{
                                 await saveFilteredImage()
+                                dismiss()
                             }
                         }
                         .buttonStyle(.borderedProminent)

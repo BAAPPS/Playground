@@ -26,7 +26,7 @@ class SupabaseAuthViewModel {
     
     
     var currentUser: SupabaseUsersModel?
- 
+    
     func cachedCurrentUser(_ profile: SupabaseUsersModel) {
         let data = try? JSONEncoder().encode(profile)
         UserDefaults.standard.set(data, forKey: userDefaultKey)
@@ -40,6 +40,12 @@ class SupabaseAuthViewModel {
         
         return user
     }
+    
+    func clearCachedUser(){
+        UserDefaults.standard.removeObject(forKey: userDefaultKey)
+    }
+    
+    
     
     func restoreSession() async {
         print("🔁 Attempting to restore session...")
@@ -95,13 +101,6 @@ class SupabaseAuthViewModel {
             UserDefaults.standard.removeObject(forKey: userDefaultKey)
         }
     }
-    
-    
-    func clearCachedUser(){
-        UserDefaults.standard.removeObject(forKey: userDefaultKey)
-    }
-    
-    
     
     
     func signUp(email: String, password: String, username:String) async {
@@ -192,7 +191,7 @@ class SupabaseAuthViewModel {
         }
         guard networkMonitor.isConnected else {
             errorMessage = "No internet connection. Cannot update profile"
-                     return false
+            return false
         }
         
         isLoading = true
@@ -224,7 +223,7 @@ class SupabaseAuthViewModel {
             print("User not logged in")
             return false
         }
-
+        
         do {
             // Check if the photo is already liked by user
             let response = try await client
@@ -233,22 +232,22 @@ class SupabaseAuthViewModel {
                 .eq("user_id", value: userId.uuidString)
                 .eq("unsplash_id", value: photo.unsplash_id)
                 .execute()
-
+            
             let likedPhotos = try JSONDecoder.supabaseJSONDecoder().decode([PhotoModel].self, from: response.data)
-
+            
             if let existing = likedPhotos.first {
                 // Safely unwrap existing.id, assuming id is optional
                 guard let existingID = existing.id else {
                     print("Error: existing liked photo missing id")
                     return false
                 }
-
+                
                 try await client
                     .from("liked_photo")
                     .delete()
                     .eq("id", value: existingID.uuidString)
                     .execute()
-
+                
                 print("💔 Like removed")
                 return false
             } else {
@@ -262,7 +261,7 @@ class SupabaseAuthViewModel {
                         "liked_by": photo.liked_by
                     ])
                     .execute()
-
+                
                 print("❤️ Photo liked")
                 return true
             }
@@ -270,16 +269,16 @@ class SupabaseAuthViewModel {
             print("Error toggling like: \(error.localizedDescription)")
             return false
         }
-
+        
     }
-
+    
     
     func hasUserLikedPhoto(unsplashID: String) async -> Bool {
         guard let userId = client.auth.currentUser?.id else {
             print("User not logged in")
             return false
         }
-
+        
         do {
             let response = try await client
                 .from("liked_photo")
@@ -287,7 +286,7 @@ class SupabaseAuthViewModel {
                 .eq("user_id", value: userId.uuidString)
                 .eq("unsplash_id", value: unsplashID)
                 .execute()
-
+            
             // Since response.data is Data, decode to [PhotoModel] or a smaller model representing liked photos
             let likedPhotos = try JSONDecoder.supabaseJSONDecoder().decode([PhotoModel].self, from: response.data)
             return !likedPhotos.isEmpty
@@ -296,7 +295,23 @@ class SupabaseAuthViewModel {
             return false
         }
     }
-
-
+    
+    
+    func logout() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do{
+            try await client.auth.signOut()
+            currentUser = nil
+            
+            clearCachedUser()
+        }
+        catch {
+            errorMessage = error.localizedDescription
+        }
+        
+        isLoading = false
+    }
     
 }
