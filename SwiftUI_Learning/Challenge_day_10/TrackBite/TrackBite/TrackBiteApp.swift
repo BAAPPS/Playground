@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct TrackBiteApp: App {
+    @State private var authVM = SupabaseAuthVM()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(authVM: authVM)
         }
+        .modelContainer(for: LocalUser.self)
     }
 }

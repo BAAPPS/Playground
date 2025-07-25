@@ -53,6 +53,69 @@ It’s designed to help me:
 
 ## Challenges and Problems Encountered
 
+### 1. Problem: Attempting Cached Login with SwiftData Only
+
+Initially, I tried to persist the logged-in user session using only **SwiftData** by saving the `LocalUser` object locally. While this approach preserved the data in the local store, it failed to provide a reliable session 
+experience on app relaunch.
+
+#### Issues:
+
+* There was **no persistent session identifier** across launches.
+* SwiftData doesn't support a built-in "current user" concept — it just stores data.
+* On app restart, I had **no way of knowing which user was the active session** without additional context.
+* Fetching all users and selecting one arbitrarily was **unreliable and unsafe**, especially when multiple users exist in the store.
+
+#### ❌ Code Example: Unreliable SwiftData-only Attempt
+
+```swift
+@MainActor
+func loadCachedUserFromSwiftDataOnly() {
+    let descriptor = FetchDescriptor<LocalUser>()
+    if let user = try? modelContext.fetch(descriptor).first {
+        currentUser = user
+    }
+}
+```
+
+**Problem:** This fetches the *first* user it finds — not necessarily the one that was last logged in.
+
+
+#### Solution: Combine SwiftData with UserDefaults
+
+To solve this issue, I introduced a **hybrid solution**:
+
+* **SwiftData** continues to store user information persistently.
+* **UserDefaults** stores the `id` of the last logged-in user, acting as a session pointer.
+
+This allowed me to reliably:
+
+* Identify the correct user on relaunch.
+* Maintain offline access to the session.
+* Keep SwiftData lean and focused on data persistence, while UserDefaults handles quick-access session metadata.
+
+##### ✅ Code Example: Stable Cached Session with ID Pointer
+
+```swift
+// Save the user's ID after login
+UserDefaults.standard.set(user.id, forKey: "cachedUserID")
+
+// Later, restore the correct user from SwiftData using the ID
+@MainActor
+func loadCachedUserFromID() {
+    guard let cachedID = UserDefaults.standard.string(forKey: "cachedUserID") else {
+        print("🟡 No cached user ID found")
+        return
+    }
+
+    let descriptor = FetchDescriptor<LocalUser>(predicate: #Predicate { $0.id == cachedID })
+    if let user = try? modelContext.fetch(descriptor).first {
+        currentUser = user
+        print("📦 Loaded cached user from SwiftData: \(user.email)")
+    }
+}
+```
+
+✅ **Result:** On every launch, I now reliably fetch the last active user. If the user exists in SwiftData and the cached ID is still valid, they are logged in automatically — creating a smooth, offline-friendly session experience.
 
 ---
 
