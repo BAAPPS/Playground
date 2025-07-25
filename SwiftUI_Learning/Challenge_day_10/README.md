@@ -8,14 +8,15 @@ development experience.
 
 ## What You’ll Build
 
-* A full-stack iOS app using SwiftUI and MapKit
-* A dynamic list of restaurants managed through a Supabase backend
-* Multiple user types (drivers, customers, admins) with role-based access
+* A full-stack iOS app using **SwiftUI**, **UIKit**, and **MapKit**
+* A dynamic list of restaurants managed through a **Supabase backend**
+* Multiple user types (drivers, customers, admins) with **role-based access**
 * Real-time simulation of driver movement on a map
 * Order assignment and tracking per user
 * Seamless syncing of delivery status between local JSON storage and Supabase
-* Offline-first data persistence with local JSON files
-* Features modeled after Yelp and DoorDash order tracking
+* Offline-first data persistence using local JSON files
+* UI elements modeled after **Yelp** and **DoorDash**
+* A reusable **UIKit-based segmented control component** embedded in SwiftUI
 
 ---
 
@@ -29,6 +30,8 @@ development experience.
 * How to detect network status and manage online/offline synchronization effectively
 * How to work with **image URLs** and remote assets to display rich UI content
 * How to simulate real-world order tracking workflows with dynamic status updates and multi-user scenarios
+* How to **embed and customize UIKit components in SwiftUI**, such as using `UISegmentedControl` for platform-consistent toggles and filters
+* How to extend your segmented control to optionally use a **UIKit picker** for longer lists or accessibility scenarios
 
 ---
 
@@ -37,8 +40,41 @@ development experience.
 ```text
 TrackBite/
 ├── Models/                  # Codable models for Supabase and local data (e.g., DeliveryDestination.swift, User.swift)
+│   └── Shared/
+│       └── KeychainManager.swift
+|       └── UserRole.swift
+│   └── Supabase/
+│       └── Extensions/
+│           └── Supabase+User.swift
+│       └── Client.swift
+|       └── SupabaseUser.swift
+│   └── SwiftData/
+│       └── LocalUser.swift
+├── UIKitRepresentables/              #  UIKit components exposed to SwiftUI
+│   └── CustomSegmentedControl.swift
+├── Utils/                            # General-purpose utilities and extensions
+│   └── Extensions/
+│       └── Color+Hex.swift
+│   └── ReusableViews.swift
+│   └── Supabase-JSONDecoder.swift
 ├── ViewModels/              # Business logic for data fetching, syncing, filtering, auth, and role management
+│   └── Local/
+│       └── LocalAuthVM.swift
+│   └── Shared/
+│       └── AuthCoordinator.swift
+│       └── NetworkMonitorVM.swift
+│   └── Supabase/
+│       └── SupabaseAuthVM.swift
+│       └── SupabaseManager.swift
 ├── Views/                   # SwiftUI views including maps, lists, user profiles, and detail screens
+│   └── Auth/
+│       └── AuthSwitcherView.swift
+│       └── LoggedInView.swift
+│       └── LogInView.swift
+│       └── SignUpView.swift
+│       └── TogglePromptView.swift
+│   └── Extensions/
+│       └── View+Extensions.swift
 │   └── ContentView.swift
 ├── Resources/               # Dummy data files (JSON), images, and other assets
 ├── Assets.xcassets/         # App icons and images
