@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct LogInView: View {
-    
+    static  let dummyUsersData: DummyUsersModel = Bundle.main.decode("dummyUsers.json")
     @State var authVM: SupabaseAuthVM
     @Binding var isSigningUp: Bool
-    @State private var email = "Jackayy@gmail.com"
-    @State private var password = "Jackayy123"
+    @State private var email = dummyUsersData.customers.first?.email ?? "default@example.com"
+    @State private var password = dummyUsersData.customers.first?.password ?? "defaultPassword123"
     
     var body: some View {
         ZStack {

@@ -1,0 +1,45 @@
+{
+  "drivers": [
+    {
+      "name": "jack",
+      "email": "jack@example.com",
+      "password": "DriverPass123"
+    },
+    {
+      "name": "anna",
+      "email": "anna@example.com",
+      "password": "AnnaDrive456"
+    }
+    ,
+    {
+      "name": "Jackayy",
+      "email": "Jackayy@gmail.com",
+      "password": "Jackayy123"
+    }
+  ],
+  "customers": [
+    {
+      "name": "mike",
+      "email": "mike@example.com",
+      "password": "CustomerPass789"
+    },
+    {
+      "name": "lisa",
+      "email": "lisa@example.com",
+      "password": "LisaShop321"
+    }
+  ],
+  "restaurants": [
+    {
+      "name": "pizza_place",
+      "email": "pizza@example.com",
+      "password": "Pizza12345"
+    },
+    {
+      "name": "burger_joint",
+      "email": "burger@example.com",
+      "password": "Burger67890"
+    }
+  ]
+}
+

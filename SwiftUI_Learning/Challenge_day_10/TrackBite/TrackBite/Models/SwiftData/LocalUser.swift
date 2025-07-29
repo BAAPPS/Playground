@@ -17,7 +17,6 @@ class LocalUser {
     var role: UserRole
     var created_at: Date?
     
-    
     init(id: String, email: String, username: String, name: String, role: UserRole, created_at: Date? = .now) {
         self.id = id
         self.email = email

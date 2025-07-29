@@ -119,4 +119,138 @@ func loadCachedUserFromID() {
 
 ---
 
+### 2. Problem: Inconsistent Navigation to Onboarding After Sign Up
+
+During development, I encountered a confusing issue where **the app would sometimes skip the onboarding flow entirely and jump straight to the logged-in view**, even immediately after a user signed up. This behavior was 
+inconsistent between the **Preview canvas** and the **iOS Simulator**, making debugging even trickier.
+
+#### Symptoms:
+
+* After successful sign-up, the app should show a tailored onboarding view based on the user’s role.
+* In Preview, onboarding appeared correctly.
+* In Simulator, it would skip onboarding and jump directly to the main `LoggedInView`.
+
+#### Root Cause:
+
+This behavior stemmed from my reliance on `localAuthVM.currentUser` alone to determine what to show:
+
+```swift
+if localAuthVM.currentUser != nil {
+    LoggedInView(authVM: authVM)
+} else {
+    AuthSwitcherView(authVM: authVM)
+}
+```
+
+Because the user was cached and loaded immediately after sign-up, `currentUser` was **already non-nil** before navigation occurred — **bypassing the onboarding logic** unintentionally.
+
+Also:
+
+* **Preview runs in a clean environment** — no persistent UserDefaults or SwiftData — so onboarding appeared as expected.
+* **Simulator retains cached data** — so `currentUser` was restored immediately, skipping onboarding.
+
+#### ❌ Problematic Logic (Before)
+
+```swift
+if localAuthVM.currentUser != nil {
+    LoggedInView(authVM: authVM) // Gets shown even if onboarding not completed
+}
+```
+
+#### Solution: Introduce Persistent Onboarding Completion Flag
+
+To fix this, I added a `hasCompletedOnboarding` flag to `LocalAuthVM`, stored in `UserDefaults`. This boolean explicitly tracks whether the user has finished onboarding, giving me full control over the app’s flow.
+
+```swift
+var hasCompletedOnboarding: Bool {
+    get { UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") }
+    set { UserDefaults.standard.set(newValue, forKey: "hasCompletedOnboarding") }
+}
+```
+
+Then I updated the view logic in `ContentView`:
+
+##### ✅ Improved Flow Logic
+
+```swift
+if localAuthVM.currentUser != nil {
+    if localAuthVM.hasCompletedOnboarding {
+        LoggedInView(authVM: authVM)
+    } else {
+        OnboardingView(userRole: localAuthVM.currentUser!.role)
+    }
+} else {
+    AuthSwitcherView(authVM: authVM)
+}
+```
+
+Finally, after the user finishes onboarding, I set the flag:
+
+```swift
+localAuthVM.hasCompletedOnboarding = true
+```
+
+#### ✅ Result: Predictable, Role-Specific Flow
+
+* Users are always taken to the correct onboarding screen after sign-up.
+* App persists onboarding status across launches using `UserDefaults`.
+* Clear separation between auth, onboarding, and main app views.
+* Debugging is much easier because Preview and Simulator now behave consistently (once cache is cleared).
+
+
+---
+
+### 3. Problem: UUID Mismatch During Onboarding
+
+**Issue:** During customer onboarding, the `id` used in `CustomerModel` did not match the `auth.uid()` from Supabase. This happened because the user ID from Supabase (`localAuthVM.currentUser?.id`) wasn't yet available 
+when `ContentView` appeared, leading to a temporary `UUID()` being used instead.
+
+**What went wrong:**
+
+* `onAppear` ran too early, before the user was fully signed in.
+* A new random UUID was incorrectly assigned, breaking RLS `WITH CHECK (auth.uid() = id)`.
+
+**Solution:**
+Used `onChange(of: localAuthVM.currentUser)` to defer logic until the user was actually available. This guaranteed the real `auth.uid()` was present before creating or updating the onboarding model.
+
+```swift
+.onChange(of: localAuthVM.currentUser) { _, _ in
+    if let userIDString = localAuthVM.currentUser?.id,
+       let userUUID = UUID(uuidString: userIDString) {
+        customerVM = CustomerVM(customerModel: CustomerModel(id: userUUID, ...))
+    }
+}
+```
+
+This reactive approach ensured model updates were synced with Supabase's authenticated user ID.
+
+---
+
+### 4. Problem: Prop Drilling and State Management
+
+**Issue:** As the app grew, onboarding and shared user state needed to flow through multiple view layers, leading to prop drilling — where props were passed down several levels unnecessarily.
+
+**Solution:**
+Adopted the new Swift 5.9+ data flow system using `@Observable` view models and `@Environment(...)` injection.
+
+```swift
+@Observable class CustomerVM { ... }
+
+@main
+struct TrackBiteApp: App {
+    @State private var customerVM = CustomerVM(...)
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environment(customerVM) // accessible app-wide
+        }
+    }
+}
+```
+
+This eliminated the need to pass state manually through view hierarchies, making the codebase cleaner and more maintainable.
+
+---
+
 ## What I Would Do Differently

@@ -9,9 +9,11 @@ import SwiftUI
 import SwiftData
 
 struct AuthSwitcherView: View {
-    
+    @Environment(LocalAuthVM.self) var localAuthVM
     @State private var isSigningUp = true
     @Bindable var authVM: SupabaseAuthVM
+    
+    
     
     var body: some View {
         ZStack {
@@ -29,5 +31,7 @@ struct AuthSwitcherView: View {
 
 #Preview {
     let authVM = SupabaseAuthVM()
+    let localAuthVM = LocalAuthVM.shared
     AuthSwitcherView(authVM: authVM)
+        .environment(localAuthVM)
 }

@@ -1,46 +1,32 @@
 //
-//  ContentView.swift
+//  OnboardingView.swift
 //  TrackBite
 //
-//  Created by D F on 7/23/25.
+//  Created by D F on 7/27/25.
 //
 
 import SwiftUI
-import SwiftData
 
-struct ContentView: View {
+struct OnboardingView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(CustomerVM.self) var customerVM
     @Environment(RestaurantVM.self) var restaurantVM
-    @Environment(\.modelContext) private var modelContext
-    @State var authVM: SupabaseAuthVM
-    
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                Group {
-                    if localAuthVM.currentUser != nil {
-                        if !localAuthVM.hasCompletedOnboarding {
-                            OnboardingView(userRole: localAuthVM.currentUser!.role)
-                        } else {
-                            LoggedInView(authVM: authVM)
-                        }
+    let userRole: UserRole
 
-                    } else {
-                        AuthSwitcherView(authVM: authVM)
-                    }
-                }
-            }
-        }
-        .onAppear {
-            localAuthVM.modelContext = modelContext
-            localAuthVM.debugPrintAllLocalUsers()
+    var body: some View {
+        switch userRole {
+        case .driver:
+            DriverOnboardingView()
+        case .customer:
+            CustomerOnboardingView()
+        case .restaurant:
+            RestaurantOnboardingView()
         }
     }
 }
 
 #Preview {
-    let authVM = SupabaseAuthVM()
+    
     let localAuthVM = LocalAuthVM.shared
     let customerVM = CustomerVM(customerModel: CustomerModel(
         id: UUID(),
@@ -66,7 +52,7 @@ struct ContentView: View {
            createdAt: Date()
        )
    )
-    ContentView(authVM: authVM)
+    OnboardingView(userRole: UserRole.customer)
         .environment(localAuthVM)
         .environment(customerVM)
         .environment(restaurantVM)
