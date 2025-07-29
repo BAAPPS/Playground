@@ -40,43 +40,11 @@ development experience.
 ```text
 TrackBite/
 ├── Models/                  # Codable models for Supabase and local data (e.g., DeliveryDestination.swift, User.swift)
-│   └── Shared/
-│       └── KeychainManager.swift
-|       └── UserRole.swift
-│   └── Supabase/
-│       └── Extensions/
-│           └── Supabase+User.swift
-│       └── Client.swift
-|       └── SupabaseUser.swift
-│   └── SwiftData/
-│       └── LocalUser.swift
-├── UIKitRepresentables/              #  UIKit components exposed to SwiftUI
-│   └── CustomSegmentedControl.swift
-├── Utils/                            # General-purpose utilities and extensions
-│   └── Extensions/
-│       └── Color+Hex.swift
-│   └── ReusableViews.swift
-│   └── Supabase-JSONDecoder.swift
-├── ViewModels/              # Business logic for data fetching, syncing, filtering, auth, and role management
-│   └── Local/
-│       └── LocalAuthVM.swift
-│   └── Shared/
-│       └── AuthCoordinator.swift
-│       └── NetworkMonitorVM.swift
-│   └── Supabase/
-│       └── SupabaseAuthVM.swift
-│       └── SupabaseManager.swift
-├── Views/                   # SwiftUI views including maps, lists, user profiles, and detail screens
-│   └── Auth/
-│       └── AuthSwitcherView.swift
-│       └── LoggedInView.swift
-│       └── LogInView.swift
-│       └── SignUpView.swift
-│       └── TogglePromptView.swift
-│   └── Extensions/
-│       └── View+Extensions.swift
-│   └── ContentView.swift
 ├── Resources/               # Dummy data files (JSON), images, and other assets
+├── UIKitRepresentables/     #  UIKit components exposed to SwiftUI
+├── Utils/                   # General-purpose utilities and extensions
+├── ViewModels/              # Business logic for data fetching, syncing, filtering, auth, and role management
+├── Views/                   # SwiftUI views including maps, lists, user profiles, and detail screens
 ├── Assets.xcassets/         # App icons and images
 └── TrackBiteApp.swift       # Application entry point
 ```
