@@ -67,6 +67,69 @@ Avoid unnecessary state management for tracking selections
 This pattern reflects how real-world apps manage detail views — where tapping a card leads to editing or viewing a full data object. It’s especially valuable when working with backend-driven models, like Supabase in my 
 case.
 
+
+### Using a Singleton ViewModel (`.shared`) for Global Access
+
+In this project, I explored how to simplify access to core view models (like authentication or network managers) by using the singleton pattern:
+
+```swift
+@Observable
+class SupabaseAuthVM {
+    static let shared = SupabaseAuthVM()
+    var isLoading = false
+    var errorMessage: String?
+}
+```
+
+This allows any view or service in the app to access shared logic or state globally using:
+
+```swift
+let authVM = SupabaseAuthVM.shared
+```
+
+#### Benefits I Discovered:
+
+* **No need to pass data down** through props or environment objects.
+* **Centralized logic**, especially useful for auth, network monitoring, or caching.
+* **Cleaner and more modular code**, particularly in cross-cutting features like session restoration or sign out.
+
+#### Tradeoffs to Keep in Mind:
+
+* **Harder to mock in unit tests**, since the singleton is tightly coupled.
+* **Not ideal for all view models**, especially those with state tied closely to the UI.
+* To keep SwiftUI observing changes, it’s still recommended to expose singletons via:
+
+  ```swift
+  @Environment(SupabaseAuthVM.self) var auth
+  ```
+
+This way, I get the best of both worlds — **global access** and **automatic view updates**.
+
+### How to Persist Data Locally in iOS
+
+**Overview:**
+Persisting data locally involves saving JSON-encoded model data to the app’s Documents directory using `FileManager`, `JSONEncoder`, and `JSONDecoder`. This approach enables your app to retain data between launches and 
+provide offline access.
+
+**Why Local Storage Matters:**
+Local storage is essential for offline support. It allows the app to display previously fetched data even without an internet connection, improving reliability and user experience.
+
+**Resources Folder vs. Documents Directory:**
+
+* **Resources Folder:** Contains files bundled with the app; these are read-only at runtime.
+* **Documents Directory:** A writable directory where the app can save and update files. Data here persists across app launches.
+
+**Reusable, Type-Safe Storage with Generics:**
+Using a generic class like `SaveDataLocallyVM<T: Codable>` allows saving and loading arrays of any Codable model (e.g., `[RestaurantModel]`, `[UserModel]`). This promotes code reuse and type safety.
+
+**File Location During Development:**
+Saved files are stored inside the app’s sandbox under a path like:
+`.../Containers/Data/Application/<UUID>/Documents/`
+You can print this path to access and inspect the saved JSON file.
+
+**Verifying Data Integrity:**
+After saving, you can open and review the formatted JSON file to confirm that the structure and content match your models and expectations.
+
 ---
 
 ## Challenges and Problems Encountered

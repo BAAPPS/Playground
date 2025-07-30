@@ -11,19 +11,34 @@ struct SettingDestinationView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(RestaurantVM.self) var restaurantVM
     var body: some View {
-        switch localAuthVM.currentUser?.role {
-        case .restaurant:
-            RestaurantProfileSettingView()
-                .environment(localAuthVM)
-                .environment(restaurantVM)
-        case .customer:
-            CustomerProfileSettingView()
-                .environment(localAuthVM)
-        case .driver:
-            DriverProfileSettingView()
-                .environment(localAuthVM)
-        case .none:
-            Text("No role assigned.")
+        Group{
+            switch localAuthVM.currentUser?.role {
+            case .restaurant:
+                RestaurantProfileSettingView()
+                    .environment(localAuthVM)
+                    .environment(restaurantVM)
+            case .customer:
+                CustomerProfileSettingView()
+                    .environment(localAuthVM)
+            case .driver:
+                DriverProfileSettingView()
+                    .environment(localAuthVM)
+            case .none:
+                Text("No role assigned.")
+            }
+        }
+        .toolbar{
+            ToolbarItem{
+                Button{
+                    Task{
+                        await SupabaseAuthVM.shared.signOut()
+                    }
+                }label:{
+                    Image(systemName: "door.right.hand.open")
+                        .foregroundColor(.rose)
+                }
+
+            }
         }
     }
 }
@@ -45,7 +60,9 @@ struct SettingDestinationView: View {
            createdAt: Date()
        )
    )
-    SettingDestinationView()
-        .environment(localAuthVM)
-        .environment(restaurantVM)
+    NavigationStack {
+        SettingDestinationView()
+            .environment(localAuthVM)
+            .environment(restaurantVM)
+    }
 }

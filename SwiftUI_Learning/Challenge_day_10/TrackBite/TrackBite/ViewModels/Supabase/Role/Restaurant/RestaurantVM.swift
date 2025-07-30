@@ -25,6 +25,7 @@ struct EquatableCoordinate: Equatable {
 class RestaurantVM {
     var isLoading = false
     var errorMessage: String?
+    let localSaver = SaveDataLocallyVM<RestaurantModel>(fileName: "restaurants.json")
     static let shared = RestaurantVM(
         restaurantModel: RestaurantModel(
             id: UUID(),
@@ -46,6 +47,7 @@ class RestaurantVM {
     var restaurantModel: RestaurantModel
     var restaurantsTable = TableName.restaurants
     var restaurants: [RestaurantModel] = []
+    var allUserRestaurants: [RestaurantModel] = []
     
     init(restaurantModel: RestaurantModel) {
         self.restaurantModel = restaurantModel
@@ -159,8 +161,6 @@ class RestaurantVM {
             return
         }
         
-        print("userID:\(userID)")
-        
         do {
             let restaurants: [RestaurantModel] = try await client
                 .from("\(restaurantsTable)")
@@ -176,5 +176,43 @@ class RestaurantVM {
         }
         
         self.isLoading = false
+    }
+    
+    @MainActor
+    func fetchAllRestaurantsFromAllUsers() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let restaurants: [RestaurantModel] = try await client
+                .from("\(restaurantsTable)")
+                .select("*")
+                .execute()
+                .value
+            
+            self.allUserRestaurants = restaurants
+            
+            // Save locally after fetching
+            try localSaver.saveLocally(restaurants)
+            
+            print("All restaurants info:, \(self.allUserRestaurants)")
+            print("✅ Restaurants saved locally after fetch.")
+            
+        }catch {
+            self.errorMessage = error.localizedDescription
+        }
+        
+        self.isLoading = false
+    }
+    
+    @MainActor
+    func loadRestaurantsFromLocal() {
+        do {
+            let savedRestaurants = try localSaver.loadLocally()
+            self.allUserRestaurants = savedRestaurants
+            print("✅ Loaded restaurants from local storage")
+        } catch {
+            self.errorMessage = error.localizedDescription
+        }
     }
 }

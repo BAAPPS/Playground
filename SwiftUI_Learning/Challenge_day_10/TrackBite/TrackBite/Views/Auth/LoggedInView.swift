@@ -45,6 +45,8 @@ struct LoggedInView: View {
                 if let role = localAuthVM.currentUser?.role {
                     await sessionCoordVM.loadUserDataAfterLogin(role: role)
                 }
+                
+                await restaurantVM.fetchAllRestaurantsFromAllUsers()
             }
         }
     }
