@@ -13,6 +13,7 @@ import Supabase
 class SupabaseAuthVM {
     var isLoading = false
     var errorMessage: String?
+    static let shared = SupabaseAuthVM()
     private let client = SupabaseManager.shared.client
     let auth = LocalAuthVM.shared
     
@@ -117,11 +118,36 @@ class SupabaseAuthVM {
         let decodedUser = try JSONDecoder().decodeSupabase(SupabaseUser.self, from: userData)
         
         print("✅ User fetched with onboarding status: \(decodedUser.hasCompletedOnboarding)")
-
+        
         
         try await auth.cacheUserLocally(decodedUser)
         
         return decodedUser
     }
+    
+    func signOut() async {
+        isLoading = true
+        errorMessage = nil
+        
+        defer { isLoading = false }
+        
+        let isConnected = NetworkMonitorVM().networkMonitor.isConnected
+        
+        // Always clear local session
+        auth.currentUser = nil
+        auth.clearCachedUser()
+        
+        // Try to revoke remote session only if connected
+        if isConnected {
+            do {
+                try await client.auth.signOut()
+            } catch {
+                errorMessage = "Signed out locally, but failed to revoke server session: \(error.localizedDescription)"
+            }
+        } else {
+            errorMessage = "You're offline. Signed out locally, but your server session remains active."
+        }
+    }
+    
     
 }
