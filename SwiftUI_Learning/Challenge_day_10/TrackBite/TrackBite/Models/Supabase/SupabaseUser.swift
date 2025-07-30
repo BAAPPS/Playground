@@ -14,4 +14,5 @@ struct SupabaseUser: Codable, Identifiable {
     let name: String
     let role: UserRole
     let created_at: Date?
+    let hasCompletedOnboarding: Bool
 }

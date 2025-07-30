@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct LogInView: View {
+    @Environment(LocalAuthVM.self) var localAuthVM
     static  let dummyUsersData: DummyUsersModel = Bundle.main.decode("dummyUsers.json")
     @State var authVM: SupabaseAuthVM
     @Binding var isSigningUp: Bool
-    @State private var email = dummyUsersData.customers.first?.email ?? "default@example.com"
-    @State private var password = dummyUsersData.customers.first?.password ?? "defaultPassword123"
+    @State private var email = dummyUsersData.restaurants.first?.email ?? "default@example.com"
+    @State private var password = dummyUsersData.restaurants.first?.password ?? "defaultPassword123"
     
     var body: some View {
         ZStack {
@@ -26,8 +27,14 @@ struct LogInView: View {
                     .padding(.vertical, 10)
                 ReusableTaskButton(name:"Log in ") {
                     
-                    await authVM.signIn(email: email, password: password)
-                    
+                    do {
+                        let user = try await authVM.signIn(email: email, password: password)
+                        
+                        print("logged in user: \(user.email)")
+                        
+                    }catch {
+                        print("Login error: \(error.localizedDescription)")
+                    }
                 }
                 
                 HStack {
@@ -49,5 +56,7 @@ struct LogInView: View {
 }
 
 #Preview {
+    let localAuthVM = LocalAuthVM.shared
     LogInView(authVM: SupabaseAuthVM(), isSigningUp: .constant(false))
+        .environment(localAuthVM)
 }

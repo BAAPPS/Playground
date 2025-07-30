@@ -14,7 +14,8 @@ class SupabaseAuthVM {
     var isLoading = false
     var errorMessage: String?
     private let client = SupabaseManager.shared.client
-
+    let auth = LocalAuthVM.shared
+    
     func fetchCurrentUser() async throws -> SupabaseUser? {
         do {
             let userId = try await client.auth.session.user.id
@@ -29,7 +30,7 @@ class SupabaseAuthVM {
             
             let user = try JSONDecoder.supabaseJSONDecoder().decode(SupabaseUser.self, from: data)
             
-            try await LocalAuthVM.shared.cacheUserLocally(user)
+            try await auth.cacheUserLocally(user)
             return user
             
         } catch {
@@ -54,11 +55,11 @@ class SupabaseAuthVM {
             
             
             if let session = response.session {
-//                print("✅ Session created: \(session)")
+                //                print("✅ Session created: \(session)")
                 let user = session.user
                 let username = user.email?.split(separator: "@").first ?? ""
                 
-                let createUser = SupabaseUser(id: user.idString, email: email, username: String(username), name: name, role: role, created_at: Date())
+                let createUser = SupabaseUser(id: user.idString, email: email, username: String(username), name: name, role: role, created_at: Date(),  hasCompletedOnboarding: false)
                 
                 
                 try await client
@@ -73,7 +74,7 @@ class SupabaseAuthVM {
                 }
                 
                 do {
-                    try await LocalAuthVM.shared.cacheUserLocally(createUser)
+                    try await auth.cacheUserLocally(createUser)
                 } catch {
                     print("Failed to cache user locally: \(error.localizedDescription)")
                 }
@@ -90,47 +91,37 @@ class SupabaseAuthVM {
         isLoading = false
     }
     
-    func signIn(email: String, password: String) async {
+    func signIn(email: String, password: String) async throws -> SupabaseUser {
         isLoading = true
         errorMessage = nil
         
-        do {
-            let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            let session = try await client.auth.signIn(email: cleanEmail, password: password)
-            
-            // Store refresh token
-            UserDefaults.standard.set(session.refreshToken, forKey: "supabase_refresh_token")
-            
-            let user = session.user
-
-            do {
-                let response = try await client
-                    .from("users")
-                    .select()
-                    .eq("id", value: user.idString)
-                    .single()
-                    .execute()
-                
-                let userData = response.data
-                
-                print(String(data: userData, encoding: .utf8) ?? "No data")
-                
-                let decodeUser = try JSONDecoder().decodeSupabase(SupabaseUser.self, from: userData)
-                
-                do {
-                    try await LocalAuthVM.shared.cacheUserLocally(decodeUser)
-                } catch {
-                    print("Failed to cache user locally: \(error.localizedDescription)")
-                }
-                
-            } catch {
-                errorMessage = "Failed to decode user: \(error.localizedDescription)"
-            }
-            
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        defer { isLoading = false }
         
-        isLoading = false
+        let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let session = try await client.auth.signIn(email: cleanEmail, password: password)
+        
+        // Store refresh token
+        UserDefaults.standard.set(session.refreshToken, forKey: "supabase_refresh_token")
+        
+        let user = session.user
+        
+        let response = try await client
+            .from("users")
+            .select()
+            .eq("id", value: user.idString)
+            .single()
+            .execute()
+        
+        let userData = response.data
+        
+        let decodedUser = try JSONDecoder().decodeSupabase(SupabaseUser.self, from: userData)
+        
+        print("✅ User fetched with onboarding status: \(decodedUser.hasCompletedOnboarding)")
+
+        
+        try await auth.cacheUserLocally(decodedUser)
+        
+        return decodedUser
     }
+    
 }

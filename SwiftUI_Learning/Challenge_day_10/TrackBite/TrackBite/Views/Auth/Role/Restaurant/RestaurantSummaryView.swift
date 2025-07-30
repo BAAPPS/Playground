@@ -82,7 +82,7 @@ struct RestaurantSummaryView: View {
             Button(action: {
                 Task {
                     await restaurantVM.onboardingComplete()
-                    localAuthVM.hasCompletedOnboarding = true
+                    await localAuthVM.markOnboardingCompleteInSupabase()
                     print("Set hasCompletedOnboarding to \(localAuthVM.hasCompletedOnboarding)")
                 }
             }) {

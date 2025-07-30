@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RestaurantModel: Codable, Identifiable {
+struct RestaurantModel: Codable, Identifiable, Hashable {
     let id: UUID
     let name: String
     let description: String?

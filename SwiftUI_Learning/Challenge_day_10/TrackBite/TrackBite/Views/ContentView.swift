@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(CustomerVM.self) var customerVM
     @Environment(RestaurantVM.self) var restaurantVM
+    @Environment(SessionCoordinatorVM.self) var sessionCoordVM
     @Environment(\.modelContext) private var modelContext
     @State var authVM: SupabaseAuthVM
     
@@ -42,6 +43,7 @@ struct ContentView: View {
 #Preview {
     let authVM = SupabaseAuthVM()
     let localAuthVM = LocalAuthVM.shared
+    let sessionCoordVM = SessionCoordinatorVM()
     let customerVM = CustomerVM(customerModel: CustomerModel(
         id: UUID(),
         address: "123 Main St",
@@ -70,4 +72,5 @@ struct ContentView: View {
         .environment(localAuthVM)
         .environment(customerVM)
         .environment(restaurantVM)
+        .environment(sessionCoordVM)
 }

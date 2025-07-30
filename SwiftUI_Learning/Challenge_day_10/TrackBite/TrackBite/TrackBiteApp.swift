@@ -12,6 +12,9 @@ import SwiftData
 struct TrackBiteApp: App {
     @State private var authVM = SupabaseAuthVM()
     @State private var localAuthVM = LocalAuthVM.shared
+    @State private var restaurantVM = RestaurantVM.shared
+    @State private var networkVM = NetworkMonitorVM()
+    @State private var sessionCoordVM = SessionCoordinatorVM()
     
     @State private var customerVM = CustomerVM(
         customerModel: CustomerModel(
@@ -24,21 +27,6 @@ struct TrackBiteApp: App {
         )
     )
     
-    @State private var restaurantVM = RestaurantVM(
-        restaurantModel: RestaurantModel(
-            id: UUID(),
-            name: "",
-            description: nil,
-            imageURL: nil,
-            address: "",
-            latitude: 0.0,
-            longitude: 0.0,
-            phone: nil,
-            website: nil,
-            ownerID: UUID(),
-            createdAt: Date()
-        )
-    )
     
     var body: some Scene {
         WindowGroup {
@@ -46,6 +34,18 @@ struct TrackBiteApp: App {
                 .environment(localAuthVM)
                 .environment(customerVM)
                 .environment(restaurantVM)
+                .environment(sessionCoordVM)
+                .task {
+                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 sec
+                    
+                    if networkVM.networkMonitor.isConnected {
+                        await networkVM.restoreSession()
+                    } else {
+                        print("🚫 Skipping restoreSession — no internet")
+                        localAuthVM.loadCachedUserFromID()
+                    }
+                }
+
                 .onAppear {
                     print("💾 App launched: hasCompletedOnboarding = \(UserDefaults.standard.bool(forKey: "hasCompletedOnboarding"))")
                     

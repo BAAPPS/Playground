@@ -49,6 +49,24 @@ It’s designed to help me:
 
 ## What I Learned
 
+
+### NavigationLink(value:) + navigationDestination(for:) 
+
+As part of building my restaurant management feature in TrackBite, I implemented SwiftUI’s NavigationLink(value:) alongside navigationDestination(for:) to navigate from a restaurant card to a detailed update view.
+
+This approach taught me the value of SwiftUI’s modern data-driven navigation system. Unlike the older .sheet or .isPresented approaches, this method allowed me to:
+
+- Pass full data models (like RestaurantModel) directly into navigation
+
+Avoid unnecessary state management for tracking selections
+
+- Write clean, scalable code that works great in lists and grids
+
+- Embrace SwiftUI’s type-safe navigation tied to my domain models
+
+This pattern reflects how real-world apps manage detail views — where tapping a card leads to editing or viewing a full data object. It’s especially valuable when working with backend-driven models, like Supabase in my 
+case.
+
 ---
 
 ## Challenges and Problems Encountered
@@ -250,6 +268,49 @@ struct TrackBiteApp: App {
 ```
 
 This eliminated the need to pass state manually through view hierarchies, making the codebase cleaner and more maintainable.
+
+---
+
+
+### 5. Problem: Syncing Onboarding Status Between Supabase and UserDefaults
+
+Initially, onboarding completion was managed only locally via `UserDefaults`. However, this caused inconsistencies when the app relaunched or was used on multiple devices, because the backend Supabase data was not updated 
+and didn’t reflect the onboarding state.
+
+
+#### Solution: Sync Onboarding Status During User Cache
+
+To solve this, I:
+
+* Added a boolean column `hasCompletedOnboarding` to the Supabase `users` table.
+* Updated the onboarding status in Supabase once onboarding completed.
+* Modified the local user caching function `cacheUserLocally(_:)` to **check the Supabase user’s `hasCompletedOnboarding` flag**.
+* When `true`, it immediately calls `setCompletedOnboarding()` to **update the local UserDefaults**, syncing local onboarding state with the backend.
+
+This guarantees that every time a user is fetched or cached, the local onboarding status stays in sync with the canonical source in Supabase.
+
+#### Code Snippet — Sync Onboarding Flag on Cache
+
+```swift
+func cacheUserLocally(_ user: SupabaseUser) async throws {
+    // ...existing caching logic...
+
+    try await MainActor.run {
+        // insert or update user in SwiftData
+        // ...
+
+        currentUser = localUser
+        
+        if user.hasCompletedOnboarding {
+            setCompletedOnboarding() // sync UserDefaults here
+            print("✅ Synced onboarding status from Supabase to UserDefaults")
+        }
+    }
+}
+```
+
+
+This approach unified the onboarding state across backend and local storage, preventing inconsistent onboarding screens and improving the user experience by always reflecting the true onboarding completion status.
 
 ---
 

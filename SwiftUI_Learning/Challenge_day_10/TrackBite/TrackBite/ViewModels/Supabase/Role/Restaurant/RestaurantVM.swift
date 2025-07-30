@@ -19,16 +19,34 @@ struct EquatableCoordinate: Equatable {
     }
 }
 
+
+
 @Observable
 class RestaurantVM {
     var isLoading = false
     var errorMessage: String?
+    static let shared = RestaurantVM(
+        restaurantModel: RestaurantModel(
+            id: UUID(),
+            name: "",
+            description: nil,
+            imageURL: nil,
+            address: "",
+            latitude: 0.0,
+            longitude: 0.0,
+            phone: nil,
+            website: nil,
+            ownerID: UUID(),
+            createdAt: Date()
+        )
+    )
     private let client = SupabaseManager.shared.client
     private let geocoder = CLGeocoder()
     private var geocodeWorkItem: DispatchWorkItem?
     var restaurantModel: RestaurantModel
+    var restaurantsTable = TableName.restaurants
+    var restaurants: [RestaurantModel] = []
     
-
     init(restaurantModel: RestaurantModel) {
         self.restaurantModel = restaurantModel
         self.name = restaurantModel.name
@@ -118,17 +136,45 @@ class RestaurantVM {
             print("payload:", payload)
             
             try await client
-                .from("restaurants")
+                .from("\(restaurantsTable)")
                 .update(payload)
                 .eq("owner_id", value:restaurantModel.ownerID.uuidString)
                 .execute()
             
-            
-        
         } catch {
             errorMessage = error.localizedDescription
         }
         
         isLoading = false
+    }
+    
+    @MainActor
+    func fetchAllRestaurantsForCurrentUser() async {
+        isLoading = true
+        errorMessage = nil
+        
+        guard let userID = LocalAuthVM.shared.currentUser?.id else {
+            errorMessage = "No user ID found."
+            isLoading = false
+            return
+        }
+        
+        print("userID:\(userID)")
+        
+        do {
+            let restaurants: [RestaurantModel] = try await client
+                .from("\(restaurantsTable)")
+                .select()
+                .eq("owner_id", value: userID)
+                .execute()
+                .value
+            
+            self.restaurants = restaurants
+            
+        } catch {
+            self.errorMessage = error.localizedDescription
+        }
+        
+        self.isLoading = false
     }
 }

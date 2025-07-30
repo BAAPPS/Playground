@@ -120,7 +120,7 @@ struct SummaryView:  View {
                     driverVM.licensePlate = licensePlate
                     driverVM.isAvailable = availability == "Available"
                     await driverVM.onboardingComplete()
-                    localAuthVM.hasCompletedOnboarding = true
+                    await localAuthVM.markOnboardingCompleteInSupabase()
                     print("Set hasCompletedOnboarding to \(localAuthVM.hasCompletedOnboarding)")
                     
                     

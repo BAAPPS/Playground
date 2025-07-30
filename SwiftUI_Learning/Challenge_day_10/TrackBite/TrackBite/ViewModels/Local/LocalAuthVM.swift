@@ -11,19 +11,34 @@ import SwiftData
 @Observable
 class LocalAuthVM {
     static let shared = LocalAuthVM()
-    private let client = SupabaseManager.shared.client
-    private let userDefaultsKey = "cachedUserID"
+    var client = SupabaseManager.shared.client
+    var userDefaultsKey = "cachedUserID"
     
     var currentUser: LocalUser? = nil
-    var hasCompletedOnboarding: Bool = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
+    
+    // Stored property that notifies SwiftUI
+    var didCompleteOnboarding: Bool = false {
         didSet {
-            UserDefaults.standard.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding")
-            print("Set hasCompletedOnboarding to \(hasCompletedOnboarding)")
+            UserDefaults.standard.set(didCompleteOnboarding, forKey: "hasCompletedOnboarding")
         }
     }
-    
 
-    
+    var hasCompletedOnboarding: Bool {
+        get {
+            didCompleteOnboarding
+        }
+    }
+
+    init() {
+        // Load from UserDefaults at launch
+        self.didCompleteOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+    }
+
+    func setCompletedOnboarding() {
+        self.didCompleteOnboarding = true
+        print("✅ Onboarding completion flag saved to UserDefaults")
+    }
+
     var modelContext: ModelContext? {
         didSet {
             Task {
@@ -32,7 +47,31 @@ class LocalAuthVM {
         }
     }
     
+    // MARK: - Mark Onboarding Complete In Supabase
+    func markOnboardingCompleteInSupabase() async {
+        guard let currentUser = currentUser else {
+            print("❌ No current user")
+            return
+        }
 
+        do {
+            try await client
+                .from("users")
+                .update(["hasCompletedOnboarding": true])
+                .eq("id", value: currentUser.id)
+                .execute()
+            
+            print("✅ Supabase updated: onboarding complete")
+
+            // Persist locally too
+            setCompletedOnboarding()
+            
+        } catch {
+            print("❌ Failed to update onboarding status: \(error.localizedDescription)")
+        }
+    }
+
+    
     
     // MARK: - Save login session + user data to SwiftData
     func cacheUserLocally(_ user: SupabaseUser) async throws {
@@ -64,6 +103,11 @@ class LocalAuthVM {
             do {
                 try modelContext.save()
                 currentUser = localUser
+                if user.hasCompletedOnboarding {
+                    setCompletedOnboarding()
+                    print("✅ Synced onboarding status from Supabase to UserDefaults")
+                }
+
                 print("✅ User cached and saved: \(user.email)")
             } catch {
                 print("❌ Failed to save local user: \(error.localizedDescription)")

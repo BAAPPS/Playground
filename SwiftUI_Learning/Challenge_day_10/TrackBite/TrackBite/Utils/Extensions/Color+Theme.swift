@@ -13,4 +13,6 @@ extension Color {
     static let lightPinkBorder = Color(hex: "#ffc9cb")
     static let darkRedBackground = Color(hex: "#801c20")
     static let softRose =  Color(hex:"#fda4a8")
+    static let rose = Color(hex:"#bb1a21")
+    static let lightWhite = Color(hex:"#f8f9fa")
 }

@@ -40,7 +40,7 @@ struct CustomerSummaryView: View {
             Button(action: {
                 Task{
                     await customerVME.onboardingComplete()
-                    localAuthVM.hasCompletedOnboarding = true
+                    await localAuthVM.markOnboardingCompleteInSupabase()
                     print("Set hasCompletedOnboarding to \(localAuthVM.hasCompletedOnboarding)")
                 }
             }) {
