@@ -149,5 +149,41 @@ class SupabaseAuthVM {
         }
     }
     
+    func updateAccountInfo(email: String, name: String, username: String) async throws {
+        guard let userId = auth.currentUser?.id else {
+            throw NSError(domain: "LocalAuthVM", code: 2, userInfo: [NSLocalizedDescriptionKey: "No current user"])
+        }
+
+    
+        do {
+            // Attempt to update the email in Supabase Auth
+            // NOTE: This can fail if the email is invalid, not verified,
+            // or if Supabase requires email confirmation for changes.
+            // Since dummy or unverified emails are often rejected by Auth,
+            // this update may throw an error, even though updating the users table succeeds.
+            try await client.auth.update(user: UserAttributes(email: email))
+//            print("✅ Email update initiated.")
+        } catch {
+            // Log the failure but continue to update the users table
+//            print("❌ Auth email update failed:", error)
+        }
+
+
+
+        // 2. Update your own users table
+        try await client
+            .from("users")
+            .update(["email": email, "name": name, "username": username])
+            .eq("id", value: userId)
+            .execute()
+
+        // 3. Fetch updated user from Supabase
+        if let updatedSupabaseUser = try await fetchCurrentUser() {
+            try await auth.cacheUserLocally(updatedSupabaseUser)
+        }
+    }
+
+    
+    
     
 }

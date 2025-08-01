@@ -10,6 +10,8 @@ import SwiftUI
 struct RestaurantProfileSettingView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(RestaurantVM.self) var restaurantVM
+    @Environment(\.supabaseAuthVM) private var authVM: Bindable<SupabaseAuthVM>?
+
     var body: some View {
         VStack{
            Text("Your Settings")
@@ -19,9 +21,31 @@ struct RestaurantProfileSettingView: View {
                 .foregroundColor(.darkRedBackground)
             Spacer()
             
-            // add list here for orders
-            Text("picker")
-                 .font(.headline)
+            List {
+                NavigationLink {
+                    RestaurantOrderView()
+                } label: {
+                    HStack {
+                        Image(systemName: "bag")
+                            .foregroundColor(.darkRedBackground)
+                        Text("My Orders")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+                    
+                    
+                }
+                
+                NavigationLink {
+                    UserProfileView()
+                        .environment(\.supabaseAuthVM, authVM)
+                } label: {
+                    Image(systemName: "person.crop.circle")
+                        .foregroundColor(.darkRedBackground)
+                    Text("Account")
+                        .font(.system(size: 16, weight: .medium))
+                }
+            }
+            .listStyle(.insetGrouped)
             
             Spacer()
         }

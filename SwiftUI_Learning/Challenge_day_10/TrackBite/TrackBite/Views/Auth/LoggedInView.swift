@@ -40,6 +40,7 @@ struct LoggedInView: View {
                 SettingDestinationView()
                     .environment(localAuthVM)
                     .environment(restaurantVM)
+                    .environment(\.supabaseAuthVM, $authVM)
             }
             .task{
                 if let role = localAuthVM.currentUser?.role {

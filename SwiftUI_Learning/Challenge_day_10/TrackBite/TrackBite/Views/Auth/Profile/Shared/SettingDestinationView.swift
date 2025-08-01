@@ -10,6 +10,9 @@ import SwiftUI
 struct SettingDestinationView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(RestaurantVM.self) var restaurantVM
+    @Environment(\.supabaseAuthVM) private var authVM: Bindable<SupabaseAuthVM>?
+
+
     var body: some View {
         Group{
             switch localAuthVM.currentUser?.role {
@@ -17,6 +20,7 @@ struct SettingDestinationView: View {
                 RestaurantProfileSettingView()
                     .environment(localAuthVM)
                     .environment(restaurantVM)
+                    .environment(\.supabaseAuthVM, authVM)
             case .customer:
                 CustomerProfileSettingView()
                     .environment(localAuthVM)
