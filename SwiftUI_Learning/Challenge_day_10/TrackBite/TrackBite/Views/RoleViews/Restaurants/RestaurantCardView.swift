@@ -15,13 +15,11 @@ struct RestaurantCardView: View {
             Text(restaurant.name)
                 .font(.headline)
                 .foregroundColor(.primary)
+            
+            Text(restaurant.address)
+                .font(.subheadline)
+                .foregroundColor(.gray)
 
-            if let desc = restaurant.description {
-                Text(desc)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)

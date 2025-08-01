@@ -32,7 +32,7 @@ struct LoggedInView: View {
                         showSettings = true
                     }label:{
                         Image(systemName: "gear")
-                            .foregroundColor(.rose)
+                            .foregroundColor(.offWhite)
                     }
                 }
             }

@@ -9,25 +9,25 @@ import Foundation
 
 struct RestaurantModel: Codable, Identifiable, Hashable {
     let id: UUID
-    let name: String
-    let description: String?
-    let imageURL: String?
-    let address: String
+    var name: String
+    var description: String?
+    var imageURL: String?
+    var address: String
     let latitude: Double
     let longitude: Double
-    let phone: String?
-    let website: String?
+    var phone: String?
+    var website: String?
     let ownerID: UUID
     let createdAt: Date
     
     struct RestaurantUpdatePayload: Encodable {
-        let name: String
-        let description: String?
-        let imageURL: String?
-        let address: String
+        var name: String
+        var description: String?
+        var imageURL: String?
+        var address: String
         let latitude: Double
         let longitude: Double
-        let phone: String?
+        var phone: String?
         
         enum CodingKeys: String, CodingKey {
             case name

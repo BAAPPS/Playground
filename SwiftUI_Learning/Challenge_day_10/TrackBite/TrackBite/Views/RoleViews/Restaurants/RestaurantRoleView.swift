@@ -20,9 +20,11 @@ struct RestaurantRoleView: View {
             LazyVGrid(columns:columns, spacing:16){
                 ForEach(restaurantVM.restaurants) { restaurant in
                     NavigationLink(value: restaurant) {
-                             RestaurantCardView(restaurant: restaurant)
-                         }                }
+                        RestaurantCardView(restaurant: restaurant)
+                    }
+                }
             }
+            .padding(.vertical, 20)
             .padding(.horizontal, 20)
             .safeAreaInset(edge: .top) {
                 Color.clear.frame(height: (UIApplication.shared.connectedScenes
@@ -37,6 +39,7 @@ struct RestaurantRoleView: View {
         .navigationDestination(for: RestaurantModel.self) { restaurant in
             RestaurantUpdateView(restaurant: restaurant)
         }
+        .navigationBarColor(background: .darkRedBackground , titleColor: .lightWhite)
     }
 }
 

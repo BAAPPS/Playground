@@ -35,7 +35,7 @@ struct SettingDestinationView: View {
                     }
                 }label:{
                     Image(systemName: "door.right.hand.open")
-                        .foregroundColor(.rose)
+                        .foregroundColor(.offWhite)
                 }
 
             }

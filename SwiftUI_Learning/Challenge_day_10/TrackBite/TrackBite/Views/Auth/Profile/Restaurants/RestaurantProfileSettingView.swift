@@ -11,8 +11,19 @@ struct RestaurantProfileSettingView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(RestaurantVM.self) var restaurantVM
     var body: some View {
-        ZStack{
+        VStack{
+           Text("Your Settings")
+                .font(.system(size: 30, weight: .bold))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .foregroundColor(.darkRedBackground)
+            Spacer()
             
+            // add list here for orders
+            Text("picker")
+                 .font(.headline)
+            
+            Spacer()
         }
         .navigationTitle(localAuthVM.currentUser?.name ?? "\( UserRole.restaurant.displayName)'s Profile")
         .navigationBarTitleDisplayMode(.inline)

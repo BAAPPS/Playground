@@ -69,7 +69,8 @@ class RestaurantVM {
     var longitude: Double = 0.0
     var phone: String? = ""
     
-    
+
+
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
@@ -215,4 +216,48 @@ class RestaurantVM {
             self.errorMessage = error.localizedDescription
         }
     }
+    
+    @MainActor
+    func updateRestaurant(_ restaurant: RestaurantModel) async  -> Bool{
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false } // ensures loading is turned off no matter what
+        
+        do {
+            let payload = RestaurantModel.RestaurantUpdatePayload(
+                name: restaurant.name,
+                description: restaurant.description,
+                imageURL: restaurant.imageURL,
+                address: restaurant.address,
+                latitude: restaurant.latitude,
+                longitude: restaurant.longitude,
+                phone: restaurant.phone
+            )
+
+            try await client
+                .from("\(restaurantsTable)")
+                .update(payload)
+                .eq("id", value: restaurant.id.uuidString) // target restaurant by its ID
+                .execute()
+
+            // Update local cache if needed
+            if let index = restaurants.firstIndex(where: { $0.id == restaurant.id }) {
+                restaurants[index] = restaurant
+            }
+
+            // Save locally after update
+            try localSaver.saveLocally(restaurants)
+            
+            print("✅ Updated restaurant: \(restaurant.name)")
+            
+            return true
+
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Failed to update restaurant: \(error)")
+            return false
+        }
+    }
+
 }
+

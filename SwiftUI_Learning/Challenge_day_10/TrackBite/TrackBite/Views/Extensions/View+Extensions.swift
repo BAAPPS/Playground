@@ -58,6 +58,30 @@ struct OnboardingNavigationStyle: ViewModifier {
 }
 
 
+struct NavigationBarModifier: ViewModifier {
+    var backgroundColor: UIColor
+    var titleColor: UIColor
+    
+    init(backgroundColor: UIColor, titleColor: UIColor) {
+        self.backgroundColor = backgroundColor
+        self.titleColor = titleColor
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = backgroundColor
+        appearance.titleTextAttributes = [.foregroundColor: titleColor]
+        appearance.largeTitleTextAttributes = [.foregroundColor: titleColor]
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
+    }
+    
+    func body(content:Content) -> some View {
+        content
+    }
+}
+
+
 extension View {
     func bodyBackground(color: Color = Color(hex: "#801c20")) -> some View {
         self.modifier(BodyBackgroundModifier(color: color))
@@ -71,5 +95,8 @@ extension View {
         self.modifier(OnboardingNavigationStyle(title: title, progressText: progress))
     }
     
+    func navigationBarColor(background: Color, titleColor: Color) -> some View {
+        self.modifier(NavigationBarModifier(backgroundColor: UIColor(background), titleColor: UIColor(titleColor)))
+    }
     
 }
