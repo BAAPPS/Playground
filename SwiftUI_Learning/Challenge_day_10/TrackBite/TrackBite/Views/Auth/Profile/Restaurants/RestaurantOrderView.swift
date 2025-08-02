@@ -10,7 +10,9 @@ import SwiftUI
 struct RestaurantOrderView: View {
     var body: some View {
         VStack {
-        }.navigationTitle("My Orders")
+        }
+        .navigationTitle("My Orders")
+        .backButton()
     }
 }
 

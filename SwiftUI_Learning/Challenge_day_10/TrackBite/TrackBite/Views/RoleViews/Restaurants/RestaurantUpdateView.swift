@@ -97,6 +97,7 @@ struct RestaurantUpdateView: View {
         }
         .navigationTitle(editableRestaurant.name)
         .navigationBarTitleDisplayMode(.inline)
+        .backButton()
         .toolbar{
             ToolbarItem{
                 Button {

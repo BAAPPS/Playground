@@ -87,6 +87,7 @@ struct UserProfileView: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .center)
         .navigationTitle("Update Account")
+        .backButton()
         .alert(alertTitle, isPresented: $showAlert) {
             Button("OK", role: .cancel) {}
         } message: {

@@ -74,10 +74,36 @@ struct NavigationBarModifier: ViewModifier {
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().tintColor = titleColor
     }
     
     func body(content:Content) -> some View {
         content
+    }
+}
+
+struct BackButtonModifier: ViewModifier {
+    var title: String
+    var imageName: String = "chevron.left"
+    
+    @Environment(\.presentationMode) var presentationMode
+
+    func body(content: Content) -> some View {
+        content
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            Image(systemName: imageName)
+                                .foregroundColor(.offWhite)
+                            Text(title)
+                        }
+                    }
+                }
+            }
     }
 }
 
@@ -99,4 +125,7 @@ extension View {
         self.modifier(NavigationBarModifier(backgroundColor: UIColor(background), titleColor: UIColor(titleColor)))
     }
     
+    func backButton(title: String = "", imageName: String = "chevron.left") -> some View {
+           self.modifier(BackButtonModifier(title: title, imageName: imageName))
+       }
 }

@@ -48,16 +48,20 @@ struct RestaurantEditView: View {
             .navigationBarColor(background: .softRose , titleColor: .offWhite)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(action: {
                         Task {
                             let success = await restaurantVM.updateRestaurant(restaurant)
                             if success {
                                 dismiss()
                             }
                         }
+                    }) {
+                        Text("Save")
+                            .foregroundColor(.offWhite) 
                     }
                 }
             }
+
         }
     }
 }

@@ -44,6 +44,7 @@ struct SettingDestinationView: View {
 
             }
         }
+        .backButton()
     }
 }
 
