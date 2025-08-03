@@ -11,4 +11,6 @@ enum TableName: String, Codable, CaseIterable {
     case drivers
     case customers
     case restaurants
+    case restaurant_owner_snapshots
+    case orders
 }

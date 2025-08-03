@@ -12,7 +12,9 @@ struct ContentView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(CustomerVM.self) var customerVM
     @Environment(RestaurantVM.self) var restaurantVM
+    @Environment(RestaurantOwnerSnapshotVM.self) var restaurantOwnerSnapshotVM
     @Environment(SessionCoordinatorVM.self) var sessionCoordVM
+    @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
     @Environment(\.modelContext) private var modelContext
     @State var authVM: SupabaseAuthVM
     
@@ -68,9 +70,30 @@ struct ContentView: View {
            createdAt: Date()
        )
    )
+    
+    let restaurantOwnerSnapshotVM =  RestaurantOwnerSnapshotVM(
+        snapshotModel: RestaurantOwnerSnapshotModel(
+            id: UUID(),
+            userId: UUID(),
+            userName: "",
+            userEmail: "",
+            restaurantId: UUID(),
+            restaurantName: "",
+            snapshotCreatedAt: Date(),
+            description: "",
+            imageURL: "",
+            address: "",
+            phone: ""
+        )
+    )
+    
+    let restaurantOrderViewModel = RestaurantOrderViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
+    
     ContentView(authVM: authVM)
         .environment(localAuthVM)
         .environment(customerVM)
         .environment(restaurantVM)
         .environment(sessionCoordVM)
+        .environment(restaurantOwnerSnapshotVM)
+        .environment(restaurantOrderViewModel)
 }

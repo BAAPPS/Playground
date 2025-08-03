@@ -13,6 +13,8 @@ struct TrackBiteApp: App {
     @State private var authVM = SupabaseAuthVM()
     @State private var localAuthVM = LocalAuthVM.shared
     @State private var restaurantVM = RestaurantVM.shared
+    @State private var restaurantSnapshotVM = RestaurantOwnerSnapshotVM.shared
+    @State private var restaurantOrderVM = RestaurantOrderViewModel.shared
     @State private var networkVM = NetworkMonitorVM()
     @State private var sessionCoordVM = SessionCoordinatorVM()
     
@@ -35,6 +37,8 @@ struct TrackBiteApp: App {
                 .environment(customerVM)
                 .environment(restaurantVM)
                 .environment(sessionCoordVM)
+                .environment(restaurantSnapshotVM)
+                .environment(restaurantOrderVM)
                 .task {
                     try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 sec
                     

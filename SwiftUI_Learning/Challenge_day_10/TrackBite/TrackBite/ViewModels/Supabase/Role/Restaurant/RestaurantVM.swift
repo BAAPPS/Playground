@@ -41,6 +41,9 @@ class RestaurantVM {
             createdAt: Date()
         )
     )
+ 
+    
+
     private let client = SupabaseManager.shared.client
     private let geocoder = CLGeocoder()
     private var geocodeWorkItem: DispatchWorkItem?
@@ -179,44 +182,7 @@ class RestaurantVM {
         self.isLoading = false
     }
     
-    @MainActor
-    func fetchAllRestaurantsFromAllUsers() async {
-        isLoading = true
-        errorMessage = nil
-        
-        do {
-            let restaurants: [RestaurantModel] = try await client
-                .from("\(restaurantsTable)")
-                .select("*")
-                .execute()
-                .value
-            
-            self.allUserRestaurants = restaurants
-            
-            // Save locally after fetching
-            try localSaver.saveLocally(restaurants)
-            
-            print("All restaurants info:, \(self.allUserRestaurants)")
-            print("✅ Restaurants saved locally after fetch.")
-            
-        }catch {
-            self.errorMessage = error.localizedDescription
-        }
-        
-        self.isLoading = false
-    }
-    
-    @MainActor
-    func loadRestaurantsFromLocal() {
-        do {
-            let savedRestaurants = try localSaver.loadLocally()
-            self.allUserRestaurants = savedRestaurants
-            print("✅ Loaded restaurants from local storage")
-        } catch {
-            self.errorMessage = error.localizedDescription
-        }
-    }
-    
+  
     @MainActor
     func updateRestaurant(_ restaurant: RestaurantModel) async  -> Bool{
         isLoading = true

@@ -24,6 +24,7 @@ struct SettingDestinationView: View {
             case .customer:
                 CustomerProfileSettingView()
                     .environment(localAuthVM)
+                    .environment(\.supabaseAuthVM, authVM)
             case .driver:
                 DriverProfileSettingView()
                     .environment(localAuthVM)
