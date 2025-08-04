@@ -11,6 +11,7 @@ struct RestaurantProfileSettingView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(RestaurantVM.self) var restaurantVM
     @Environment(\.supabaseAuthVM) private var authVM: Bindable<SupabaseAuthVM>?
+    @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
 
     var body: some View {
         VStack{
@@ -24,6 +25,7 @@ struct RestaurantProfileSettingView: View {
             List {
                 NavigationLink {
                     RestaurantOrderView()
+                        .environment(restaurantOrderViewModel)
                 } label: {
                     HStack {
                         Image(systemName: "bag")
@@ -71,9 +73,13 @@ struct RestaurantProfileSettingView: View {
            createdAt: Date()
        )
    )
+    
+    let restaurantOrderViewModel = RestaurantOrderViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
+    
     NavigationStack {
         RestaurantProfileSettingView()
             .environment(localAuthVM)
             .environment(restaurantVM)
+            .environment(restaurantOrderViewModel)
     }
 }

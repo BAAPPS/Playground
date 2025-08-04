@@ -21,6 +21,7 @@ struct SettingDestinationView: View {
                     .environment(localAuthVM)
                     .environment(restaurantVM)
                     .environment(\.supabaseAuthVM, authVM)
+                    .environment(restaurantOrderViewModel)
             case .customer:
                 CustomerProfileSettingView()
                     .environment(localAuthVM)

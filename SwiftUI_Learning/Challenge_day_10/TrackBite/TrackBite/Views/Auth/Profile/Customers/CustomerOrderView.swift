@@ -10,6 +10,10 @@ import SwiftUI
 struct CustomerOrderView: View {
     @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
     @State private var customerOrderVM = CustomerOrderVM.shared
+    
+    
+ 
+    
     var body: some View {
         VStack {
             if customerOrderVM.isLoading {

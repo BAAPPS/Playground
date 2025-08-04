@@ -48,7 +48,7 @@ class RestaurantOrderViewModel {
     var orderModel: RestaurantOrderModel
     var ordersTable = TableName.orders
     var orders:[RestaurantOrderModel] = []
-    
+    var restaurantCustomerOrders:[RestaurantOrderModel] = []
     
     
     var deliveryAddress: String = ""
@@ -130,4 +130,47 @@ class RestaurantOrderViewModel {
         isLoading = false
     }
     
+    @MainActor
+    func fetchOrdersForCurrentUserRestaurants() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            // Step 1: Get the current user's restaurants
+            await RestaurantVM.shared.fetchAllRestaurantsForCurrentUser()
+            let userRestaurants = RestaurantVM.shared.restaurants
+            
+            guard !userRestaurants.isEmpty else {
+                errorMessage = "No restaurants found for this user."
+                isLoading = false
+                return
+            }
+            
+            // Step 2: Collect restaurant IDs
+            let restaurantIDs = userRestaurants.map { $0.id.uuidString }
+            
+            // Step 3: Fetch all orders that match any of those restaurant IDs
+            let fetchedOrders: [RestaurantOrderModel] = try await client
+                .from("orders")
+                .select("*")
+                .in("restaurant_id", values: restaurantIDs)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            
+            self.restaurantCustomerOrders = fetchedOrders
+            print("✅ Loaded \(fetchedOrders.count) orders from all your restaurants.")
+            
+            // Save locally
+            try localSaver.saveLocally(fetchedOrders)
+            
+        } catch {
+            self.errorMessage = error.localizedDescription
+            print("❌ Failed to fetch or cache orders:", error)
+        }
+        
+        isLoading = false
+    }
+    
 }
+
