@@ -48,6 +48,10 @@ struct RestaurantOrderModel: Codable, Identifiable, Hashable {
         var order_type: OrderType
     }
     
+    struct CustomerOrderLookUpPayload: Codable {
+        var customer_id: UUID
+    }
+    
     enum CodingKeys: String,  CodingKey {
         case id
         case customerId = "customer_id"

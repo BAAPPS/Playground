@@ -10,6 +10,7 @@ import SwiftUI
 struct CustomerProfileSettingView: View {
     @Environment(LocalAuthVM.self) var localAuthVM
     @Environment(\.supabaseAuthVM) private var authVM: Bindable<SupabaseAuthVM>?
+    @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
 
     var body: some View {
         VStack{
@@ -23,6 +24,7 @@ struct CustomerProfileSettingView: View {
             List {
                 NavigationLink {
                     CustomerOrderView()
+                        .environment(restaurantOrderViewModel)
                 } label: {
                     HStack {
                         Image(systemName: "bag")
@@ -57,8 +59,11 @@ struct CustomerProfileSettingView: View {
 
 #Preview {
     let localAuthVM = LocalAuthVM.shared
+    
+    let restaurantOrderViewModel = RestaurantOrderViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
     NavigationStack {
         CustomerProfileSettingView()
             .environment(localAuthVM)
+            .environment(restaurantOrderViewModel)
     }
 }
