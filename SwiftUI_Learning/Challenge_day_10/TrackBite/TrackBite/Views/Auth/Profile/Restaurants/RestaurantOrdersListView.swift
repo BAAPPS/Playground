@@ -16,37 +16,32 @@ struct GroupedOrderKey: Hashable {
 struct RestaurantOrdersListView: View {
     
     @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
+    @State private var selectedOrder: RestaurantOrderModel? = nil
     
-    var groupedOrders: [GroupedOrderKey: [RestaurantOrderModel]] {
-        Dictionary(grouping: restaurantOrderViewModel.restaurantCustomerOrders) {
-            GroupedOrderKey(status: $0.status, type: $0.orderType)
-        }
-    }
     var body: some View {
-        
         List{
             ForEach(OrderStatus.allCases, id:\.self) {status in
                 let anyForStatus = OrderType.allCases.contains { type in
-                    groupedOrders[GroupedOrderKey(status: status, type: type)]?.isEmpty == false
+                    restaurantOrderViewModel.groupedOrders[GroupedOrderKey(status: status, type: type)]?.isEmpty == false
                 }
                 
                 let statusCapitalized = status.rawValue.capitalized
                 
                 if anyForStatus {
-                    VStack(alignment:.leading, spacing:8) {
-                        HStack {
-                            Text("Orders:")
-                            Text(statusCapitalized)
-                                .foregroundStyle(Color.softRose)
-                        }
-                        .font(.title3)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                    
+                    HStack {
+                        Text("Orders:")
+                        Text(statusCapitalized)
+                            .foregroundStyle(Color.softRose)
                         
                     }
+                    .font(.title3)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .listRowSeparator(.hidden)
                     
                     ForEach(OrderType.allCases, id:\.self) { type  in
                         let key = GroupedOrderKey(status:status, type: type)
-                        let orders = groupedOrders[key] ?? []
+                        let orders = restaurantOrderViewModel.groupedOrders[key] ?? []
                         
                         if !orders.isEmpty {
                             VStack(alignment:.leading, spacing:8) {
@@ -56,36 +51,44 @@ struct RestaurantOrdersListView: View {
                                 
                                 Divider()
                                 
-                                ForEach(orders, id:\.self) {order in
-                                    
-                                    VStack(alignment: .leading, spacing:4){
-                                        if order.orderType == .delivery {
-                                            Text("Delivery Address: \(order.deliveryAddress)")
-                                                .foregroundColor(status.foregroundDeliveryTextColor)
-                                                .italic()
-                                        } else {
-                                            Text("Pickup Order")
-                                                .foregroundColor(status.foregroundOrderColor)
-                                                .italic()
+                                ForEach(Array(orders.enumerated()), id: \.element.id) { index, order in
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Button {
+                                            selectedOrder = order
+                                        } label: {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                if order.orderType == .delivery {
+                                                    Text("Delivery Address: \(order.deliveryAddress)")
+                                                        .foregroundColor(status.foregroundDeliveryTextColor)
+                                                        .italic()
+                                                } else {
+                                                    Text("Pickup Order")
+                                                        .foregroundColor(status.foregroundOrderColor)
+                                                        .italic()
+                                                }
+                                                
+                                                Text("Created: \(order.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "N/A")")
+                                                    .foregroundColor(status.foregroundCreatedDateColor)
+                                            }
+                                            .padding(.vertical, 4)
                                         }
                                         
-                                        Text("Created: \(order.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "N/A")")
-                                            .foregroundColor(status.foregroundCreatedDateColor)
+            
+                                        if index < orders.count - 1 {
+                                            Rectangle()
+                                                .fill(Color.offWhite)
+                                                .frame(height: 1)
+                                        }
                                     }
-                                    .padding(.vertical, 4)
-                                    
-                                    
-                                    
                                 }
-                                
-                                Divider()
-                                
+                                           
                             }
                             .listRowSeparator(.visible)
                             .listRowBackground(Color.clear)
                             .padding()
                             .background(status.backgroundColor)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
+                            
                         }
                         
                     }
@@ -97,6 +100,12 @@ struct RestaurantOrdersListView: View {
         .listStyle(.inset)
         .scrollContentBackground(.hidden)
         .background(Color.clear)
+        .fullScreenCover(item: $selectedOrder) { order in
+            NavigationStack {
+                RestaurantOrderUpdateView(order: order)
+            }
+        }
+        
         
     }
 }
@@ -120,6 +129,21 @@ struct RestaurantOrdersListView: View {
     
     // Dummy orders
     restaurantOrderViewModel.restaurantCustomerOrders = [
+        .init(
+            id: UUID(),
+            customerId: UUID(),
+            restaurantId: UUID(),
+            driverId: nil,
+            deliveryAddress: "456 Delivery Rd",
+            status: .pending,
+            estimatedTimeMinutes: 30,
+            deliveryFee: 4.0,
+            isPickedUp: false,
+            isDelivered: false,
+            orderType: .delivery,
+            createdAt: Date().addingTimeInterval(-3600),
+            updatedAt: Date()
+        ),
         .init(
             id: UUID(),
             customerId: UUID(),

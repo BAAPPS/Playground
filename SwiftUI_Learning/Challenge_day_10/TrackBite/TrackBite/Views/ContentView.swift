@@ -19,19 +19,17 @@ struct ContentView: View {
     @State var authVM: SupabaseAuthVM
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                Group {
-                    if localAuthVM.currentUser != nil {
-                        if !localAuthVM.hasCompletedOnboarding {
-                            OnboardingView(userRole: localAuthVM.currentUser!.role)
-                        } else {
-                            LoggedInView(authVM: authVM)
-                        }
-
+        VStack(spacing: 0) {
+            Group {
+                if localAuthVM.currentUser != nil {
+                    if !localAuthVM.hasCompletedOnboarding {
+                        OnboardingView(userRole: localAuthVM.currentUser!.role)
                     } else {
-                        AuthSwitcherView(authVM: authVM)
+                        LoggedInView(authVM: authVM)
                     }
+                    
+                } else {
+                    AuthSwitcherView(authVM: authVM)
                 }
             }
         }
@@ -56,20 +54,20 @@ struct ContentView: View {
     ))
     
     let restaurantVM = RestaurantVM(
-       restaurantModel: RestaurantModel(
-           id: UUID(),
-           name: "",
-           description: nil,
-           imageURL: nil,
-           address: "",
-           latitude: 0.0,
-           longitude: 0.0,
-           phone: nil,
-           website: nil,
-           ownerID: UUID(),
-           createdAt: Date()
-       )
-   )
+        restaurantModel: RestaurantModel(
+            id: UUID(),
+            name: "",
+            description: nil,
+            imageURL: nil,
+            address: "",
+            latitude: 0.0,
+            longitude: 0.0,
+            phone: nil,
+            website: nil,
+            ownerID: UUID(),
+            createdAt: Date()
+        )
+    )
     
     let restaurantOwnerSnapshotVM =  RestaurantOwnerSnapshotVM(
         snapshotModel: RestaurantOwnerSnapshotModel(

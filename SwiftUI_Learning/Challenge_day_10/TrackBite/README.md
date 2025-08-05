@@ -377,4 +377,51 @@ This approach unified the onboarding state across backend and local storage, pre
 
 ---
 
+
+### 6. Problem: Edits to Restaurant Orders Not Persisting After Sheet Dismissal
+
+While building the restaurant order management flow, I ran into a confusing bug: **edits to an order made in a sheet were not reflected in the main UI** after the sheet was dismissed. The changes appeared to save visually 
+within the sheet, but disappeared once it closed.
+
+#### Issues:
+
+* I passed a **local copy** of the order using `@State`, not a direct binding to the source.
+* After the `.sheet` was dismissed, the local changes were **never written back** into the main order list (`restaurantCustomerOrders`) inside the view model.
+* This caused the user to think their changes were saved, when they actually weren't.
+
+#### ❌ Code Example: Sheet With Local State (No Sync Back)
+
+```swift
+.sheet(isPresented: $isEditMode) {
+    RestaurantOrderEditView(order: $editableOrder)
+}
+```
+
+This presented the edit form and allowed changes, but after dismissing the sheet, nothing triggered an update to the main view model.
+
+#### Solution: Manually Sync Edits Using `.onDismiss`
+
+To fix this, I used the `onDismiss` closure on `.sheet` to explicitly **write back the updated local state** into the view model's array:
+
+##### ✅ Code Example: Working Sheet with Manual Sync
+
+```swift
+.sheet(isPresented: $isEditMode, onDismiss: {
+    if let index = restaurantOrderViewModel.restaurantCustomerOrders.firstIndex(where: { $0.id == editableOrder.id }) {
+        restaurantOrderViewModel.restaurantCustomerOrders[index] = editableOrder
+    }
+}) {
+    RestaurantOrderEditView(order: $editableOrder)
+}
+```
+
+Now, whenever the sheet is dismissed:
+
+* The latest version of `editableOrder` is saved back into `restaurantCustomerOrders`.
+* The main view updates correctly, reflecting the user's changes.
+
+✅ **Result:** Edits made in the sheet persist across the app, even after dismissing the modal. The user experience is now consistent and intuitive.
+
+---
+
 ## What I Would Do Differently

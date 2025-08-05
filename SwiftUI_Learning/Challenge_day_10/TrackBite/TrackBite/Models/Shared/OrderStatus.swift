@@ -9,7 +9,7 @@ import Foundation
 
 enum OrderStatus: String, Codable, CaseIterable {
     case pending
-    case inProgress = "in_progress"
+    case inProgress = "in progress"
     case completed
     case cancelled
 }

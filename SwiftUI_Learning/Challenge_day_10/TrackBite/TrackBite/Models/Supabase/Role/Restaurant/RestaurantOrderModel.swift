@@ -27,6 +27,11 @@ struct RestaurantOrderModel: Codable, Identifiable, Hashable {
         status == .completed || isDelivered == true
     }
     
+    var orderStatus: Bool {
+        isPickedUp == true || isDelivered == true
+    }
+    
+    
     struct RestaurantOrderPayload: Codable {
         var customer_id: UUID
         var restaurant_id: UUID
@@ -37,8 +42,8 @@ struct RestaurantOrderModel: Codable, Identifiable, Hashable {
         var delivery_fee: Double?
         var is_picked_up: Bool?
         var is_delivered: Bool?
-        var order_type: OrderType  
-
+        var order_type: OrderType
+        
     }
     
     struct CustomerRestaurantOrderPayload: Codable {
@@ -68,3 +73,4 @@ struct RestaurantOrderModel: Codable, Identifiable, Hashable {
         case orderType = "order_type"
     }
 }
+

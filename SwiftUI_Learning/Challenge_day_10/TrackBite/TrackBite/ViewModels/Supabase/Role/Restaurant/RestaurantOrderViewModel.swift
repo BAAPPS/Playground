@@ -58,10 +58,19 @@ class RestaurantOrderViewModel {
     var isPickedUp: Bool? = false
     var isDelivered: Bool? = false
     var orderType: OrderType
+    var selectedOrder: RestaurantOrderModel?
     
-    func updateCustomerOrder(_ order: RestaurantOrderModel) async {
+    var groupedOrders: [GroupedOrderKey: [RestaurantOrderModel]] {
+        Dictionary(grouping: restaurantCustomerOrders) {
+            GroupedOrderKey(status: $0.status, type: $0.orderType)
+        }
+    }
+    
+    func updateCustomerOrder(_ order: RestaurantOrderModel) async  -> Bool {
         isLoading = true
         errorMessage = nil
+        
+        defer { isLoading = false } 
         
         do {
             let updatePayload = RestaurantOrderModel.RestaurantOrderPayload(
@@ -86,14 +95,13 @@ class RestaurantOrderViewModel {
             
             print("✅ Order updated.")
             
+            return true
             
         } catch {
             errorMessage = error.localizedDescription
             print("❌ Order update failed:", error)
+            return false
         }
-        
-        
-        isLoading = false
     }
     
     
@@ -158,7 +166,10 @@ class RestaurantOrderViewModel {
                 .execute()
                 .value
             
-            self.restaurantCustomerOrders = fetchedOrders
+            if self.restaurantCustomerOrders != fetchedOrders {
+                self.restaurantCustomerOrders = fetchedOrders
+            }
+            
             print("✅ Loaded \(fetchedOrders.count) orders from all your restaurants.")
             
             // Save locally

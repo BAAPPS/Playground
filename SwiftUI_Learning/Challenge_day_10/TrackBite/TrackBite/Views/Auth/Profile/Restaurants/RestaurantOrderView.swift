@@ -24,14 +24,15 @@ struct RestaurantOrderView: View {
                     description: Text("Cusomters haven't placed any orders yet. Check back soon!")
                 )
             } else {
+                
                 RestaurantOrdersListView()
+                
             }
         }
         .navigationTitle("My Orders")
         .backButton()
-        .task {
-            await restaurantOrderViewModel.fetchOrdersForCurrentUserRestaurants()
-            print("🧾 Orders:", restaurantOrderViewModel.restaurantCustomerOrders)
+        .onAppear {
+            print("🔄 Back to Order List View")
         }
     }
 }
@@ -69,12 +70,12 @@ struct RestaurantOrderView: View {
             updatedAt: Date()
         )
     ]
-
+    
     let mockVM = RestaurantOrderViewModel(
         orderModel: dummyOrders.first!
     )
     mockVM.restaurantCustomerOrders = dummyOrders
-
+    
     return NavigationStack {
         RestaurantOrderView()
             .environment(mockVM)

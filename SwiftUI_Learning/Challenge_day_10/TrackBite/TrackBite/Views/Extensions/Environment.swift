@@ -12,9 +12,14 @@ private struct SupabaseAuthVMKey: EnvironmentKey {
     static let defaultValue: Bindable<SupabaseAuthVM>? = nil
 }
 
+
+
+
 extension EnvironmentValues {
     var supabaseAuthVM: Bindable<SupabaseAuthVM>? {
         get { self[SupabaseAuthVMKey.self] }
         set { self[SupabaseAuthVMKey.self] = newValue }
     }
 }
+
+

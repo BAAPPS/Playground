@@ -16,10 +16,9 @@ struct LoggedInView: View {
     @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
     @Bindable var authVM: SupabaseAuthVM
     @State private var showSettings = false
-    
-    
+
     var body: some View {
-        NavigationStack {
+        NavigationStack{
             ZStack {
                 RoleDestinationView()
                     .environment(localAuthVM)
@@ -53,6 +52,12 @@ struct LoggedInView: View {
                 }
                 
                 await restaurantOwnerSnapshotVM.fetchAllRestaurantsSnapshotsFromAllUsers()
+                
+                if restaurantOrderViewModel.restaurantCustomerOrders.isEmpty {
+                    await restaurantOrderViewModel.fetchOrdersForCurrentUserRestaurants()
+                    
+                }
+                
             }
         }
     }
@@ -63,20 +68,20 @@ struct LoggedInView: View {
     let localAuthVM = LocalAuthVM.shared
     let sessionCoordVM = SessionCoordinatorVM()
     let restaurantVM = RestaurantVM(
-       restaurantModel: RestaurantModel(
-           id: UUID(),
-           name: "",
-           description: nil,
-           imageURL: nil,
-           address: "",
-           latitude: 0.0,
-           longitude: 0.0,
-           phone: nil,
-           website: nil,
-           ownerID: UUID(),
-           createdAt: Date()
-       )
-   )
+        restaurantModel: RestaurantModel(
+            id: UUID(),
+            name: "",
+            description: nil,
+            imageURL: nil,
+            address: "",
+            latitude: 0.0,
+            longitude: 0.0,
+            phone: nil,
+            website: nil,
+            ownerID: UUID(),
+            createdAt: Date()
+        )
+    )
     
     let restaurantOwnerSnapshotVM =  RestaurantOwnerSnapshotVM(
         snapshotModel: RestaurantOwnerSnapshotModel(
