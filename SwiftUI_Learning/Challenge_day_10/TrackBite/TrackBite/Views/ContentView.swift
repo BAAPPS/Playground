@@ -15,24 +15,25 @@ struct ContentView: View {
     @Environment(RestaurantOwnerSnapshotVM.self) var restaurantOwnerSnapshotVM
     @Environment(SessionCoordinatorVM.self) var sessionCoordVM
     @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
+    @Environment(DriversOrdersViewModel.self) var driversOrdersViewModel
     @Environment(\.modelContext) private var modelContext
     @State var authVM: SupabaseAuthVM
     
     var body: some View {
-        VStack(spacing: 0) {
-            Group {
-                if localAuthVM.currentUser != nil {
-                    if !localAuthVM.hasCompletedOnboarding {
-                        OnboardingView(userRole: localAuthVM.currentUser!.role)
+            VStack(spacing: 0) {
+                Group {
+                    if localAuthVM.currentUser != nil {
+                        if !localAuthVM.hasCompletedOnboarding {
+                            OnboardingView(userRole: localAuthVM.currentUser!.role)
+                        } else {
+                            LoggedInView(authVM: authVM)
+                        }
+
                     } else {
-                        LoggedInView(authVM: authVM)
+                        AuthSwitcherView(authVM: authVM)
                     }
-                    
-                } else {
-                    AuthSwitcherView(authVM: authVM)
                 }
             }
-        }
         .onAppear {
             localAuthVM.modelContext = modelContext
             localAuthVM.debugPrintAllLocalUsers()
@@ -54,20 +55,20 @@ struct ContentView: View {
     ))
     
     let restaurantVM = RestaurantVM(
-        restaurantModel: RestaurantModel(
-            id: UUID(),
-            name: "",
-            description: nil,
-            imageURL: nil,
-            address: "",
-            latitude: 0.0,
-            longitude: 0.0,
-            phone: nil,
-            website: nil,
-            ownerID: UUID(),
-            createdAt: Date()
-        )
-    )
+       restaurantModel: RestaurantModel(
+           id: UUID(),
+           name: "",
+           description: nil,
+           imageURL: nil,
+           address: "",
+           latitude: 0.0,
+           longitude: 0.0,
+           phone: nil,
+           website: nil,
+           ownerID: UUID(),
+           createdAt: Date()
+       )
+   )
     
     let restaurantOwnerSnapshotVM =  RestaurantOwnerSnapshotVM(
         snapshotModel: RestaurantOwnerSnapshotModel(
@@ -87,6 +88,9 @@ struct ContentView: View {
     
     let restaurantOrderViewModel = RestaurantOrderViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
     
+    
+    let driversOrderViewModel = DriversOrdersViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
+    
     ContentView(authVM: authVM)
         .environment(localAuthVM)
         .environment(customerVM)
@@ -94,4 +98,5 @@ struct ContentView: View {
         .environment(sessionCoordVM)
         .environment(restaurantOwnerSnapshotVM)
         .environment(restaurantOrderViewModel)
+        .environment(driversOrderViewModel)
 }

@@ -14,6 +14,7 @@ struct LoggedInView: View {
     @Environment(SessionCoordinatorVM.self) var sessionCoordVM
     @Environment(RestaurantOwnerSnapshotVM.self) var restaurantOwnerSnapshotVM
     @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
+    @Environment(DriversOrdersViewModel.self) var driversOrdersViewModel
     @Bindable var authVM: SupabaseAuthVM
     @State private var showSettings = false
 
@@ -25,6 +26,7 @@ struct LoggedInView: View {
                     .environment(restaurantVM)
                     .environment(restaurantOwnerSnapshotVM)
                     .environment(restaurantOrderViewModel)
+                    .environment(driversOrdersViewModel)
             }
             .bodyBackground(color:.lightWhite)
             .navigationTitle("\(localAuthVM.currentUser?.name ?? "Unknown User")")
@@ -102,6 +104,8 @@ struct LoggedInView: View {
     
     let restaurantOrderViewModel = RestaurantOrderViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
     
+    let driversOrderViewModel = DriversOrdersViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
+    
     NavigationStack {
         LoggedInView(authVM: authVM)
             .environment(localAuthVM)
@@ -109,5 +113,6 @@ struct LoggedInView: View {
             .environment(sessionCoordVM)
             .environment(restaurantOwnerSnapshotVM)
             .environment(restaurantOrderViewModel)
+            .environment(driversOrderViewModel)
     }
 }

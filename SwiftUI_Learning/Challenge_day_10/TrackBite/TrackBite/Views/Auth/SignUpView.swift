@@ -15,9 +15,9 @@ struct SignUpView: View {
 
     @State var authVM: SupabaseAuthVM
     @Binding var isSigningUp: Bool
-    @State private var name = dummyUsersData.restaurants.last?.name ?? "Default Name"
-    @State private var email = dummyUsersData.restaurants.last?.email ?? "default@example.com"
-    @State private var password = dummyUsersData.restaurants.last?.password ?? "defaultPassword123"
+    @State private var name = dummyUsersData.customers.last?.name ?? "Default Name"
+    @State private var email = dummyUsersData.customers.last?.email ?? "default@example.com"
+    @State private var password = dummyUsersData.customers.last?.password ?? "defaultPassword123"
     @State private var navigateToOnboarding = false
 
     @State private var selectedRole: UserRole = .driver

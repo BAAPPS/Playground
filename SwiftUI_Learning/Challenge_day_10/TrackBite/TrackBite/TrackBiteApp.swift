@@ -15,6 +15,7 @@ struct TrackBiteApp: App {
     @State private var restaurantVM = RestaurantVM.shared
     @State private var restaurantSnapshotVM = RestaurantOwnerSnapshotVM.shared
     @State private var restaurantOrderVM = RestaurantOrderViewModel.shared
+    @State private var driversOrderVM = DriversOrdersViewModel.shared
     @State private var networkVM = NetworkMonitorVM()
     @State private var sessionCoordVM = SessionCoordinatorVM()
     
@@ -39,6 +40,7 @@ struct TrackBiteApp: App {
                 .environment(sessionCoordVM)
                 .environment(restaurantSnapshotVM)
                 .environment(restaurantOrderVM)
+                .environment(driversOrderVM)
                 .task {
                     try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 sec
                     

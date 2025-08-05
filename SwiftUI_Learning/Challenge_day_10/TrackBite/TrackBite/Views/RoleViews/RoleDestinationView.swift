@@ -12,6 +12,7 @@ struct RoleDestinationView: View {
     @Environment(RestaurantVM.self) var restaurantVM
     @Environment(RestaurantOwnerSnapshotVM.self) var restaurantOwnerSnapshotVM
     @Environment(RestaurantOrderViewModel.self) var restaurantOrderViewModel
+    @Environment(DriversOrdersViewModel.self) var driversOrdersViewModel
     var body: some View {
         switch localAuthVM.currentUser?.role {
         case .restaurant:
@@ -27,6 +28,7 @@ struct RoleDestinationView: View {
         case .driver:
             DriversRoleView()
                 .environment(localAuthVM)
+                .environment(driversOrdersViewModel)
         case .none:
             Text("No role assigned.")
         }
@@ -69,9 +71,11 @@ struct RoleDestinationView: View {
     )
     
     let restaurantOrderViewModel = RestaurantOrderViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
+    let driversOrderViewModel = DriversOrdersViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
     RoleDestinationView()
         .environment(localAuthVM)
         .environment(restaurantVM)
         .environment(restaurantOwnerSnapshotVM)
         .environment(restaurantOrderViewModel)
+        .environment(driversOrderViewModel)
 }
