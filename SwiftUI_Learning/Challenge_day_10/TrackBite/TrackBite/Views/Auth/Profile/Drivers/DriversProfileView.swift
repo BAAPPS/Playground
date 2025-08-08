@@ -1,13 +1,13 @@
 //
-//  CustomerUserProfileView.swift
+//  DriversProfileView.swift
 //  TrackBite
 //
-//  Created by D F on 8/3/25.
+//  Created by D F on 8/8/25.
 //
 
 import SwiftUI
 
-struct CustomerUserProfileView: View {
+struct DriversProfileView: View {
     @Environment(\.supabaseAuthVM) private var authVM: Bindable<SupabaseAuthVM>?
     @State private var newEmail: String = ""
     @State private var newName: String = ""
@@ -98,5 +98,5 @@ struct CustomerUserProfileView: View {
 }
 
 #Preview {
-    CustomerUserProfileView()
+    DriversProfileView()
 }

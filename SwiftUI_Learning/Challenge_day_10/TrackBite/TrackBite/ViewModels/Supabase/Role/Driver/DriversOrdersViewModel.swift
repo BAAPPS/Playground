@@ -14,7 +14,13 @@ class DriversOrdersViewModel {
     var errorMessage: String?
     private let client = SupabaseManager.shared.client
     let restaurantOwnerSnapshotVM = RestaurantOwnerSnapshotVM.shared
-    let localSaver = SaveDataLocallyVM<RestaurantOrderModel>(fileName: "drivers_delivery_orders.json")
+    var localSaver: SaveDataLocallyVM<RestaurantOrderModel> {
+        guard let userID = LocalAuthVM.shared.currentUser?.id else {
+            return SaveDataLocallyVM(fileName: "drivers-orders.json")
+        }
+        return SaveDataLocallyVM(fileName: "drivers-orders-\(userID).json")
+    }
+    
     
     static let shared = DriversOrdersViewModel(
         orderModel: RestaurantOrderModel(
@@ -39,12 +45,31 @@ class DriversOrdersViewModel {
         self.orderModel = orderModel
     }
     
-
+    
     var orderModel: RestaurantOrderModel
     var ordersTable = TableName.orders
     var restaurantTable  = TableName.restaurants
     var restaurantDeliveryOrders:[RestaurantOrderModel] = []
     var restaurants: [RestaurantModel] = []
+    var orders: [RestaurantOrderModel] = []
+    var enrichedOrders: [(order: RestaurantOrderModel, restaurant: RestaurantOwnerSnapshotModel)] = []
+    
+    
+    private func enrichOrders(_ orders: [RestaurantOrderModel]) {
+        let orderRestaurantIds = Set(orders.map { $0.restaurantId })
+        let matchingSnapshots = restaurantOwnerSnapshotVM.allUserRestaurants.filter {
+            orderRestaurantIds.contains($0.restaurantId)
+        }
+        
+        self.enrichedOrders = orders.compactMap { order in
+            guard let snapshot = matchingSnapshots.first(where: { $0.restaurantId == order.restaurantId }) else {
+                return nil
+            }
+            return (order, snapshot)
+        }
+        
+        print("✅ Enriched orders for driver:", self.enrichedOrders.count)
+    }
     
     func restaurantCoordinate(for order: RestaurantOrderModel) -> CLLocationCoordinate2D? {
         guard let restaurant = restaurants.first(where: { $0.id == order.restaurantId }) else {
@@ -56,8 +81,9 @@ class DriversOrdersViewModel {
     func restaurant(for order: RestaurantOrderModel) -> RestaurantModel? {
         restaurants.first(where: { $0.id == order.restaurantId })
     }
-
-
+    
+    
+    
     @MainActor
     func fetchRestaurantsByIds(_ ids: [UUID]) async throws -> [RestaurantModel] {
         try await client
@@ -67,7 +93,7 @@ class DriversOrdersViewModel {
             .execute()
             .value
     }
-
+    
     
     
     @MainActor
@@ -141,7 +167,63 @@ class DriversOrdersViewModel {
             return false
         }
     }
-
-
-
+    
+    @MainActor
+    func fetchCurrentDriverOrders(forceRefresh: Bool = false) async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            if !forceRefresh {
+                do {
+                    let cachedOrders = try localSaver.loadLocally()
+                    if !cachedOrders.isEmpty {
+                        self.orders = cachedOrders
+                        print("✅ Loaded driver orders from local cache: \(orders.count)")
+                        enrichOrders(cachedOrders)
+                        isLoading = false
+                        return
+                    } else {
+                        print("⚠️ Cached driver orders empty, fetching fresh data")
+                    }
+                } catch {
+                    print("⚠️ No valid local cache, fetching from server.")
+                }
+            }
+            
+            
+            guard let userID = LocalAuthVM.shared.currentUser?.id,
+                  let userUUID = UUID(uuidString: userID) else {
+                errorMessage = "No user ID found."
+                isLoading = false
+                return
+            }
+            
+            print(userUUID)
+            
+            // Fetch orders assigned to this driver only
+            let fetchedOrders: [RestaurantOrderModel] = try await client
+                .from("orders")
+                .select("*")
+                .eq("driver_id", value: userUUID)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            
+            self.orders = fetchedOrders
+            print("✅ Fetched driver orders: \(orders.count)")
+            
+            try localSaver.saveLocally(fetchedOrders)
+            print("✅ Driver orders saved locally.")
+            
+            enrichOrders(fetchedOrders)
+            
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Failed to fetch or cache driver orders:", error)
+        }
+        
+        isLoading = false
+    }
 }
+
