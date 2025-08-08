@@ -12,8 +12,8 @@ struct LogInView: View {
     static  let dummyUsersData: DummyUsersModel = Bundle.main.decode("dummyUsers.json")
     @State var authVM: SupabaseAuthVM
     @Binding var isSigningUp: Bool
-    @State private var email = dummyUsersData.drivers.first?.email ?? "default@example.com"
-    @State private var password = dummyUsersData.drivers.first?.password ?? "defaultPassword123"
+    @State private var email = dummyUsersData.customers.last?.email ?? "default@example.com"
+    @State private var password = dummyUsersData.customers.last?.password ?? "defaultPassword123"
     
     var body: some View {
         ZStack {

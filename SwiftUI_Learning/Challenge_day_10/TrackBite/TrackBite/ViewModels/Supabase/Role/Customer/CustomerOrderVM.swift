@@ -17,10 +17,14 @@ class CustomerOrderVM {
     var orders:[RestaurantOrderModel] = []
     var enrichedOrders: [(order: RestaurantOrderModel, restaurant: RestaurantOwnerSnapshotModel)] = []
     let restaurantOwnerSnapshotVM = RestaurantOwnerSnapshotVM.shared
-    let localSaver = SaveDataLocallyVM<RestaurantOrderModel>(fileName: "customers-order.json")
+    var localSaver: SaveDataLocallyVM<RestaurantOrderModel> {
+        guard let userID = LocalAuthVM.shared.currentUser?.id else {
+            return SaveDataLocallyVM(fileName: "customers-order.json")
+        }
+        return SaveDataLocallyVM(fileName: "customers-order-\(userID).json")
+    }
     
     static let shared = CustomerOrderVM(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
-    
     
     
     
@@ -29,17 +33,25 @@ class CustomerOrderVM {
     }
     
     private func enrichOrders(_ orders: [RestaurantOrderModel]) {
-        let allSnapshots = restaurantOwnerSnapshotVM.allUserRestaurants
-        
+        // Step 1: Extract restaurant IDs from the current orders
+        let orderRestaurantIds = Set(orders.map { $0.restaurantId })
+
+        // Step 2: Filter snapshots to just the restaurants in those orders
+        let matchingSnapshots = restaurantOwnerSnapshotVM.allUserRestaurants.filter {
+            orderRestaurantIds.contains($0.restaurantId)
+        }
+
+        // Step 3: Build enriched order list
         self.enrichedOrders = orders.compactMap { order in
-            guard let matchingSnapshot = allSnapshots.first(where: { $0.restaurantId == order.restaurantId }) else {
+            guard let matchingSnapshot = matchingSnapshots.first(where: { $0.restaurantId == order.restaurantId }) else {
                 return nil
             }
             return (order, matchingSnapshot)
         }
-        
-        print("✅ Enriched orders:", self.enrichedOrders.count)
+
+        print("✅ Enriched orders for customer:", self.enrichedOrders.count)
     }
+
     
     @MainActor
     func currentUserOrders(forceRefresh: Bool = false) async {

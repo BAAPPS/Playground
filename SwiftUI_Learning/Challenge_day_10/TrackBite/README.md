@@ -422,6 +422,85 @@ Now, whenever the sheet is dismissed:
 
 ✅ **Result:** Edits made in the sheet persist across the app, even after dismissing the modal. The user experience is now consistent and intuitive.
 
+
+---
+
+### 7. Problem: Stale Customer Order Data Due to Static Local Cache Filename
+
+Initially, the app used a **single static filename (`customers-order.json`)** to locally cache customer orders across all users. This caused multiple issues:
+
+#### Issues:
+
+* The app **loaded stale cached orders from previous users**, causing the current customer to see incorrect order data that belonged to others.
+* Even after switching users, the app still displayed the **same cached orders because the cache filename did not differentiate users**.
+* This mixing of cached data led to confusion and incorrect UI display.
+* The problem was subtle because the fetch from the server was correct, but the **local cache overwrote the orders list** after launch.
+* The `enrichOrders` function, which matches orders to restaurant snapshots, only works properly when the orders list is accurate per user, so its results were misleading.
+
+#### ❌ Code Example: Static Cache Filename Causing Stale Data
+
+```swift
+let localSaver = SaveDataLocallyVM<RestaurantOrderModel>(fileName: "customers-order.json")
+
+@MainActor
+func currentUserOrders(forceRefresh: Bool = false) async {
+    // Load from static cache file regardless of current user
+    let cachedOrders = try localSaver.loadLocally()
+    self.orders = cachedOrders
+    enrichOrders(cachedOrders)
+    // This caused wrong orders to display for all customers
+}
+```
+
+#### Solution: Use User-Specific Cache Filename & Clear Old Cache
+
+To fix this, the local cache filename was made **unique per user** by appending the current user ID to the filename:
+
+```swift
+var localSaver: SaveDataLocallyVM<RestaurantOrderModel> {
+    guard let userID = LocalAuthVM.shared.currentUser?.id else {
+        return SaveDataLocallyVM(fileName: "customers-order.json")
+    }
+    return SaveDataLocallyVM(fileName: "customers-order-\(userID).json")
+}
+```
+
+Additionally, old cached files for previous users were deleted to avoid loading outdated data.
+
+This ensured that:
+
+* Each user loads their **own cached orders only**.
+* The `enrichOrders` function now matches orders properly to restaurant snapshots, showing accurate enriched data.
+* Fresh server fetches update the user-specific cache correctly.
+* Users see only their own orders, fixing the data confusion.
+
+##### ✅ Code Snippet: User-Specific Local Cache with EnrichOrders
+
+```swift
+private func enrichOrders(_ orders: [RestaurantOrderModel]) {
+    let orderRestaurantIds = Set(orders.map { $0.restaurantId })
+    let matchingSnapshots = restaurantOwnerSnapshotVM.allUserRestaurants.filter {
+        orderRestaurantIds.contains($0.restaurantId)
+    }
+    self.enrichedOrders = orders.compactMap { order in
+        guard let matchingSnapshot = matchingSnapshots.first(where: { $0.restaurantId == order.restaurantId }) else {
+            return nil
+        }
+        return (order, matchingSnapshot)
+    }
+}
+
+var localSaver: SaveDataLocallyVM<RestaurantOrderModel> {
+    guard let userID = LocalAuthVM.shared.currentUser?.id else {
+        return SaveDataLocallyVM(fileName: "customers-order.json")
+    }
+    return SaveDataLocallyVM(fileName: "customers-order-\(userID).json")
+}
+```
+ 
+**Result:** After applying this fix and clearing old cached files, the app reliably displays **only the current customer’s orders** enriched with the correct restaurant data, providing a consistent and correct user 
+experience.
+
 ---
 
 ## What I Would Do Differently
