@@ -81,6 +81,7 @@ class DriversOrdersViewModel {
                 .from(ordersTable.rawValue)
                 .select()
                 .eq("order_type", value: OrderType.delivery.rawValue)
+                .eq("status", value: OrderStatus.pending.rawValue)
                 .order("created_at", ascending: false)
                 .execute()
                 .value
@@ -104,6 +105,43 @@ class DriversOrdersViewModel {
         
         isLoading = false
     }
+    
+    
+    func updateOrderAsDriver(_ order: RestaurantOrderModel) async -> Bool {
+        isLoading = true
+        errorMessage = nil
+        
+        defer { isLoading = false }
+        
+        do {
+            let updatePayload = RestaurantOrderModel.RestaurantOrderPayload(
+                customer_id: order.customerId,
+                restaurant_id: order.restaurantId,
+                driver_id: order.driverId,
+                delivery_address: order.deliveryAddress,
+                status: order.status,
+                estimated_time_minutes: order.estimatedTimeMinutes,
+                delivery_fee: order.deliveryFee,
+                is_picked_up: order.isPickedUp,
+                is_delivered: order.isDelivered,
+                order_type: order.orderType
+            )
+            
+            try await client
+                .from(ordersTable.rawValue)
+                .update(updatePayload)
+                .eq("id", value: order.id)
+                .execute()
+            
+            print("✅ Order updated by driver.")
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Driver order update failed:", error)
+            return false
+        }
+    }
+
 
 
 }

@@ -11,7 +11,7 @@ import MapKit
 struct SimulatedMapView: View {
     let region: MKCoordinateRegion
     let annotations: [Place]
-
+    
     var body: some View {
         Map(initialPosition: .region(region)) {
             ForEach(annotations) { place in
@@ -56,13 +56,20 @@ struct PlaceAnnotationView: View {
 struct DeliveryMapSimulatorView: View {
     let restaurantCoordinate: CLLocationCoordinate2D
     let customerCoordinate: CLLocationCoordinate2D
+    let order: RestaurantOrderModel
+    
+    @Environment(LocalAuthVM.self) var localAuthVM
+    @Environment(RestaurantOrderViewModel.self) private var restaurantOrderVM
+    @Environment(DriversOrdersViewModel.self) var driversOrdersViewModel
+    
     @State private var driverCoordinate: CLLocationCoordinate2D
     @State private var progress: Double = 0
     @State private var timer: Timer?
     
-    init(restaurantCoordinate: CLLocationCoordinate2D, customerCoordinate: CLLocationCoordinate2D) {
+    init(restaurantCoordinate: CLLocationCoordinate2D, customerCoordinate: CLLocationCoordinate2D, order: RestaurantOrderModel) {
         self.restaurantCoordinate = restaurantCoordinate
         self.customerCoordinate = customerCoordinate
+        self.order = order
         _driverCoordinate = State(initialValue: restaurantCoordinate)
     }
     
@@ -88,7 +95,7 @@ struct DeliveryMapSimulatorView: View {
             timer?.invalidate()
         }
     }
-
+    
     
     
     // Center the map between restaurant and customer, zoomed out enough to see both
@@ -120,6 +127,7 @@ struct DeliveryMapSimulatorView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { t in
             if currentStep >= steps {
                 t.invalidate()
+                markOrderAsDelivered()
                 return
             }
             currentStep += 1
@@ -131,13 +139,43 @@ struct DeliveryMapSimulatorView: View {
             driverCoordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
         }
     }
+    
+    func markOrderAsDelivered() {
+        Task {
+            var updatedOrder = order
+            if let userID = localAuthVM.currentUser?.id,
+                let userIDString = UUID(uuidString: userID) {
+                updatedOrder.driverId = userIDString
+            }
+            updatedOrder.isDelivered = true
+            updatedOrder.status = .completed
+            updatedOrder.updatedAt = Date()
+            
+            let success = await driversOrdersViewModel.updateOrderAsDriver(updatedOrder)
+            if success {
+                print("✅ Order marked as delivered.")
+            } else {
+                print("❌ Failed to update order.")
+            }
+        }
+    }
 }
 
 
-
 #Preview {
+    let restaurantOrderViewModel = RestaurantOrderViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
+    
+    let restaurantOM = RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date())
+    
+    let localAuthVM = LocalAuthVM.shared
+    let driversOrderViewModel = DriversOrdersViewModel(orderModel: RestaurantOrderModel(id: UUID(), customerId: UUID(), restaurantId: UUID(), driverId: UUID(), deliveryAddress: "", status: .inProgress, estimatedTimeMinutes: 0, deliveryFee: 8.0, isPickedUp: false, isDelivered: false, orderType: .pickup, createdAt: Date(), updatedAt: Date()))
     DeliveryMapSimulatorView(
         restaurantCoordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),  // San Francisco
-        customerCoordinate: CLLocationCoordinate2D(latitude: 37.7849, longitude: -122.4094)    // Nearby location
+        customerCoordinate: CLLocationCoordinate2D(latitude: 37.7849, longitude: -122.4094),  // Nearby location
+        order: restaurantOM
+        
     )
+    .environment(restaurantOrderViewModel)
+    .environment(localAuthVM)
+    .environment(driversOrderViewModel)
 }

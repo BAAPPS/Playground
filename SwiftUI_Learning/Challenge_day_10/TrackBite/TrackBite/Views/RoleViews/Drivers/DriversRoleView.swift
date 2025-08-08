@@ -117,10 +117,13 @@ struct DriversRoleView: View {
                 await driversOrdersViewModel.fetchAllDeliveryOrdersFromAllRestaurants()
             }
             .navigationDestination(isPresented: $isShowingMap) {
-                if let restCoord = restaurantCoordinate, let custCoord = customerCoordinate {
+                if let restCoord = restaurantCoordinate,
+                    let custCoord = customerCoordinate,
+                    let order = selectedOrder {
                     DeliveryMapSimulatorView(
                         restaurantCoordinate: restCoord,
-                        customerCoordinate: custCoord
+                        customerCoordinate: custCoord,
+                        order: order
                     )
                 } else {
                     Text("Loading map...")
