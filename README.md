@@ -54,10 +54,16 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 53-56** - Project 11, parts one to four: [BookWormm](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_11)
 - **Day 57-59** - Project 12, parts one to three: [SwiftData](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_12)
 
-### Days 62-76: Filters, maps, and more (Incomplete ❌)
+### Days 62-76: Filters, maps, and more (Completed ✅) (Incomplete ❌)
 
 - **Day 62-67** – Project 13, part one to six: [Instafilter](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_13)
 - **Day 68-73** – Project 14, part one to six: [BucketList](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_14)
+- **Day 74-76** – Project 15, part one to three: [AccessibilityApp](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_15)
+
+### Days 79-94: Controlling UI flow (Incomplete ❌)
+
+- **Day 79-85** – Project 16, part one to seven: [HotProspects](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_16)
+
 
 ---
 
@@ -205,7 +211,7 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 [SwiftData](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_12/SwiftData/README.md)
 
-### Days 62-76: Filters, maps, and more (Incomplete ❌)
+### Days 62-76: Filters, maps, and more (Completed ✅)
 
 #### Day 62-67 – Project 13, part one to six
 
@@ -214,6 +220,17 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 #### Day 68-73 – Project 14, part one to six
 
 [BucketList](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_14/BucketList/README.md)
+
+#### Day 74-76 – Project 15, part one to three
+
+[AccessibilityApp](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_15/AccessibilityApp/README.md)
+
+### Days 79-94: Controlling UI flow (Incomplete ❌)
+
+#### Day 79-85 – Project 16, part one to seven: 
+
+[HotProspects](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_16/HotProspects/README.md)
+
 
 ---
 
