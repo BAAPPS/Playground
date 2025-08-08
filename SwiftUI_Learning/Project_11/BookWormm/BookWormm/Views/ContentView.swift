@@ -38,6 +38,9 @@ struct ContentView: View {
         }
     }
     
+    let maximumRating = 5
+
+    
     var body: some View {
         NavigationStack {
             List {
@@ -55,6 +58,20 @@ struct ContentView: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
+                        .accessibilityElement()
+                        .accessibilityLabel("Rating")
+                        .accessibilityValue(book.rating == 1 ? "1 star" : "\(book.rating) stars")
+                        .accessibilityAdjustableAction { direction in
+                            switch direction {
+                            case .increment:
+                                if book.rating < maximumRating { book.rating += 1 }
+                            case .decrement:
+                                if book.rating > 1 { book.rating -= 1 }
+                            default:
+                                break
+                            }
+                        }
+                        
                     }
                 }
                 .onDelete(perform: deleteBooks)

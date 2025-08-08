@@ -138,6 +138,8 @@ struct ContentView: View {
                             Image(systemName: "\(word.count).circle")
                             Text(word)
                         }
+                        .accessibilityElement()
+                        .accessibilityLabel("\(word), \(word.count) letters")
                     }
                 }
                 
@@ -158,7 +160,7 @@ struct ContentView: View {
         }
         .onSubmit(addNewWord)
         .onAppear(perform: startGame)
-
+        
         .alert(errorTitle, isPresented: $showError){
             Button("OK"){}
         } message: {
