@@ -10,6 +10,7 @@ Along building this app, you'll explore several important iOS development techni
 - Sharing custom data using SwiftUI’s environment  
 - Displaying notifications on the lock screen  
 - And many other useful features
+- Custom sorting based on email address, names, or contacted 
 
 ## What the App Does
 
@@ -21,9 +22,10 @@ Along building this app, you'll explore several important iOS development techni
 
 ```text
 HotProspects/
-├── ContentView.swift           # Main user interface
-├── Assets.xcassets/            # App assets and icons
-├── HotProspectsApp.swift       # App entry point
+├── Model/  
+├── Views/  
+├── Assets.xcassets/           
+├── HotProspectsApp.swift       
 ````
 
 ## Final Thoughts
