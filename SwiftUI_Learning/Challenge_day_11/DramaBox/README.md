@@ -47,8 +47,22 @@ This challenge is designed to:
 * Simulate a **real-world media library app** from scratch.
 
 ---
-
 ## What I Learned
+
+**Problem 1: Episodes embedded in show inserts caused encoding errors**  
+- **Solution:** Decoupled episodes from shows and inserted them separately. This fixed JSON serialization issues and allowed proper Swift `Codable` handling.
+
+**Problem 2: Slow uploads when inserting episodes one by one**  
+- **Solution:** Implemented batch inserts for episodes after filtering out duplicates. This reduced network requests and significantly improved performance.
+
+**Problem 3: Duplicate key errors in the database**  
+- **Solution:** Checked for existing shows and episode titles before inserting. Only new records are uploaded to avoid violating unique constraints.
+
+**Problem 4: Difficulty decoding Supabase responses**  
+- **Solution:** Used strongly-typed structs (`ShowDetailsResponse`, episode arrays) to reliably decode `Data` returned from Supabase, rather than trying unsafe casts.
+
+**Problem 5: Managing async workflows with multiple network calls**  
+- **Solution:** Used `async/await` with structured error handling to ensure sequential, reliable uploads while keeping the UI responsive.
 
 
 

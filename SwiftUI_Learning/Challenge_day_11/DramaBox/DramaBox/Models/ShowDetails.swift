@@ -17,11 +17,9 @@ struct ShowDetails: Codable {
     let cast: [String]
     let title: String
     let bannerImageURL: String?
-    let episodes: [Episode]
+    let episodes: [Episode]?
     
 
-    
-    // Insert struct for uploading to Supabase (Encodable only)
     struct Insert: Codable {
         let title: String
         let subtitle: String
@@ -34,18 +32,17 @@ struct ShowDetails: Codable {
         let banner_image_url: String?
     }
 }
-
 struct Episode: Codable {
     let title: String
     let url: String
     let thumbnailURL: String?
     
     
-    // Insert struct for uploading episodes (Encodable only)
     struct Insert: Codable {
         let show_id: Int
         let title: String
         let url: String
-        let thumbnail_url: String
+        let thumbnail_url: String?
     }
 }
+

@@ -16,79 +16,27 @@ class ShowSQLViewModel {
     
     private let supabaseClient = SupabaseManager.shared.client
     
-    func uploadShows(from jsonString: String) async {
+    /// Upload shows and their episodes
+    func uploadShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async {
         self.errorMessage = nil
         self.successMessage = nil
         
-        guard let jsonData = jsonString.data(using: .utf8) else {
-            self.errorMessage = "Invalid JSON string encoding."
-            return
-        }
-        
         do {
-            let decoder = JSONDecoder()
-            // Decode Insert structs (snake_case keys expected)
-            let shows = try decoder.decode([ShowDetails.Insert].self, from: jsonData)
-            
-            try await insertShows(shows)
-            
-            self.successMessage = "Uploaded \(shows.count) shows successfully."
-            
+            try await insertShows(showsWithEpisodes)
+            self.successMessage = "Uploaded \(showsWithEpisodes.count) shows successfully."
         } catch {
             self.errorMessage = "Upload failed: \(error.localizedDescription)"
-            print("Decoding/upload error:", error)
+            print("Upload error:", error)
         }
     }
     
-    func insertShowWithEpisodes(_ show: ShowDetails) async throws {
-        // Insert the show first
-        let showInsert = ShowDetails.Insert(
-            title: show.title,
-            subtitle: show.subtitle,
-            schedule: show.schedule,
-            genres: show.genres,
-            cast: show.cast,
-            year: show.year,
-            description: show.description,
-            thumb_image_url: show.thumbImageURL,
-            banner_image_url: show.bannerImageURL
-        )
-
-        let showResponse = try await supabaseClient
-            .from("show_details")
-            .insert([showInsert])
-            .select("id")
-            .execute()
-
-        let data = showResponse.data
-        guard
-            let insertedShows = try? JSONDecoder().decode([ShowDetailsResponse].self, from: data),
-            let insertedShow = insertedShows.first
-        else {
-            throw NSError(domain: "Supabase", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to insert show"])
-        }
-
-        let showId = insertedShow.id
-
-        // Prepare episodes to insert
-        let episodeInserts = show.episodes.compactMap { episode -> Episode.Insert? in
-            guard let thumb = episode.thumbnailURL else { return nil }
-            return Episode.Insert(show_id: showId, title: episode.title, url: episode.url, thumbnail_url: thumb)
-        }
-
-        if !episodeInserts.isEmpty {
-            try await supabaseClient
-                .from("episodes")
-                .insert(episodeInserts)
-                .execute()
-        }
-    }
-
-    
-    private func insertShows(_ shows: [ShowDetails.Insert]) async throws {
-        for show in shows {
-            // Check if show exists
-            let existingResponse = try await supabaseClient
+    private func insertShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async throws {
+        for item in showsWithEpisodes {
+            let show = item.show
+            let episodes = item.episodes
+            
+            // 1. Check if the show already exists
+            let existingShowResponse = try await supabaseClient
                 .from("show_details")
                 .select("id")
                 .eq("title", value: show.title)
@@ -96,29 +44,57 @@ class ShowSQLViewModel {
                 .limit(1)
                 .execute()
             
-            let data = existingResponse.data
-            
-            if let existingShows = try? JSONDecoder().decode([ShowDetailsResponse].self, from: data),
+            let existingData = existingShowResponse.data
+            if let existingShows = try? JSONDecoder().decode([ShowDetailsResponse].self, from: existingData),
                !existingShows.isEmpty {
-                print("Show already exists, skipping insert:", show.title)
+                print("Show already exists, skipping:", show.title)
                 continue
             }
             
-            // Insert show
-            let response = try await supabaseClient
+            // 2. Insert the show and get its ID
+            let insertShowResponse = try await supabaseClient
                 .from("show_details")
                 .insert([show])
                 .select("id")
                 .execute()
             
-            let responseData = response.data
-            let insertedShows = try JSONDecoder().decode([ShowDetailsResponse].self, from: responseData)
-            
-            guard let insertedShow = insertedShows.first else {
-                throw NSError(domain: "Supabase", code: 0, userInfo: [NSLocalizedDescriptionKey: "Insert response array empty"])
+            let insertedData = insertShowResponse.data
+            guard let insertedShows = try? JSONDecoder().decode([ShowDetailsResponse].self, from: insertedData),
+                  let showId = insertedShows.first?.id else {
+                print("Failed to get inserted show ID for:", show.title)
+                continue
             }
             
-//            let insertedId = insertedShow.id
+            // 3. Insert episodes efficiently, avoiding duplicates
+            if let episodes = episodes, !episodes.isEmpty {
+                // Fetch existing episode titles for this show
+                let existingEpisodesResponse = try await supabaseClient
+                    .from("episodes")
+                    .select("title")
+                    .eq("show_id", value: showId)
+                    .execute()
+                
+                let existingTitles: [String] = (try? JSONDecoder().decode([[String: String]].self, from: existingEpisodesResponse.data).compactMap { $0["title"] }) ?? []
+                
+                // Filter out episodes that already exist
+                let newEpisodes = episodes.filter { !existingTitles.contains($0.title) }
+                
+                if !newEpisodes.isEmpty {
+                    let episodeInserts = newEpisodes.map { ep in
+                        Episode.Insert(
+                            show_id: showId,
+                            title: ep.title,
+                            url: ep.url,
+                            thumbnail_url: ep.thumbnailURL
+                        )
+                    }
+                    
+                    try await supabaseClient
+                        .from("episodes")
+                        .insert(episodeInserts)
+                        .execute()
+                }
+            }
         }
     }
 }
