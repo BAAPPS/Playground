@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3CDCB8A82E4BDA36005BD4E1 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8A72E4BDA36005BD4E1 /* SwiftSoup */; };
+		3CDCB8BB2E4BF60B005BD4E1 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8BA2E4BF60B005BD4E1 /* Auth */; };
+		3CDCB8BD2E4BF60B005BD4E1 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8BC2E4BF60B005BD4E1 /* PostgREST */; };
+		3CDCB8BF2E4BF60B005BD4E1 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8BE2E4BF60B005BD4E1 /* Storage */; };
+		3CDCB8C12E4BF60B005BD4E1 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8C02E4BF60B005BD4E1 /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		3CDCB88E2E4BD558005BD4E1 /* DramaBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DramaBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +31,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3CDCB8C12E4BF60B005BD4E1 /* Supabase in Frameworks */,
+				3CDCB8BF2E4BF60B005BD4E1 /* Storage in Frameworks */,
+				3CDCB8BD2E4BF60B005BD4E1 /* PostgREST in Frameworks */,
+				3CDCB8BB2E4BF60B005BD4E1 /* Auth in Frameworks */,
+				3CDCB8A82E4BDA36005BD4E1 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +78,11 @@
 			);
 			name = DramaBox;
 			packageProductDependencies = (
+				3CDCB8A72E4BDA36005BD4E1 /* SwiftSoup */,
+				3CDCB8BA2E4BF60B005BD4E1 /* Auth */,
+				3CDCB8BC2E4BF60B005BD4E1 /* PostgREST */,
+				3CDCB8BE2E4BF60B005BD4E1 /* Storage */,
+				3CDCB8C02E4BF60B005BD4E1 /* Supabase */,
 			);
 			productName = DramaBox;
 			productReference = 3CDCB88E2E4BD558005BD4E1 /* DramaBox.app */;
@@ -94,6 +112,10 @@
 			);
 			mainGroup = 3CDCB8852E4BD558005BD4E1;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3CDCB8A62E4BDA36005BD4E1 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3CDCB88F2E4BD558005BD4E1 /* Products */;
 			projectDirPath = "";
@@ -324,6 +346,53 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3CDCB8A62E4BDA36005BD4E1 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.1;
+			};
+		};
+		3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3CDCB8A72E4BDA36005BD4E1 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CDCB8A62E4BDA36005BD4E1 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+		3CDCB8BA2E4BF60B005BD4E1 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		3CDCB8BC2E4BF60B005BD4E1 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		3CDCB8BE2E4BF60B005BD4E1 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		3CDCB8C02E4BF60B005BD4E1 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3CDCB8862E4BD558005BD4E1 /* Project object */;
 }
