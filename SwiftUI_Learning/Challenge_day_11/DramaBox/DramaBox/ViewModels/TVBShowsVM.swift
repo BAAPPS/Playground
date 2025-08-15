@@ -97,7 +97,7 @@ class TVBShowsVM {
 
     }
     
-    func fetchAllShowDetailsAndSave() async {
+    func fetchAllShowDetailsAndSave() async -> [ShowDetails] {
         do {
             let categorizedShows = try await fetchAndParseShows()
             
@@ -138,8 +138,11 @@ class TVBShowsVM {
             saveShowDetailsLocally(allDetails)
             print("✅ Saved all show details locally, total: \(allDetails.count) shows")
             
+            return allDetails
+            
         } catch {
             print("Failed to fetch shows or save details: \(error)")
+            return []
         }
     }
     

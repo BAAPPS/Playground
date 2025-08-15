@@ -13,19 +13,14 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            
-            Button("Scrape and Upload Shows") {
-                Task {
-                    await combinedVM.scrapeAndUploadShows()
-                    
-                    if let success = combinedVM.successMessage {
-                        print(success)
-                    }
-                    if let error = combinedVM.errorMessage {
-                        print(error)
-                        
-                    }
-                }
+        }
+        .task{
+            let result = await combinedVM.scrapeAndUploadShows()
+            switch result {
+            case .success(let message):
+                print(message)
+            case .failure(let error):
+                print(error.localizedDescription)
             }
         }
     }

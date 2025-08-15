@@ -11,22 +11,16 @@ import Supabase
 @MainActor
 @Observable
 class ShowSQLViewModel {
-    var errorMessage: String? = nil
-    var successMessage: String? = nil
-    
     private let supabaseClient = SupabaseManager.shared.client
     
     /// Upload shows and their episodes
-    func uploadShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async {
-        self.errorMessage = nil
-        self.successMessage = nil
-        
+    func uploadShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async -> Result<String, Error> {
+      
         do {
             try await insertShows(showsWithEpisodes)
-            self.successMessage = "Uploaded \(showsWithEpisodes.count) shows successfully."
+            return .success("Uploaded \(showsWithEpisodes.count) shows successfully.")
         } catch {
-            self.errorMessage = "Upload failed: \(error.localizedDescription)"
-            print("Upload error:", error)
+            return .failure(error)
         }
     }
     
