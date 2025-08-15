@@ -94,7 +94,7 @@ class TVBShowsVM {
             bannerImageURL: bannerImageURL.absoluteString,
             episodes: episodes
         )
-
+        
     }
     
     func fetchAllShowDetailsAndSave() async -> [ShowDetails] {
@@ -103,22 +103,27 @@ class TVBShowsVM {
             
             // Load saved details and build a set of saved URLs
             let savedDetails = loadShowDetailsLocally() ?? []
-            let savedTitles = Set(savedDetails.map { $0.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) })
-            
-            
+            // let savedTitles = Set(savedDetails.map { $0.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) })
+            let savedIDs = Set(savedDetails.map { "\($0.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))-\($0.year)" })
             var allDetails = savedDetails
             
             // Concurrency: fetch details in parallel
             try await withThrowingTaskGroup(of: ShowDetails?.self) { group in
                 for (_, shows) in categorizedShows {
                     for show in shows {
-                        if savedTitles.contains(show.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)) {
-                            // Skip already saved shows
+                        // Create a temporary id using title and placeholder year
+                        let tempID = "\(show.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))"
+                        
+                        // Skip if already saved
+                        if savedDetails.contains(where: { $0.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) == tempID }) {
                             continue
                         }
+                    
+                        
                         group.addTask {
                             do {
                                 return try await self.fetchAndParseShowDetails(from: show.url)
+                                
                             } catch {
                                 print("❌ Failed to fetch details for \(show.title): \(error)")
                                 return nil
@@ -129,8 +134,13 @@ class TVBShowsVM {
                 
                 for try await detail in group {
                     if let detail = detail {
-                        allDetails.append(detail)
-                        print("✅ Fetched details for: \(detail.title)")
+                        // Skip duplicates based on generated id (title + year)
+                        if !savedIDs.contains(detail.id) {
+                            allDetails.append(detail)
+                            print("✅ Fetched details for: \(detail.title) (\(detail.year))")
+                        } else {
+                            print("⚠️ Skipped duplicate: \(detail.title) (\(detail.year))")
+                        }
                     }
                 }
             }

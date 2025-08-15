@@ -19,6 +19,10 @@ struct ShowDetails: Codable {
     let bannerImageURL: String?
     let episodes: [Episode]?
     
+    var id: String {
+        "\(title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))-\(year)"
+    }
+
 
     struct Insert: Codable {
         let title: String
