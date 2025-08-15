@@ -23,6 +23,11 @@ struct ShowDetails: Codable {
         "\(title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))-\(year)"
     }
 
+    enum CodingKeys: String, CodingKey {
+           case schedule, subtitle, genres, year, description, cast, title, episodes
+           case thumbImageURL = "thumb_image_url"
+           case bannerImageURL = "banner_image_url"
+       }
 
     struct Insert: Codable {
         let title: String
@@ -41,7 +46,12 @@ struct Episode: Codable {
     let url: String
     let thumbnailURL: String?
     
-    
+    enum CodingKeys: String, CodingKey {
+        case title, url
+        case thumbnailURL = "thumbnail_url"
+    }
+
+
     struct Insert: Codable {
         let show_id: Int
         let title: String

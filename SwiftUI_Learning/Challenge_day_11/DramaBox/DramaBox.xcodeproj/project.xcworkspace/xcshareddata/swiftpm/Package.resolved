@@ -1,6 +1,15 @@
 {
-  "originHash" : "e8d0a66a1e0ed2702f2ab9491807d7538c8747f83a51a7c129edc125b4a887d6",
+  "originHash" : "d931f81c051ae8266515b176165afb4b9bdf46b1108d247feecea117c413f5f8",
   "pins" : [
+    {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher.git",
+      "state" : {
+        "revision" : "2015fda791daa72c8058619545a593bf8c1dd59f",
+        "version" : "8.5.0"
+      }
+    },
     {
       "identity" : "supabase-swift",
       "kind" : "remoteSourceControl",

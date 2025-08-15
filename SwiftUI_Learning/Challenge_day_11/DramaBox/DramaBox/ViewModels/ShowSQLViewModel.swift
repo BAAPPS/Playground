@@ -13,6 +13,18 @@ import Supabase
 class ShowSQLViewModel {
     private let supabaseClient = SupabaseManager.shared.client
     
+    func fetchShowsFromSupabase() async throws -> [ShowDetails] {
+        let response = try await supabaseClient
+            .from("show_details")
+            .select("*")
+            .execute()
+        
+        let data = response.data
+        
+        let shows = try JSONDecoder().decode([ShowDetails].self, from: data)
+        return shows
+    }
+    
     /// Upload shows and their episodes
     func uploadShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async -> Result<String, Error> {
       

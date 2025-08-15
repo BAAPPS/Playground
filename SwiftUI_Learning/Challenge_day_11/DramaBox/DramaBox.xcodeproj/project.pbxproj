@@ -12,6 +12,7 @@
 		3CDCB8BD2E4BF60B005BD4E1 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8BC2E4BF60B005BD4E1 /* PostgREST */; };
 		3CDCB8BF2E4BF60B005BD4E1 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8BE2E4BF60B005BD4E1 /* Storage */; };
 		3CDCB8C12E4BF60B005BD4E1 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8C02E4BF60B005BD4E1 /* Supabase */; };
+		3CDCB8DA2E4FE2A4005BD4E1 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 3CDCB8D92E4FE2A4005BD4E1 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3CDCB8DA2E4FE2A4005BD4E1 /* Kingfisher in Frameworks */,
 				3CDCB8C12E4BF60B005BD4E1 /* Supabase in Frameworks */,
 				3CDCB8BF2E4BF60B005BD4E1 /* Storage in Frameworks */,
 				3CDCB8BD2E4BF60B005BD4E1 /* PostgREST in Frameworks */,
@@ -83,6 +85,7 @@
 				3CDCB8BC2E4BF60B005BD4E1 /* PostgREST */,
 				3CDCB8BE2E4BF60B005BD4E1 /* Storage */,
 				3CDCB8C02E4BF60B005BD4E1 /* Supabase */,
+				3CDCB8D92E4FE2A4005BD4E1 /* Kingfisher */,
 			);
 			productName = DramaBox;
 			productReference = 3CDCB88E2E4BD558005BD4E1 /* DramaBox.app */;
@@ -115,6 +118,7 @@
 			packageReferences = (
 				3CDCB8A62E4BDA36005BD4E1 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				3CDCB8D82E4FE2A4005BD4E1 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3CDCB88F2E4BD558005BD4E1 /* Products */;
@@ -364,6 +368,14 @@
 				minimumVersion = 2.5.1;
 			};
 		};
+		3CDCB8D82E4FE2A4005BD4E1 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -391,6 +403,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3CDCB8B92E4BF60B005BD4E1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
+		};
+		3CDCB8D92E4FE2A4005BD4E1 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CDCB8D82E4FE2A4005BD4E1 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
