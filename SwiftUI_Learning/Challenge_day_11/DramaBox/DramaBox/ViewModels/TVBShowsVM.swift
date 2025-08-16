@@ -58,7 +58,7 @@ class TVBShowsVM {
         return categorizedShows
     }
     
-    func fetchAndParseShowDetails(from url: URL) async throws -> ShowDetails {
+    func fetchAndParseShowDetails(from url: URL) async throws -> ShowDisplayable {
         let html = try await fetchHTML(from: url)
         let doc = try SwiftSoup.parse(html)
         
@@ -97,84 +97,122 @@ class TVBShowsVM {
         
     }
     
-    func fetchAllShowDetailsAndSave() async -> [ShowDetails] {
+    
+    func fetchAllShowDetailsAndSave() async -> [ShowDisplayable] {
         do {
             let categorizedShows = try await fetchAndParseShows()
             
-            // Load saved details and build a set of saved URLs
+            // Load saved details and build a set of saved IDs
             let savedDetails = loadShowDetailsLocally() ?? []
-            // let savedTitles = Set(savedDetails.map { $0.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) })
-            let savedIDs = Set(savedDetails.map { "\($0.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))-\($0.year)" })
             var allDetails = savedDetails
             
-            // Concurrency: fetch details in parallel
-            try await withThrowingTaskGroup(of: ShowDetails?.self) { group in
-                for (_, shows) in categorizedShows {
-                    for show in shows {
-                        // Create a temporary id using title and placeholder year
-                        let tempID = "\(show.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))"
-                        
-                        // Skip if already saved
-                        if savedDetails.contains(where: { $0.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) == tempID }) {
-                            continue
-                        }
-                    
-                        
+            // Consistent ID: title + year
+            func makeID(for show: ShowDisplayable) -> String {
+                "\(show.title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))-\(show.year)"
+            }
+            
+            // Start with all previously saved IDs
+            var allIDs = Set(savedDetails.map { makeID(for: $0) })
+            
+            let allShows = categorizedShows.flatMap { $0.value }
+            let maxRetries = 2
+            let batchSize = 30 // limit concurrency to 30 at a time
+            
+            // Process shows in batches
+            for batchStart in stride(from: 0, to: allShows.count, by: batchSize) {
+                let batch = Array(allShows[batchStart..<min(batchStart + batchSize, allShows.count)])
+                
+                try await withThrowingTaskGroup(of: ShowDisplayable?.self) { group in
+                    for show in batch {
                         group.addTask {
-                            do {
-                                return try await self.fetchAndParseShowDetails(from: show.url)
-                                
-                            } catch {
-                                print("❌ Failed to fetch details for \(show.title): \(error)")
-                                return nil
+                            var attempts = 0
+                            while attempts <= maxRetries {
+                                do {
+                                    return try await self.fetchAndParseShowDetails(from: show.url)
+                                } catch {
+                                    attempts += 1
+                                    print("⚠️ Attempt \(attempts) failed for \(show.title): \(error)")
+                                    if attempts > maxRetries {
+                                        print("❌ Giving up on \(show.title)")
+                                        return nil
+                                    }
+                                    try await Task.sleep(nanoseconds: 100_000_000) // 0.1s wait
+                                }
                             }
+                            return nil
                         }
                     }
-                }
-                
-                for try await detail in group {
-                    if let detail = detail {
-                        // Skip duplicates based on generated id (title + year)
-                        if !savedIDs.contains(detail.id) {
-                            allDetails.append(detail)
-                            print("✅ Fetched details for: \(detail.title) (\(detail.year))")
-                        } else {
-                            print("⚠️ Skipped duplicate: \(detail.title) (\(detail.year))")
+                    
+                    // Append results with fast O(1) duplicate check
+                    for try await detail in group {
+                        guard let detail = detail else {
+                            print("❌ Fetch returned nil")
+                            continue
                         }
+                        
+                        let detailID = makeID(for: detail)
+                        if allIDs.contains(detailID) {
+                            print("⚠️ Skipped (already saved or duplicate): \(detail.title) (\(detail.year))")
+                            continue
+                        }
+                        
+                        allDetails.append(detail)
+                        allIDs.insert(detailID)
+                        print("✅ Fetched details for: \(detail.title) (\(detail.year))")
                     }
                 }
             }
             
             saveShowDetailsLocally(allDetails)
             print("✅ Saved all show details locally, total: \(allDetails.count) shows")
-            
             return allDetails
             
         } catch {
-            print("Failed to fetch shows or save details: \(error)")
+            print("❌ Failed to fetch shows or save details: \(error)")
             return []
         }
+
     }
-    
-    func saveShowDetailsLocally(_ showDetails: [ShowDetails], fileName: String = "ShowDetails.json") {
+    func saveShowDetailsLocally(_ showDetails: [ShowDisplayable], fileName: String = "ShowDetails.json") {
+        // Only save the concrete Codable type
+        let concreteShows = showDetails.compactMap { $0 as? ShowDetails }
+        
         let saver = SaveDataLocallyVM<ShowDetails>(fileName: fileName)
         do {
-            try saver.saveLocally(showDetails)
+            try saver.saveLocally(concreteShows)
         } catch {
-            print("Failed to save locally: \(error)")
+            print("❌ Failed to save locally: \(error)")
         }
     }
     
-    func loadShowDetailsLocally(fileName: String = "ShowDetails.json") -> [ShowDetails]? {
+    func loadShowDetailsLocally(fileName: String = "ShowDetails.json") -> [ShowDisplayable]? {
+        let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
+        
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            print("📄 Local JSON does not exist yet: \(fileName)")
+            return nil
+        }
+        
         let saver = SaveDataLocallyVM<ShowDetails>(fileName: fileName)
         do {
-            return try saver.loadLocally()
+            let loaded = try saver.loadLocally()
+            return loaded // upcast to [ShowDisplayable]
         } catch {
-            print("Failed to load show details: \(error)")
+            print("❌ Failed to load show details: \(error)")
             return nil
         }
     }
     
+    func shouldFetchNewShows() -> Bool {
+        guard let lastFetch = UserDefaults.standard.object(forKey: "lastFetchDate") as? Date else {
+            return true // never fetched before
+        }
+        
+        // Fetch if last fetch was more than 12 hours ago
+        return Date().timeIntervalSince(lastFetch) > 12 * 60 * 60
+    }
+
+
     
     // MARK: - Private Helpers
     
@@ -231,8 +269,8 @@ class TVBShowsVM {
             for item in items.array() {
                 let aTag = try item.select("a").first()
                 let epUrl = try aTag?.attr("href") ?? ""
-                let epTitle = try aTag?.select("div.episodeName").text() ?? ""
-                let epThumb = try aTag?.select("img").attr("src") ?? ""
+                let epTitle = try item.select("div.episodeName").text()
+                let epThumb = try item.select("img").first()?.attr("src") ?? ""
                 
                 guard let episodeURL = URL(string: epUrl, relativeTo: baseURL) else { continue }
                 

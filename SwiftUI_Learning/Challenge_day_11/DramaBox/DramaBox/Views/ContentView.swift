@@ -12,13 +12,17 @@ struct ContentView: View {
     
     @State private var combinedVM = CombinedViewModel()
     @State private var networkMonitor = NetworkMonitorModel()
-    @State private var shows: [ShowDetails] = []
+    @State private var shows: [ShowDisplayable] = []
     @State private var isLoading = true
     @State private var isOnline = false
+    @State private var hasLoadedOnce = false
+    @State private var isFetchingShows = false
+    
+    
     
     var body: some View {
-        Group {
-            if isLoading || shows.isEmpty {
+        NavigationStack {
+            if shows.isEmpty {
                 ZStack {
                     LinearGradient(
                         gradient: Gradient(colors: [.black.opacity(0.8), .gray.opacity(0.5)]),
@@ -39,39 +43,61 @@ struct ContentView: View {
                     }
                 }
             } else {
-                NavigationStack {
-                    TabView{
-                        FullScreenPageView(shows: shows)
-                            .tabItem {
-                                Image(systemName: "film")
-                                Text("Newest")
-                            }
-                    }
+                TabView {
+                    FullScreenPageView(shows: shows)
+                        .tabItem {
+                            Image(systemName: "film")
+                            Text("Newest")
+                        }
                 }
             }
         }
-        .task{
-            let result = await combinedVM.scrapeAndUploadNewShows()
-            switch result {
-            case .success(let message):
-                print(message)
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-            // Load merged shows for display (online first, fallback local)
+        .task {
             isOnline = networkMonitor.isConnected
-            shows = await combinedVM.fetchMergedShows()
-            print("Loaded shows count:", shows.count)
-            isLoading = false
+            loadAndFetchShowsIfNeeded()
         }
-        .onChange(of: networkMonitor.isConnected) {oldStatus, newStatus in
+        .onChange(of: networkMonitor.isConnected) { _, newStatus in
             isOnline = newStatus
-            Task{
-                shows = await combinedVM.fetchMergedShows()
-            }
-            
+            loadAndFetchShowsIfNeeded()
         }
     }
+    
+    @MainActor
+    private func loadAndFetchShowsIfNeeded() {
+        Task {
+            guard !isFetchingShows else { return } // prevent duplicate calls
+            isFetchingShows = true
+            
+            // 1️⃣ Load local cache first
+            if !hasLoadedOnce, let localShows = combinedVM.tvbShowsVM.loadShowDetailsLocally(), !localShows.isEmpty {
+                shows = localShows
+                isLoading = false
+                hasLoadedOnce = true // mark that we've loaded cache at least once
+            }
+            
+            // 2️⃣ Only fetch if online and allowed
+            guard isOnline, combinedVM.tvbShowsVM.shouldFetchNewShows() else {
+                isFetchingShows = false
+                return
+            }
+            
+            // 3️⃣ Scrape & upload
+            let _ = await combinedVM.scrapeAndUploadNewShows(isOnline: true)
+            
+            // 4️⃣ Merge with UI
+            let mergedShows = await combinedVM.fetchMergedShows(isOnline: true)
+            for show in mergedShows {
+                if !shows.contains(where: { $0.id == show.id }) {
+                    shows.append(show)
+                }
+            }
+            
+            // 5️⃣ Update last fetch date
+            UserDefaults.standard.set(Date(), forKey: "lastFetchDate")
+            isFetchingShows = false
+        }
+    }
+    
 }
 
 #Preview {

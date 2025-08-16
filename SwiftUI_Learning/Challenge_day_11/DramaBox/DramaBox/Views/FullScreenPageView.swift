@@ -9,7 +9,7 @@ import SwiftUI
 import Kingfisher
 
 struct FullScreenPageView: View {
-    let shows: [ShowDetails]
+    let shows: [ShowDisplayable]
     @State private var currentPage = 0
     
     var body: some View {

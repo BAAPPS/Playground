@@ -7,9 +7,11 @@
 
 import Foundation
 
-struct ShowDetails: Codable {
+import Foundation
+
+struct ShowDetails: Codable, ShowDisplayable {
     let schedule: String
-    let subtitle: String
+    let subtitle: String?
     let genres: [String]
     let year: String
     let description: String
@@ -18,17 +20,19 @@ struct ShowDetails: Codable {
     let title: String
     let bannerImageURL: String?
     let episodes: [Episode]?
-    
+
+    // computed id for protocol
     var id: String {
         "\(title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))-\(year)"
     }
 
     enum CodingKeys: String, CodingKey {
-           case schedule, subtitle, genres, year, description, cast, title, episodes
-           case thumbImageURL = "thumb_image_url"
-           case bannerImageURL = "banner_image_url"
-       }
+        case schedule, subtitle, genres, year, description, cast, title, episodes
+        case thumbImageURL = "thumb_image_url"
+        case bannerImageURL = "banner_image_url"
+    }
 
+    // Insert type for Supabase upload
     struct Insert: Codable {
         let title: String
         let subtitle: String
@@ -41,22 +45,3 @@ struct ShowDetails: Codable {
         let banner_image_url: String?
     }
 }
-struct Episode: Codable {
-    let title: String
-    let url: String
-    let thumbnailURL: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case title, url
-        case thumbnailURL = "thumbnail_url"
-    }
-
-
-    struct Insert: Codable {
-        let show_id: Int
-        let title: String
-        let url: String
-        let thumbnail_url: String?
-    }
-}
-
