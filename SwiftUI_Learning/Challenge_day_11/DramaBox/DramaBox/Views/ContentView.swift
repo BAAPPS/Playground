@@ -43,13 +43,7 @@ struct ContentView: View {
                     }
                 }
             } else {
-                TabView {
-                    FullScreenPageView(shows: shows)
-                        .tabItem {
-                            Image(systemName: "film")
-                            Text("Newest")
-                        }
-                }
+                CustomTabBarView(shows: shows)
             }
         }
         .task {
