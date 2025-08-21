@@ -12,6 +12,53 @@ import Supabase
 @Observable
 class ShowSQLViewModel {
     private let supabaseClient = SupabaseManager.shared.client
+    private let cacheFileName = "ShowDetails.json"
+    
+    private let cache = SaveDataLocallyVM<ShowDetails>(fileName: "ShowDetails.json")
+
+    
+    var shows: [ShowDisplayable] = []
+      
+    // MARK: - Public API
+    /// Load shows from Supabase if online, otherwise from local cache
+    func loadShows(isOnline: Bool) async {
+        if isOnline {
+            await loadOnlineShows()
+        } else {
+            loadCachedShows()
+        }
+    }
+    
+    /// Load online shows and update cache
+    private func loadOnlineShows() async {
+        do {
+            let fresh = try await fetchShowsFromSupabase()
+            shows = fresh
+            try? cache.saveLocally(fresh)
+        } catch {
+            print("❌ Failed to load online shows:", error.localizedDescription)
+            // fallback to cache
+            loadCachedShows()
+        }
+    }
+    
+    /// Load shows from local cache
+    func loadCachedShows() {
+        do {
+            shows = try cache.loadLocally()
+        } catch {
+            print("❌ Failed to load cached shows:", error.localizedDescription)
+            shows = []
+        }
+    }
+    
+    /// Public method to load cached shows
+    func loadCachedShowsDirectly() -> [ShowDisplayable] {
+           (try? cache.loadLocally()) ?? []
+       }
+    
+ 
+    // MARK: - Supabase
     
     func fetchShowsFromSupabase() async throws -> [ShowDetails] {
         let response = try await supabaseClient
@@ -19,11 +66,10 @@ class ShowSQLViewModel {
             .select("*")
             .execute()
         
-        let data = response.data
-        
-        let shows = try JSONDecoder().decode([ShowDetails].self, from: data)
-        return shows
+        return try JSONDecoder().decode([ShowDetails].self, from: response.data)
     }
+    
+    // MARK: - Upload Shows & Episodes
     
     /// Upload shows and their episodes
     func uploadShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async -> Result<String, Error> {

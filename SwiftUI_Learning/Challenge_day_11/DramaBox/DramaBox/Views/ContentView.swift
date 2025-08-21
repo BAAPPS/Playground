@@ -9,13 +9,11 @@ import SwiftUI
 import Kingfisher
 
 struct ContentView: View {
-    
     @State private var combinedVM = CombinedViewModel()
     @State private var networkMonitor = NetworkMonitorModel()
     @State private var shows: [ShowDisplayable] = []
     @State private var isLoading = true
     @State private var isOnline = false
-    @State private var hasLoadedOnce = false
     @State private var isFetchingShows = false
     
     
@@ -23,72 +21,61 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             if shows.isEmpty {
-                ZStack {
-                    LinearGradient(
-                        gradient: Gradient(colors: [.black.opacity(0.8), .gray.opacity(0.5)]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .ignoresSafeArea()
-                    
-                    VStack(spacing: 16) {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 300, height: 450)
-                            .shimmer()
-                        
-                        ProgressView("Loading shows…")
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .foregroundColor(.white)
-                    }
-                }
+                loadingView
             } else {
                 CustomTabBarView(shows: shows)
             }
         }
-        .task {
-            isOnline = networkMonitor.isConnected
-            loadAndFetchShowsIfNeeded()
-        }
+        .task { await loadShowsIfNeeded() }
         .onChange(of: networkMonitor.isConnected) { _, newStatus in
             isOnline = newStatus
-            loadAndFetchShowsIfNeeded()
+            if newStatus { Task { await loadShowsIfNeeded() } }
         }
     }
     
+    
+    private var loadingView: some View {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [.black.opacity(0.8), .gray.opacity(0.5)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 16) {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 300, height: 450)
+                    .shimmer()
+                
+                ProgressView("Loading shows…")
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .foregroundColor(.white)
+            }
+        }
+    }
+    
+    
     @MainActor
-    private func loadAndFetchShowsIfNeeded() {
-        Task {
-            guard !isFetchingShows else { return } // prevent duplicate calls
-            isFetchingShows = true
-            
-            // 1️⃣ Load local cache first
-            if !hasLoadedOnce, let localShows = combinedVM.tvbShowsVM.loadShowDetailsLocally(), !localShows.isEmpty {
-                shows = localShows
-                isLoading = false
-                hasLoadedOnce = true // mark that we've loaded cache at least once
+    private func loadShowsIfNeeded() async {
+        guard !isFetchingShows else { return }
+        isFetchingShows = true
+        defer { isFetchingShows = false }
+        
+        shows = await combinedVM.fetchMergedShows(isOnline: isOnline)
+        isLoading = false
+        
+        
+        // Scrape and upload new shows if online
+        if isOnline {
+            let result = await combinedVM.scrapeAndUploadNewShows(isOnline: true)
+            switch result {
+            case .success(let message):
+                print("⬆️ Upload result:", message)
+            case .failure(let error):
+                print("❌ Upload failed:", error.localizedDescription)
             }
-            
-            // 2️⃣ Only fetch if online and allowed
-            guard isOnline, combinedVM.tvbShowsVM.shouldFetchNewShows() else {
-                isFetchingShows = false
-                return
-            }
-            
-            // 3️⃣ Scrape & upload
-            let _ = await combinedVM.scrapeAndUploadNewShows(isOnline: true)
-            
-            // 4️⃣ Merge with UI
-            let mergedShows = await combinedVM.fetchMergedShows(isOnline: true)
-            for show in mergedShows {
-                if !shows.contains(where: { $0.id == show.id }) {
-                    shows.append(show)
-                }
-            }
-            
-            // 5️⃣ Update last fetch date
-            UserDefaults.standard.set(Date(), forKey: "lastFetchDate")
-            isFetchingShows = false
         }
     }
     
