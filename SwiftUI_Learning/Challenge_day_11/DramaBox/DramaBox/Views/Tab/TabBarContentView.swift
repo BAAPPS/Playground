@@ -11,18 +11,27 @@ struct TabBarContentView: View {
     let selectedTab: Int
     let shows: [ShowDisplayable]
     
+     @State private var pathStore = PathStore()
+     
+     
+    
     var body: some View {
-        switch selectedTab {
-        case 0:
-            FullScreenPageView(shows: shows)
-        case 1:
-            Color.black.opacity(0.5).ignoresSafeArea()
-        
-        case 2:
-            Color.blue.opacity(0.4).ignoresSafeArea()
+        NavigationStack(path:$pathStore.path){
+            switch selectedTab {
+            case 0:
+                FullScreenPageView(shows: shows, year: "2025", path: $pathStore.path)
+                    .navigationDestination(for:  ShowDetails.self) { show in
+                        FullScreenDetailView(show: show, pathStore: $pathStore)
+                    }
+            case 1:
+                Color.black.opacity(0.5).ignoresSafeArea()
             
-        default:
-            Color.black.ignoresSafeArea()
+            case 2:
+                Color.blue.opacity(0.4).ignoresSafeArea()
+                
+            default:
+                Color.black.ignoresSafeArea()
+            }
         }
     }
 }

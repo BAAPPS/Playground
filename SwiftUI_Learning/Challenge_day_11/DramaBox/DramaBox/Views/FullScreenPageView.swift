@@ -8,30 +8,41 @@
 import SwiftUI
 import Kingfisher
 
+// Safe array indexing to avoid out-of-bounds
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
+}
+
+// Helper for KFImage
+extension KFImage {
+    static func url(from string: String?) -> KFImage {
+        if let string, let url = URL(string: string) {
+            return KFImage(url)
+        }
+        return KFImage(URL(string: ""))
+    }
+}
+
 struct FullScreenPageView: View {
     let shows: [ShowDisplayable]
     let year: String
     @State private var currentPage = 0
     
-    private var shows2025:[ShowDisplayable] {
-        shows.filter{$0.year == year}
-    }
-    
-    
-    init(shows: [ShowDisplayable], year: String = "2025") {
-        self.shows = shows
-        self.year = year
-    }
+    @Binding var path: NavigationPath
 
+    private var filteredShows: [ShowDetails] {
+        shows.compactMap { $0 as? ShowDetails }.filter { $0.year == year }
+    }
     
     var body: some View {
-        SnapPagingView(pageCount: shows2025.count, currentPage: $currentPage) { width, height in
-            VStack(spacing: 0) {
-                ForEach(shows2025.indices, id: \.self) { index in
-                    let show = shows2025[index]
-                    if let urlString = show.thumbImageURL,
-                       let url = URL(string: urlString) {
-                        KFImage(url)
+        ZStack {
+            SnapPagingView(pageCount: filteredShows.count, currentPage: $currentPage) { width, height in
+                VStack(spacing: 0) {
+                    ForEach(filteredShows.indices, id: \.self) { index in
+                        let show = filteredShows[index]
+                        KFImage.url(from: show.thumbImageURL)
                             .placeholder {
                                 ZStack {
                                     Color.black.opacity(0.2)
@@ -43,17 +54,39 @@ struct FullScreenPageView: View {
                             .frame(width: width, height: height)
                             .clipped()
                             .transition(.opacity)
-                            .animation(.easeInOut(duration: 0.3), value: url)
+                            .animation(.easeInOut(duration: 0.3), value: show.thumbImageURL)
+                            .overlayEffect()
                     }
                 }
+                .ignoresSafeArea()
             }
-            .overlayEffect()
-            .ignoresSafeArea()
+            
+            VStack {
+                HStack {
+                    Spacer()
+                    if let currentShow = filteredShows[safe: currentPage] {
+                        Button {
+                            path.append(currentShow)
+                        } label: {
+                            Image(systemName: "info.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(.red.opacity(0.5))
+                                .clipShape(Circle())
+                        }
+                        .padding(.top, 50)
+                        .padding(.trailing, 20)
+                    }
+                }
+                Spacer()
+            }
         }
     }
 }
 
 #Preview {
+    @Previewable @State var pathStore = PathStore()
     FullScreenPageView(shows: [
         ShowDetails(schedule:"25 Episodes",
                     subtitle:"輕．功",
@@ -78,5 +111,5 @@ struct FullScreenPageView: View {
                     bannerImageURL:"https://img.tvbaw.com/eyJidWNrZXQiOiJ0dmJhdy1uYSIsImtleSI6ImltYWdlcy9iYW5uZXIvMjZkZDkxYjItYzVkMS00MDVmLWI2MjAtZTU4ZjRmYjVkMzkxLmpwZyIsImVkaXRzIjp7InJlc2l6ZSI6IHsiZml0IjoiY292ZXIifSB9fQ==",
                     episodes: [Episode( title:"Episode 01",url:"https://tvbanywherena.com/english/videos/365-GoWithTheFloat/1750790321631766971",thumbnailURL:"https://cf-images.us-east-1.prod.boltdns.net/v1/jit/5324042807001/575dee99-bbff-4c18-8da2-ea46bd47f03d/main/1920x1080/21m28s224ms/match/image.jpg") ]
                    )
-    ], year:"2022")
+    ], year:"2022", path: $pathStore.path)
 }

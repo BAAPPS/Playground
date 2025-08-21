@@ -9,7 +9,7 @@ import Foundation
 
 import Foundation
 
-struct ShowDetails: Codable, ShowDisplayable {
+struct ShowDetails: Codable, Hashable, ShowDisplayable {
     let schedule: String
     let subtitle: String?
     let genres: [String]
@@ -43,5 +43,14 @@ struct ShowDetails: Codable, ShowDisplayable {
         let description: String
         let thumb_image_url: String?
         let banner_image_url: String?
+    }
+    
+    // MARK: - Hashable
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)  // hash only the id
+    }
+
+    static func == (lhs: ShowDetails, rhs: ShowDetails) -> Bool {
+        lhs.id == rhs.id
     }
 }
