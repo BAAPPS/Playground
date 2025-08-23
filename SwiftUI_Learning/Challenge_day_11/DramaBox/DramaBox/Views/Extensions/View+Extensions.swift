@@ -18,7 +18,7 @@ struct OverlayEffectModifier: ViewModifier {
                     .opacity(opacity)
                     .ignoresSafeArea()
             )
-            
+        
     }
 }
 
@@ -47,7 +47,28 @@ struct ShimmerModifier: ViewModifier {
     }
 }
 
+struct BannerSafeAreaModifier: ViewModifier {
+    var allowUnderNavBar: Bool
+    
+    func body(content: Content) -> some View {
+        if allowUnderNavBar {
+            content.ignoresSafeArea(edges: .top)
+        } else {
+            content
+        }
+    }
+}
 
+struct DividerModifier: ViewModifier {
+    var height: CGFloat = 25
+    var color: Color = .black.opacity(0.6)
+    
+    func body(content: Content) -> some View {
+        Divider()
+            .frame(height: height)
+            .background(color)
+    }
+}
 
 
 extension View {
@@ -55,6 +76,15 @@ extension View {
         modifier(OverlayEffectModifier(opacity: opacity, color: color))
     }
     func shimmer(duration: Double = 1.2, tint: Color = Color.white.opacity(0.6)) -> some View {
-            modifier(ShimmerModifier(duration: duration, tint: tint))
-        }
+        modifier(ShimmerModifier(duration: duration, tint: tint))
+    }
+    
+    func bannerSafeArea(allowUnderNavBar: Bool = false) -> some View {
+        modifier(BannerSafeAreaModifier(allowUnderNavBar: allowUnderNavBar))
+    }
+    
+    func shortDivider(height: CGFloat = 25, color: Color = .black.opacity(0.6)) -> some View {
+        self.modifier(DividerModifier(height: height, color: color))
+    }
 }
+

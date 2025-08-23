@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 struct ShowDetails: Codable, Hashable, ShowDisplayable {
     let schedule: String
     let subtitle: String?
@@ -44,6 +42,9 @@ struct ShowDetails: Codable, Hashable, ShowDisplayable {
         let thumb_image_url: String?
         let banner_image_url: String?
     }
+    
+    struct ShowDetailsResponse: Decodable { let id: Int }
+
     
     // MARK: - Hashable
     func hash(into hasher: inout Hasher) {

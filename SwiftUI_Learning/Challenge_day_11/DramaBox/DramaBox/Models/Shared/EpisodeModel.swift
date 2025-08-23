@@ -24,4 +24,11 @@ struct Episode: Codable {
         let url: String
         let thumbnail_url: String?
     }
+    
+    struct EpisodeRecord: Decodable {
+        let show_id: Int
+        let title: String
+    }
+
+
 }

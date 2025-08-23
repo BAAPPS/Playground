@@ -11,9 +11,9 @@ struct TabBarContentView: View {
     let selectedTab: Int
     let shows: [ShowDisplayable]
     
-     @State private var pathStore = PathStore()
-     
-     
+    @State private var pathStore = PathStore()
+    
+    
     
     var body: some View {
         NavigationStack(path:$pathStore.path){
@@ -25,7 +25,7 @@ struct TabBarContentView: View {
                     }
             case 1:
                 Color.black.opacity(0.5).ignoresSafeArea()
-            
+                
             case 2:
                 Color.blue.opacity(0.4).ignoresSafeArea()
                 
@@ -42,7 +42,7 @@ struct TabBarContentView: View {
                     subtitle:"輕．功",
                     genres:["Action","Drama","Family"],
                     year:"2022",
-                    description:"Combining warmth and humor, Qing·gong tells the joys, sorrows and joys of a group of former filmmakers...",
+                    description:"Combining warmth and humor, Qing·gong tells the joys, sorrows and joys of a group of former filmmakers. A dragon and tiger martial artist who is thought to know Qinggong is under the same roof again with the children of the flat people who leave the nest. Nuclear bomb-level contradictions.",
                     thumbImageURL:"https://img.tvbaw.com/eyJidWNrZXQiOiJ0dmJhdy1uYSIsImtleSI6ImltYWdlcy9wb3N0ZXIvMWQ1MTY3NjctOWNlMS00NzU0LWJhMjQtYjVmYWU3Y2Y5ZDc1LnBuZyIsImVkaXRzIjp7InJlc2l6ZSI6IHsiZml0IjoiY292ZXIifSB9fQ==",
                     cast:["Wayne Lai","Mimi Kung Tse-Yan"],
                     title:"Go With The Float",

@@ -14,29 +14,24 @@ class CombinedViewModel {
     let tvbShowsVM = TVBShowsVM()
     let showSQLVM = ShowSQLViewModel()
     
-    /// Fetch merged shows: online (Supabase) + local (TVB cache)
     func fetchMergedShows(isOnline: Bool) async -> [ShowDisplayable] {
         var allShows: [ShowDisplayable] = []
         var seenIDs = Set<String>()
         
-        // Load SQL cached shows
         let sqlCached = showSQLVM.loadCachedShowsDirectly()
         allShows.append(contentsOf: sqlCached)
         sqlCached.forEach { seenIDs.insert($0.id) }
-
         
-        // If online, fetch online shows and merge
         if isOnline {
-            await showSQLVM.loadShows(isOnline: true) // fetches Supabase and updates cache
+            await showSQLVM.loadShows(isOnline: true)
             for show in showSQLVM.shows where !seenIDs.contains(show.id) {
                 allShows.append(show)
                 seenIDs.insert(show.id)
             }
         }
         
-        // Add TVB local shows if not duplicate
-        let tvbLocalShows = tvbShowsVM.loadShowDetailsLocally() ?? []
-        for show in tvbLocalShows where !seenIDs.contains(show.id) {
+        let tvbLocal = tvbShowsVM.loadShowDetailsLocally() ?? []
+        for show in tvbLocal where !seenIDs.contains(show.id) {
             allShows.append(show)
             seenIDs.insert(show.id)
         }
@@ -45,44 +40,73 @@ class CombinedViewModel {
         return allShows
     }
     
-    /// Scrape TVB shows, filter new ones, and upload to Supabase
     func scrapeAndUploadNewShows(isOnline: Bool) async -> Result<String, Error> {
-        guard isOnline else {
-            print("📴 Offline: skipping scrape and upload")
-            return .success("Offline mode, skipping upload")
+        guard isOnline else { return .success("📴 Offline, skipping upload") }
+        
+        let existingShows = await fetchMergedShows(isOnline: true)
+        let existingIDs = Set(existingShows.map { $0.id })
+        
+        let allScraped = await tvbShowsVM.fetchAllShowDetailsAndSave()
+        let newShows = allScraped.filter { !existingIDs.contains($0.id) }
+        let existingScraped = allScraped.filter { existingIDs.contains($0.id) }
+        
+        var resultMessage = ""
+        
+        // Upload new shows + episodes
+        if !newShows.isEmpty {
+            let inserts = newShows.map { show in
+                (show: ShowDetails.Insert(
+                    title: show.title,
+                    subtitle: show.subtitle ?? "",
+                    schedule: show.schedule,
+                    genres: show.genres,
+                    cast: show.cast,
+                    year: show.year,
+                    description: show.description,
+                    thumb_image_url: show.thumbImageURL,
+                    banner_image_url: show.bannerImageURL
+                ), episodes: show.episodes)
+            }
+            let result = await showSQLVM.uploadShows(inserts)
+            switch result {
+            case .success(let msg): resultMessage += msg + "\n"
+            case .failure(let err): resultMessage += "Failed: \(err)\n"
+            }
         }
         
-        let mergedShows = await fetchMergedShows(isOnline: true)
-        let existingIDs = Set(mergedShows.map { $0.id })
-        
-        // Scrape all show details
-        let allScrapedShows = await tvbShowsVM.fetchAllShowDetailsAndSave()
-        
-        // Filter only new shows
-        let newShows = allScrapedShows.filter { !existingIDs.contains($0.id) }
-        guard !newShows.isEmpty else {
-            return .success("No new shows found, skipping upload.")
+        // Update episodes for existing shows
+        for show in existingScraped {
+            let existingTitles = try? await showSQLVM.fetchEpisodesByShowTitle(title: show.title, year: show.year)
+            let missingEpisodes = (show.episodes ?? []).filter { !(existingTitles ?? []).contains($0.title) }
+            if !missingEpisodes.isEmpty {
+                let result = await showSQLVM.uploadShows([
+                    (
+                        show: ShowDetails.Insert(
+                            title: show.title,
+                            subtitle: show.subtitle ?? "",
+                            schedule: show.schedule,
+                            genres: show.genres,
+                            cast: show.cast,
+                            year: show.year,
+                            description: show.description,
+                            thumb_image_url: show.thumbImageURL,
+                            banner_image_url: show.bannerImageURL
+                        ),
+                        episodes: missingEpisodes
+                    )
+                ])
+                
+                switch result {
+                case .success(let message):
+                    print("⬆️ Upload succeeded:", message)
+                case .failure(let error):
+                    print("❌ Upload failed:", error.localizedDescription)
+                }
+                
+                
+            }
         }
         
-        print("⬆️ Uploading \(newShows.count) new shows to Supabase")
-        
-        // Convert to ShowDetails.Insert + episodes
-        let showsWithEpisodes = newShows.map { show in
-            let insert = ShowDetails.Insert(
-                title: show.title,
-                subtitle: show.subtitle ?? "",
-                schedule: show.schedule,
-                genres: show.genres,
-                cast: show.cast,
-                year: show.year,
-                description: show.description,
-                thumb_image_url: show.thumbImageURL,
-                banner_image_url: show.bannerImageURL
-            )
-            return (show: insert, episodes: show.episodes)
-        }
-        
-        return await showSQLVM.uploadShows(showsWithEpisodes)
+        return .success(resultMessage.isEmpty ? "No new shows or episodes" : resultMessage)
     }
 }
-

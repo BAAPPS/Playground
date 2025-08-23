@@ -8,23 +8,6 @@
 import SwiftUI
 import Kingfisher
 
-// Safe array indexing to avoid out-of-bounds
-extension Array {
-    subscript(safe index: Int) -> Element? {
-        indices.contains(index) ? self[index] : nil
-    }
-}
-
-// Helper for KFImage
-extension KFImage {
-    static func url(from string: String?) -> KFImage {
-        if let string, let url = URL(string: string) {
-            return KFImage(url)
-        }
-        return KFImage(URL(string: ""))
-    }
-}
-
 struct FullScreenPageView: View {
     let shows: [ShowDisplayable]
     let year: String
@@ -109,7 +92,7 @@ struct FullScreenPageView: View {
                     cast:["Wayne Lai","Mimi Kung Tse-Yan"],
                     title:"Go With The Float",
                     bannerImageURL:"https://img.tvbaw.com/eyJidWNrZXQiOiJ0dmJhdy1uYSIsImtleSI6ImltYWdlcy9iYW5uZXIvMjZkZDkxYjItYzVkMS00MDVmLWI2MjAtZTU4ZjRmYjVkMzkxLmpwZyIsImVkaXRzIjp7InJlc2l6ZSI6IHsiZml0IjoiY292ZXIifSB9fQ==",
-                    episodes: [Episode( title:"Episode 01",url:"https://tvbanywherena.com/english/videos/365-GoWithTheFloat/1750790321631766971",thumbnailURL:"https://cf-images.us-east-1.prod.boltdns.net/v1/jit/5324042807001/575dee99-bbff-4c18-8da2-ea46bd47f03d/main/1920x1080/21m28s224ms/match/image.jpg") ]
+                    episodes: [Episode(title:"Episode 01",url:"https://tvbanywherena.com/english/videos/365-GoWithTheFloat/1750790321631766971",thumbnailURL:"https://cf-images.us-east-1.prod.boltdns.net/v1/jit/5324042807001/575dee99-bbff-4c18-8da2-ea46bd47f03d/main/1920x1080/21m28s224ms/match/image.jpg") ]
                    )
     ], year:"2022", path: $pathStore.path)
 }
