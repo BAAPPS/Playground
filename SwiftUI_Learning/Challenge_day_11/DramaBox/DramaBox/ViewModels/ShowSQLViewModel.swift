@@ -14,7 +14,7 @@ class ShowSQLViewModel {
     private let supabaseClient = SupabaseManager.shared.client
     private let cache = SaveDataLocallyVM<ShowDetails>(fileName: "ShowDetails.json")
     
-    var shows: [ShowDisplayable] = []
+    var shows: [ShowDetails] = []
     private let episodeBatchSize = 50
     
     // MARK: - Load Shows
@@ -27,8 +27,29 @@ class ShowSQLViewModel {
     private func loadOnlineShows() async {
         do {
             let fresh = try await fetchShowsFromSupabase()
-            shows = fresh
-            try? cache.saveLocally(fresh)
+            let cached = loadCachedShowsDirectly()
+
+            var localDict = Dictionary(uniqueKeysWithValues: cached.map { ($0.id, $0) })
+
+
+            // Merge fresh shows into cached
+            for newShow in fresh {
+                if let oldShow = localDict[newShow.id] {
+                    // Replace only if different
+                    if oldShow != newShow {
+                        localDict[newShow.id] = newShow
+                    }
+
+
+                } else {
+                    // New show → add it
+                    localDict[newShow.id] = newShow
+                }
+            }
+
+            shows = Array(localDict.values)
+            try? cache.saveLocally(shows)
+            
         } catch {
             print("❌ Failed to load online shows:", error.localizedDescription)
             loadCachedShows()
@@ -43,7 +64,7 @@ class ShowSQLViewModel {
         }
     }
     
-    func loadCachedShowsDirectly() -> [ShowDisplayable] {
+    func loadCachedShowsDirectly() -> [ShowDetails] {
         (try? cache.loadLocally()) ?? []
     }
     
@@ -82,47 +103,47 @@ class ShowSQLViewModel {
     
     // MARK: - Upload
 
+    @MainActor
+    private func updateShowIdDict(_ dict: inout [String: Int], key: String, id: Int) {
+        dict[key] = id
+    }
+
+    @MainActor
+    private func updateEpisodeDict(_ dict: inout [Int: Set<String>], showId: Int, titles: [String]) {
+        dict[showId, default: []].formUnion(titles)
+    }
+    
+    @MainActor
     func uploadShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async -> Result<String, Error> {
         var uploadedShows = 0
         var uploadedEpisodes = 0
 
         do {
-            // 1️⃣ Fetch all existing shows once
+            // 1️⃣ Fetch existing shows
             let existingShows = try await fetchShowsFromSupabase()
-            // Map "title-year" to Int id
             var showTitleYearToId: [String: Int] = Dictionary(
-                uniqueKeysWithValues: existingShows.compactMap { show -> (String, Int)? in
-                    if let id = Int(show.id) {
-                        return ("\(show.title)-\(show.year)", id)
-                    } else {
-                        return nil // skip invalid ids
-                    }
+                uniqueKeysWithValues: existingShows.compactMap { show in
+                    guard let id = Int(show.id) else { return nil }
+                    return ("\(show.title)-\(show.year)", id)
                 }
             )
 
-            // 2️⃣ Fetch all existing episodes once
+            // 2️⃣ Fetch existing episodes
             let allEpisodesResponse = try await supabaseClient
                 .from("episodes")
                 .select("show_id,title")
                 .execute()
-            
-            // Decode into EpisodeRecord (show_id is Int)
             let decodedEpisodes = try JSONDecoder().decode([Episode.EpisodeRecord].self, from: allEpisodesResponse.data)
             var existingEpisodesDict: [Int: Set<String>] = [:]
             for ep in decodedEpisodes {
                 existingEpisodesDict[ep.show_id, default: []].insert(ep.title)
             }
 
-            // 3️⃣ Concurrently insert shows + episodes
+            // 3️⃣ Insert concurrently
             await withTaskGroup(of: (Int, Int).self) { group in
-                for item in showsWithEpisodes {
+                for showItem in showsWithEpisodes {
                     group.addTask {
-                        return await self.insertShowAndEpisodesSafe(
-                            item.show,
-                            episodes: item.episodes,
-                            showTitleYearToId: &showTitleYearToId,
-                            existingEpisodesDict: &existingEpisodesDict
-                        )
+                        await self.insertShowAndEpisodesTask(showItem, showDict: &showTitleYearToId, episodeDict: &existingEpisodesDict)
                     }
                 }
 
@@ -140,65 +161,58 @@ class ShowSQLViewModel {
     }
 
     // MARK: - Insert (Safe)
-
-    private func insertShowAndEpisodesSafe(
-        _ show: ShowDetails.Insert,
-        episodes: [Episode]?,
-        showTitleYearToId: inout [String: Int],
-        existingEpisodesDict: inout [Int: Set<String>]
+    
+    @MainActor
+    private func insertShowAndEpisodesTask(
+        _ showItem: (show: ShowDetails.Insert, episodes: [Episode]?),
+        showDict: inout [String: Int],
+        episodeDict: inout [Int: Set<String>]
     ) async -> (Int, Int) {
-        
         var insertedShows = 0
         var insertedEpisodes = 0
-        let key = "\(show.title)-\(show.year)"
-        
         do {
-            // 1️⃣ Insert or fetch show
+            let key = "\(showItem.show.title)-\(showItem.show.year)"
             let showId: Int
-            if let existingId = showTitleYearToId[key] {
+
+            // Insert or fetch show
+            if let existingId = showDict[key] {
                 showId = existingId
-                print("⚠️ Show exists:", show.title)
             } else {
                 let insertResponse = try await supabaseClient
                     .from("show_details")
-                    .insert([show])
+                    .insert([showItem.show])
                     .select("id")
                     .execute()
                 let inserted = try JSONDecoder().decode([ShowDetails.ShowDetailsResponse].self, from: insertResponse.data)
-                guard let id = inserted.first?.id else { return (0, 0) }
+                guard let id = inserted.first?.id else { return (0,0) }
                 showId = id
                 insertedShows = 1
-                showTitleYearToId[key] = showId
-                print("✅ Inserted show:", show.title)
+                updateShowIdDict(&showDict, key: key, id: id)
             }
-            
-            // 2️⃣ Insert episodes
-            guard let episodes = episodes, !episodes.isEmpty else { return (insertedShows, 0) }
-            let existingTitles = existingEpisodesDict[showId] ?? []
+
+            // Insert episodes
+            guard let episodes = showItem.episodes, !episodes.isEmpty else { return (insertedShows, 0) }
+            let existingTitles = episodeDict[showId] ?? []
             let newEpisodes = episodes.filter { !existingTitles.contains($0.title) }
-            
+
             if !newEpisodes.isEmpty {
                 let batchSize = 50
                 for batchStart in stride(from: 0, to: newEpisodes.count, by: batchSize) {
                     let batch = Array(newEpisodes[batchStart..<min(batchStart + batchSize, newEpisodes.count)])
                     let inserts = batch.map { Episode.Insert(show_id: showId, title: $0.title, url: $0.url, thumbnail_url: $0.thumbnailURL) }
-                    
-                    do {
-                        try await supabaseClient.from("episodes").insert(inserts).execute()
-                        insertedEpisodes += inserts.count
-                    } catch {
-                        print("⚠️ Some episodes may be duplicates for show:", show.title)
-                    }
+                    try await supabaseClient.from("episodes").insert(inserts).execute()
+                    insertedEpisodes += inserts.count
                 }
-                existingEpisodesDict[showId, default: []].formUnion(newEpisodes.map { $0.title })
+                updateEpisodeDict(&episodeDict, showId: showId, titles: newEpisodes.map { $0.title })
             }
-            
+
         } catch {
-            print("❌ Error inserting show/episodes:", show.title, "-", error.localizedDescription)
+            print("❌ Error uploading show \(showItem.show.title):", error)
         }
-        
+
         return (insertedShows, insertedEpisodes)
     }
+
 
 }
 
