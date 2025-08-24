@@ -9,23 +9,20 @@ import SwiftUI
 
 enum AppTab: Int, CaseIterable, Identifiable {
     case newest
-    case favorite
-    case list
+    case genres
     var id: Int { rawValue }
     
     var title: String {
         switch self {
         case .newest: return "Newest"
-        case .favorite : return "Favorite"
-        case .list: return "List"
+        case .genres : return "Genres"
         }
     }
     
     var systemIcon: String {
         switch self {
         case .newest: return "film"
-        case .favorite: return "heart"
-        case .list: return "list.bullet"
+        case .genres: return "square.grid.3x2"
         }
     }
 }

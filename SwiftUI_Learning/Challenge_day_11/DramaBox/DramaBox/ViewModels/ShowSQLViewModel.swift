@@ -28,10 +28,10 @@ class ShowSQLViewModel {
         do {
             let fresh = try await fetchShowsFromSupabase()
             let cached = loadCachedShowsDirectly()
-
+            
             var localDict = Dictionary(uniqueKeysWithValues: cached.map { ($0.id, $0) })
-
-
+            
+            
             // Merge fresh shows into cached
             for newShow in fresh {
                 if let oldShow = localDict[newShow.id] {
@@ -39,14 +39,14 @@ class ShowSQLViewModel {
                     if oldShow != newShow {
                         localDict[newShow.id] = newShow
                     }
-
-
+                    
+                    
                 } else {
                     // New show → add it
                     localDict[newShow.id] = newShow
                 }
             }
-
+            
             shows = Array(localDict.values)
             try? cache.saveLocally(shows)
             
@@ -101,13 +101,48 @@ class ShowSQLViewModel {
         return try await fetchEpisodesByShow(showId: showId)
     }
     
-    // MARK: - Upload
+  
+    private func fetchShowsOnline() async -> [ShowDetails] {
+        do {
+            let response = try await supabaseClient
+                .from("show_details")
+                .select("*")
+                .execute()
 
+            let decoded = try JSONDecoder().decode([ShowDetails].self, from: response.data)
+            let uniqueResults = Array(Set(decoded)).sorted { $0.title < $1.title }
+
+            try? cache.saveLocally(uniqueResults)
+            return uniqueResults
+        } catch {
+            print("❌ Failed to fetch online shows:", error)
+            return fetchShowsOffline()
+        }
+    }
+    
+    // MARK: - Local Fetch
+
+    private func fetchShowsOffline() -> [ShowDetails] {
+        (try? cache.loadLocally()) ?? []
+    }
+
+    func fetchShows(isOnline: Bool) async {
+        if isOnline {
+            shows = await fetchShowsOnline()
+        } else {
+            shows = fetchShowsOffline()
+        }
+    }
+
+    
+    
+    // MARK: - Upload
+    
     @MainActor
     private func updateShowIdDict(_ dict: inout [String: Int], key: String, id: Int) {
         dict[key] = id
     }
-
+    
     @MainActor
     private func updateEpisodeDict(_ dict: inout [Int: Set<String>], showId: Int, titles: [String]) {
         dict[showId, default: []].formUnion(titles)
@@ -117,7 +152,7 @@ class ShowSQLViewModel {
     func uploadShows(_ showsWithEpisodes: [(show: ShowDetails.Insert, episodes: [Episode]?)]) async -> Result<String, Error> {
         var uploadedShows = 0
         var uploadedEpisodes = 0
-
+        
         do {
             // 1️⃣ Fetch existing shows
             let existingShows = try await fetchShowsFromSupabase()
@@ -127,7 +162,7 @@ class ShowSQLViewModel {
                     return ("\(show.title)-\(show.year)", id)
                 }
             )
-
+            
             // 2️⃣ Fetch existing episodes
             let allEpisodesResponse = try await supabaseClient
                 .from("episodes")
@@ -138,7 +173,7 @@ class ShowSQLViewModel {
             for ep in decodedEpisodes {
                 existingEpisodesDict[ep.show_id, default: []].insert(ep.title)
             }
-
+            
             // 3️⃣ Insert concurrently
             await withTaskGroup(of: (Int, Int).self) { group in
                 for showItem in showsWithEpisodes {
@@ -146,20 +181,20 @@ class ShowSQLViewModel {
                         await self.insertShowAndEpisodesTask(showItem, showDict: &showTitleYearToId, episodeDict: &existingEpisodesDict)
                     }
                 }
-
+                
                 for await (sCount, eCount) in group {
                     uploadedShows += sCount
                     uploadedEpisodes += eCount
                 }
             }
-
+            
             return .success("✅ Uploaded \(uploadedShows) shows and \(uploadedEpisodes) episodes successfully (duplicates skipped).")
-
+            
         } catch {
             return .failure(error)
         }
     }
-
+    
     // MARK: - Insert (Safe)
     
     @MainActor
@@ -173,7 +208,7 @@ class ShowSQLViewModel {
         do {
             let key = "\(showItem.show.title)-\(showItem.show.year)"
             let showId: Int
-
+            
             // Insert or fetch show
             if let existingId = showDict[key] {
                 showId = existingId
@@ -189,12 +224,12 @@ class ShowSQLViewModel {
                 insertedShows = 1
                 updateShowIdDict(&showDict, key: key, id: id)
             }
-
+            
             // Insert episodes
             guard let episodes = showItem.episodes, !episodes.isEmpty else { return (insertedShows, 0) }
             let existingTitles = episodeDict[showId] ?? []
             let newEpisodes = episodes.filter { !existingTitles.contains($0.title) }
-
+            
             if !newEpisodes.isEmpty {
                 let batchSize = 50
                 for batchStart in stride(from: 0, to: newEpisodes.count, by: batchSize) {
@@ -205,14 +240,14 @@ class ShowSQLViewModel {
                 }
                 updateEpisodeDict(&episodeDict, showId: showId, titles: newEpisodes.map { $0.title })
             }
-
+            
         } catch {
             print("❌ Error uploading show \(showItem.show.title):", error)
         }
-
+        
         return (insertedShows, insertedEpisodes)
     }
-
-
+    
+    
 }
 

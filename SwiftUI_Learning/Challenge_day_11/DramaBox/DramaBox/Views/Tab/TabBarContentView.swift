@@ -24,7 +24,10 @@ struct TabBarContentView: View {
                         FullScreenDetailView(show: show, pathStore: $pathStore)
                     }
             case 1:
-                Color.black.opacity(0.5).ignoresSafeArea()
+                CategoryListView(path: $pathStore.path)
+                    .navigationDestination(for: ShowDetails.self) {show in
+                        FullScreenDetailView(show: show, pathStore: $pathStore)
+                    }
                 
             case 2:
                 Color.blue.opacity(0.4).ignoresSafeArea()

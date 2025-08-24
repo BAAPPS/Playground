@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ShowDetails: Codable, Hashable, ShowDisplayable {
+struct ShowDetails: Codable, Hashable,Equatable, ShowDisplayable {
     let schedule: String
     let subtitle: String?
     let genres: [String]
