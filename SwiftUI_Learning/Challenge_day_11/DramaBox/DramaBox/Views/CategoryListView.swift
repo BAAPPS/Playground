@@ -36,6 +36,14 @@ struct CategoryListView: View {
                                 }
                                 .padding(.vertical, 4)
                             }
+                            .swipeActions(edge: .trailing) {
+                                Button {
+                                    path.append(show)
+                                }label: {
+                                    Label("Open", systemImage: "arrow.right")
+                                }
+                                .tint(.blue)
+                            }
                         }
                     }
                 }

@@ -31,7 +31,7 @@ This project serves as a practical exercise in **full-stack development** using 
 * **Real-time Fetching from Supabase** – Keep data synced with the backend.
 * **Offline Mode** – Access previously saved data without an internet connection.
 * **Filtering & Sorting** – Quickly find shows by genre, release year, or alphabetical order.
-* **Swipe Actions** – Mark as favorite, delete, or share directly from the list.
+* **Swipe Actions** – Navigate to the show’s detail page.
 * **Notifications** – Alerts when new shows are available in the library.
 
 ---

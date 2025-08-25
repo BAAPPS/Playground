@@ -12,7 +12,7 @@ DramaBox is a multi-tab SwiftUI app that:
 * Displays it in a **custom tab-based UI** with filtering, sorting, and search.
 * Integrates with **Supabase** for cloud data storage and syncing.
 * Supports **offline mode** using SwiftData and local JSON files via FileManager.
-* Allows **swipe actions** for marking favorites and deleting items.
+* Allows **swipe actions** to navigate to the show’s detail page.
 * Sends **local notifications** when new content is available.
 
 **Key features at a glance:**
