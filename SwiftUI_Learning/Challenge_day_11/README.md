@@ -9,7 +9,7 @@ A SwiftUI learning project where we build a **TVB drama library app** from scrat
 DramaBox is a multi-tab SwiftUI app that:
 
 * Retrieves **TVB show data** from `https://tvbanywherena.com/english`.
-* Displays it in a **tab-based UI** with filtering, sorting, and search.
+* Displays it in a **custom tab-based UI** with filtering, sorting, and search.
 * Integrates with **Supabase** for cloud data storage and syncing.
 * Supports **offline mode** using SwiftData and local JSON files via FileManager.
 * Allows **swipe actions** for marking favorites and deleting items.
