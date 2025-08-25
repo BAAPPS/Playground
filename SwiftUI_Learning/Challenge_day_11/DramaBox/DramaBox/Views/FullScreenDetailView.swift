@@ -88,16 +88,18 @@ struct FullScreenDetailView: View {
             }
             .padding(.top, 5)
             
-            VStack {
-                Text(show.description)
-                    .padding()
-                    .font(.subheadline)
-                    .foregroundColor(.black.opacity(0.7))
-                    .accessibilityLabel("About Show")
-                    .accessibilityValue(show.description)
-                    .multilineTextAlignment(.leading)
+            ScrollView(.vertical, showsIndicators: true) {
+                VStack(alignment: .leading) {
+                    Text(show.description)
+                        .padding()
+                        .font(.subheadline)
+                        .foregroundColor(.black.opacity(0.7))
+                        .accessibilityLabel("About Show")
+                        .accessibilityValue(show.description)
+                        .multilineTextAlignment(.leading)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack {
                 Text("All Episodes")
