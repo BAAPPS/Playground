@@ -80,17 +80,17 @@ class ShowSQLViewModel {
         // Load cache
         let cachedShows = (try? cache.loadLocally()) ?? []
         let cachedDict = Dictionary(uniqueKeysWithValues: cachedShows.map { ($0.id, $0) })
-
+        
         if isOnline {
             do {
                 // Fetch online
                 let onlineShows = try await fetchShowsFromSupabase()
-
-                //  Merge cache + online episodes
+                
+                // Merge cache + online episodes and sort them
                 let mergedShows = onlineShows.map { show -> ShowDetails in
                     if let cached = cachedDict[show.id] {
                         let mergedEpisodes = (cached.episodes ?? []) + (show.episodes ?? [])
-                        let uniqueEpisodes = Array(Set(mergedEpisodes))
+                        let sortedUniqueEpisodes = mergedEpisodes.dedupAndSort() // <— dedupe & sort numerically
                         
                         return ShowDetails(
                             schedule: show.schedule,
@@ -102,19 +102,31 @@ class ShowSQLViewModel {
                             cast: show.cast,
                             title: show.title,
                             bannerImageURL: show.bannerImageURL,
-                            episodes: uniqueEpisodes
+                            episodes: sortedUniqueEpisodes
                         )
                     } else {
-                        return show
+                        let sortedEpisodes = (show.episodes ?? []).dedupAndSort()
+                        return ShowDetails(
+                            schedule: show.schedule,
+                            subtitle: show.subtitle,
+                            genres: show.genres,
+                            year: show.year,
+                            description: show.description,
+                            thumbImageURL: show.thumbImageURL,
+                            cast: show.cast,
+                            title: show.title,
+                            bannerImageURL: show.bannerImageURL,
+                            episodes: sortedEpisodes
+                        )
                     }
                 }
-
-                // Deduplicate and sort
+                
+                // Deduplicate shows by title
                 let uniqueResults = Array(Set(mergedShows)).sorted { $0.title < $1.title }
-
+                
                 // Save cache
                 try? cache.saveLocally(uniqueResults)
-
+                
                 return uniqueResults
             } catch {
                 print("❌ Failed to fetch online shows:", error)
@@ -124,8 +136,9 @@ class ShowSQLViewModel {
             return cachedShows
         }
     }
-
-
+    
+    
+    
     private func fetchShowsOnline() async -> [ShowDetails] {
         do {
             // Fetch all shows and their episodes in one query
@@ -142,8 +155,8 @@ class ShowSQLViewModel {
             return fetchShowsOffline()
         }
     }
-
-
+    
+    
     
     // MARK: - Local Fetch
     

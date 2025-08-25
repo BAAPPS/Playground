@@ -106,7 +106,8 @@ struct FullScreenDetailView: View {
                     .padding(.vertical)
 
                 if let episodes = show.episodes {
-                    List(episodes, id: \.title) { episode in
+                    let sortedEpisodes = episodes.dedupAndSort()
+                    List(sortedEpisodes, id: \.title) { episode in
                         HStack(spacing: 12) {
                             KFImage.url(from: episode.thumbnailURL)
                                 .placeholder {
