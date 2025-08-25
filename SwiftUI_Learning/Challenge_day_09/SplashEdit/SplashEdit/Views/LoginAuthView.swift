@@ -49,15 +49,7 @@ struct LoginAuthView: View {
                 
                 Spacer()
                 
-                HStack {
-                    Text("Don't have an account?")
-                        .foregroundColor(Color(hex:"#edf2f4"))
-                    Button{
-                        isSigningUp = true
-                    } label: {
-                        TogglePromptView(isSignUp: $isSigningUp)
-                    }
-                }
+              
                 Spacer()
             }
         }

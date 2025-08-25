@@ -12,6 +12,7 @@ struct PublicUserModel: Codable, Identifiable {
     let username: String
     let createdAt: Date
     
+    
     enum CodingKeys: String, CodingKey{
         case username
         case createdAt = "created_at"

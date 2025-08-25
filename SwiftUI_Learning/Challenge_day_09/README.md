@@ -1,6 +1,7 @@
 # SplashEdit
 
-A full-featured SwiftUI challenge project combining Core Image, Supabase, and the Unsplash API. Users can browse high-quality images, apply real-time filters, store edits locally and in the cloud, and curate a personal collection with likes and favorites — all with offline-first functionality.
+A full-featured SwiftUI challenge project combining Core Image, Supabase, and the Unsplash API. Users can browse high-quality images, apply real-time filters, store edits locally and in the cloud, and curate a personal 
+collection with likes and favorites — all with offline-first functionality.
 
 ---
 
@@ -37,6 +38,7 @@ SplashEdit/
 |   └── NetworkMonitorModel.swift 
 |   └── PhotoModel.swift 
 |   └── SupabaseClientModel.swift 
+|   └── SupabaseFilteredModel.swift 
 |   └── SupabaseUserModel.swift
 |   └── UnsplashPhotosModel.swift 
 |   └── UsersModel.swift 
@@ -48,6 +50,7 @@ SplashEdit/
 |   └── SecretsManager.swift
 |   └── Supabase-JSONDecoder.swift
 ├── ViewModels/              # Handles filtering, syncing, and auth logic
+|   └── FilteredPhotoVM.swift 
 |   └── PhotoViewModel.swift 
 |   └── SupabaseAuthViewModel.swift 
 |   └── SupabaseManager.swift
@@ -56,6 +59,7 @@ SplashEdit/
 ├── Views/                   # All SwiftUI views
 │   └── AuthSwicherView.swift
 │   └── ContentView.swift
+│   └── FilterPhotoView.swift
 │   └── LoggedInView.swift
 │   └── LoginAuthView.swift
 │   └── PhotoDetailView.swift
