@@ -24,7 +24,7 @@ enum AppTab: Int, CaseIterable, Identifiable {
     var systemIcon: String {
         switch self {
         case .newest: return "film"
-        case .genres: return "square.grid.3x2"
+        case .genres: return "list.bullet"
         case .search: return "magnifyingglass"
         }
     }

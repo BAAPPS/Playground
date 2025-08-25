@@ -9,6 +9,8 @@ import SwiftUI
 import Kingfisher
 
 struct ContentView: View {
+    @State private var showCache = SaveDataLocallyVM<ShowDetails>(fileName: "ShowDetails.json")
+
     @State private var combinedVM = CombinedViewModel()
     @State private var networkMonitor = NetworkMonitorModel()
     @State private var shows: [ShowDisplayable] = []
@@ -36,7 +38,7 @@ struct ContentView: View {
             await loadShowsIfNeeded()
             
             if !hasRequestedNotifications {
-               await combinedVM.requestNotificationPermission()
+                await combinedVM.requestNotificationPermission()
                 hasRequestedNotifications = true
             }
         }
@@ -63,7 +65,7 @@ struct ContentView: View {
                     .frame(width: 300, height: 450)
                     .shimmer()
                 
-                ProgressView("Loading shows…")
+                ProgressView("Scrapping shows…")
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     .foregroundColor(.white)
             }
@@ -75,28 +77,61 @@ struct ContentView: View {
     private func loadShowsIfNeeded() async {
         guard !isFetchingShows else { return }
         isFetchingShows = true
+        isLoading = true // start loading spinner
         defer { isFetchingShows = false }
         
-        // Merge cached + online shows
-        shows = await combinedVM.fetchMergedShows(isOnline: isOnline)
-        isLoading = false
+        // 1️⃣ Load cached shows immediately if available
+        if let cachedShows = try? showCache.loadLocally(), !cachedShows.isEmpty {
+            shows = cachedShows
+            isLoading = false
+        }
         
-        // Only scrape TVB once for initial population
+        // 2️⃣ Fetch merged shows
+        let mergedShows = await combinedVM.fetchMergedShows(isOnline: isOnline)
+        if !mergedShows.isEmpty {
+            shows = mergedShows
+            let concreteMerged = mergedShows.compactMap { $0 as? ShowDetails }
+            try? showCache.saveLocally(concreteMerged)
+            isLoading = false
+        }
+        
+        // 3️⃣ Scrape new shows if needed
         if isOnline && !hasScrapedShows {
-            let result = await combinedVM.scrapeAndUploadNewShows(isOnline: true)
-            hasScrapedShows = true
-            switch result {
-            case .success(let message): print("⬆️ Initial scrape:", message)
-            case .failure(let error): print("❌ Scrape failed:", error.localizedDescription)
+            Task {
+                let result = await combinedVM.scrapeAndUploadNewShows(isOnline: true)
+                hasScrapedShows = true
+                print("⬆️ Initial scrape:", result)
+                
+                let refreshed = await combinedVM.fetchMergedShows(isOnline: true)
+                if !refreshed.isEmpty {
+                    await MainActor.run {
+                        shows = refreshed
+                        isLoading = false
+                    }
+                    let concreteRefreshed = refreshed.compactMap { $0 as? ShowDetails }
+                    try? showCache.saveLocally(concreteRefreshed)
+                }
             }
         }
         
-        // Always update online shows from Supabase without scraping TVB again
+        // 4️⃣ Update online shows in background
         if isOnline {
-            await combinedVM.showSQLVM.loadOnlineShows()
-            shows = await combinedVM.fetchMergedShows(isOnline: true) // merge fresh online shows with local
+            Task {
+                await combinedVM.showSQLVM.loadOnlineShows()
+                let updated = await combinedVM.fetchMergedShows(isOnline: true)
+                if !updated.isEmpty {
+                    await MainActor.run {
+                        shows = updated
+                        isLoading = false
+                    }
+                    let concreteUpdated = updated.compactMap { $0 as? ShowDetails }
+                    try? showCache.saveLocally(concreteUpdated)
+                }
+            }
         }
     }
+
+    
     
     
 }
