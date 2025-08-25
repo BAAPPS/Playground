@@ -17,7 +17,7 @@ struct ShowDetails: Codable, Hashable,Equatable, ShowDisplayable {
     let cast: [String]
     let title: String
     let bannerImageURL: String?
-    let episodes: [Episode]?
+    var episodes: [Episode]?
 
     // computed id for protocol
     var id: String {

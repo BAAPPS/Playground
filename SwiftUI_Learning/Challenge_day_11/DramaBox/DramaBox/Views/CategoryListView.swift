@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CategoryListView: View {
-    @State private var showSQLVM = ShowSQLViewModel()
+    @Environment(CombinedViewModel.self) var combinedVM
     @State private var networkMonitor = NetworkMonitorModel()
     @State private var showsByGenre: [Genre: [ShowDetails]] = [:]
     
@@ -41,7 +41,9 @@ struct CategoryListView: View {
                 }
             }
         }
+        .padding(.top, 70)
         .navigationTitle("Shows by Genre")
+        .navigationBarTitleDisplayMode(.inline)
         .task(id: networkMonitor.isConnected) {
             await fetchAndGroupShows()
         }
@@ -49,22 +51,32 @@ struct CategoryListView: View {
     
     @MainActor
     private func fetchAndGroupShows() async {
-        await showSQLVM.fetchShows(isOnline: networkMonitor.isConnected)
-        
-        var grouped: [Genre: [ShowDetails]] = [:]
-        for genre in Genre.allCases {
-            grouped[genre] = showSQLVM.shows.filter { $0.genres.contains(genre.rawValue) }
+        // Only fetch if showsByGenre is empty or network just became online
+        if showsByGenre.isEmpty || networkMonitor.isConnected {
+            let fetchedShows = await combinedVM.showSQLVM.fetchShows(isOnline: networkMonitor.isConnected)
+            
+            // Update the shows in SQL VM for other views
+            combinedVM.showSQLVM.shows = fetchedShows
+            
+            // Group by genre
+            var grouped: [Genre: [ShowDetails]] = [:]
+            for genre in Genre.allCases {
+                grouped[genre] = fetchedShows.filter { $0.genres.contains(genre.rawValue) }
+            }
+            showsByGenre = grouped
         }
-        showsByGenre = grouped
     }
+    
 }
 
 #Preview {
     @Previewable @State var navPath = NavigationPath()
     @Previewable @State  var pathStore = PathStore()
+    @Previewable @State var combinedVM = CombinedViewModel()
     
     NavigationStack {
         CategoryListView(path: $navPath)
+            .environment(combinedVM)
             .navigationDestination(for: ShowDetails.self) { show in
                 FullScreenDetailView(show: show, pathStore: $pathStore)
             }

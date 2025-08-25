@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CustomTabBarView: View {
+//    @Environment(CombinedViewModel.self) var combinedVM
     @State private var selectedTab = 0
     let shows: [ShowDisplayable]
     
@@ -16,7 +17,7 @@ struct CustomTabBarView: View {
         ZStack(alignment: .bottom) {
             TabBarContentView(selectedTab: selectedTab, shows: shows)
                 .ignoresSafeArea()
-            
+        
             HStack {
                 ForEach(AppTab.allCases) { tab in
                     TabBarButtonView(

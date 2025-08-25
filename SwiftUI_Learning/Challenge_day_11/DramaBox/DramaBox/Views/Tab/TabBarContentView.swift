@@ -10,7 +10,7 @@ import SwiftUI
 struct TabBarContentView: View {
     let selectedTab: Int
     let shows: [ShowDisplayable]
-    
+    @Environment(CombinedViewModel.self) var combinedVM
     @State private var pathStore = PathStore()
     
     
@@ -25,6 +25,7 @@ struct TabBarContentView: View {
                     }
             case 1:
                 CategoryListView(path: $pathStore.path)
+                    .environment(combinedVM)
                     .navigationDestination(for: ShowDetails.self) {show in
                         FullScreenDetailView(show: show, pathStore: $pathStore)
                     }

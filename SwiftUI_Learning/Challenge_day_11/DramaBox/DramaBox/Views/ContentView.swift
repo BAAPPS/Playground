@@ -15,7 +15,8 @@ struct ContentView: View {
     @State private var isLoading = true
     @State private var isOnline = false
     @State private var isFetchingShows = false
-    
+    @AppStorage("hasScrapedShows") private var hasScrapedShows: Bool = false
+
     
     
     var body: some View {
@@ -26,6 +27,7 @@ struct ContentView: View {
                 CustomTabBarView(shows: shows)
             }
         }
+        .environment(combinedVM)
         .task { await loadShowsIfNeeded() }
         .onChange(of: networkMonitor.isConnected) { _, newStatus in
             isOnline = newStatus
@@ -62,25 +64,33 @@ struct ContentView: View {
         guard !isFetchingShows else { return }
         isFetchingShows = true
         defer { isFetchingShows = false }
-        
+
+        // Merge cached + online shows
         shows = await combinedVM.fetchMergedShows(isOnline: isOnline)
         isLoading = false
-        
-        
-        // Scrape and upload new shows if online
-        if isOnline {
+
+        // Only scrape TVB once for initial population
+        if isOnline && !hasScrapedShows {
             let result = await combinedVM.scrapeAndUploadNewShows(isOnline: true)
+            hasScrapedShows = true
             switch result {
-            case .success(let message):
-                print("⬆️ Upload result:", message)
-            case .failure(let error):
-                print("❌ Upload failed:", error.localizedDescription)
+            case .success(let message): print("⬆️ Initial scrape:", message)
+            case .failure(let error): print("❌ Scrape failed:", error.localizedDescription)
             }
         }
+
+        // Always update online shows from Supabase without scraping TVB again
+        if isOnline {
+            await combinedVM.showSQLVM.loadOnlineShows()
+            shows = await combinedVM.fetchMergedShows(isOnline: true) // merge fresh online shows with local
+        }
     }
+
     
 }
 
 #Preview {
+    @Previewable @State var combinedVM = CombinedViewModel()
     ContentView()
+        .environment(combinedVM)
 }

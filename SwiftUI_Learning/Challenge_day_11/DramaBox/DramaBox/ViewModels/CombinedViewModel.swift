@@ -14,31 +14,45 @@ class CombinedViewModel {
     let tvbShowsVM = TVBShowsVM()
     let showSQLVM = ShowSQLViewModel()
     
+    /// Fetch all shows (cached + online) for UI consumption
     func fetchMergedShows(isOnline: Bool) async -> [ShowDisplayable] {
-        var allShows: [ShowDisplayable] = []
-        var seenIDs = Set<String>()
+        // Load cached SQL shows
+        var sqlShows = showSQLVM.loadCachedShowsDirectly()
         
-        let sqlCached = showSQLVM.loadCachedShowsDirectly()
-        allShows.append(contentsOf: sqlCached)
-        sqlCached.forEach { seenIDs.insert($0.id) }
-        
+        // Update online shows if online
         if isOnline {
-            await showSQLVM.loadShows(isOnline: true)
-            for show in showSQLVM.shows where !seenIDs.contains(show.id) {
-                allShows.append(show)
-                seenIDs.insert(show.id)
+            await showSQLVM.loadOnlineShows() // fetch fresh online shows + cache
+            sqlShows = showSQLVM.shows
+        }
+        
+        // 3️⃣ Load local TVB shows
+        let tvbLocal = tvbShowsVM.loadShowDetailsLocally() ?? []
+        var localDict: [String: ShowDetails] = Dictionary(uniqueKeysWithValues: sqlShows.map { ($0.id, $0) })
+        
+        for show in tvbLocal {
+            let details = show.asShowDetails()
+            if let old = localDict[show.id] {
+                let mergedEpisodes = (details.episodes ?? []) + (old.episodes ?? [])
+                localDict[show.id] = ShowDetails(
+                    schedule: details.schedule,
+                    subtitle: details.subtitle,
+                    genres: details.genres,
+                    year: details.year,
+                    description: details.description,
+                    thumbImageURL: details.thumbImageURL,
+                    cast: details.cast,
+                    title: details.title,
+                    bannerImageURL: details.bannerImageURL,
+                    episodes: Array(Set(mergedEpisodes))
+                )
+            } else {
+                localDict[show.id] = details
             }
         }
         
-        let tvbLocal = tvbShowsVM.loadShowDetailsLocally() ?? []
-        for show in tvbLocal where !seenIDs.contains(show.id) {
-            allShows.append(show)
-            seenIDs.insert(show.id)
-        }
-        
-        print("ℹ️ Merged shows count: \(allShows.count)")
-        return allShows
+        return Array(localDict.values)
     }
+    
     
     func scrapeAndUploadNewShows(isOnline: Bool) async -> Result<String, Error> {
         guard isOnline else { return .success("📴 Offline, skipping upload") }

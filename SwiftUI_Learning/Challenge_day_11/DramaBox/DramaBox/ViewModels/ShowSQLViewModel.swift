@@ -17,50 +17,25 @@ class ShowSQLViewModel {
     var shows: [ShowDetails] = []
     private let episodeBatchSize = 50
     
-    // MARK: - Load Shows
     
-    func loadShows(isOnline: Bool) async {
-        if isOnline { await loadOnlineShows() }
-        else { loadCachedShows() }
-    }
-    
-    private func loadOnlineShows() async {
+    // MARK: - Load Online with Cache Fallback
+    func loadOnlineShows() async {
         do {
             let fresh = try await fetchShowsFromSupabase()
-            let cached = loadCachedShowsDirectly()
-            
-            var localDict = Dictionary(uniqueKeysWithValues: cached.map { ($0.id, $0) })
-            
-            
-            // Merge fresh shows into cached
-            for newShow in fresh {
-                if let oldShow = localDict[newShow.id] {
-                    // Replace only if different
-                    if oldShow != newShow {
-                        localDict[newShow.id] = newShow
-                    }
-                    
-                    
-                } else {
-                    // New show → add it
-                    localDict[newShow.id] = newShow
-                }
-            }
-            
-            shows = Array(localDict.values)
-            try? cache.saveLocally(shows)
-            
+            shows = fresh
+            try? cache.saveLocally(fresh)
         } catch {
             print("❌ Failed to load online shows:", error.localizedDescription)
             loadCachedShows()
         }
     }
     
+    // MARK: - Offline Load
     func loadCachedShows() {
         do {
             shows = try cache.loadLocally()
         } catch {
-            shows = []
+            print("⚠️ Failed to load cached shows:", error.localizedDescription)
         }
     }
     
@@ -73,7 +48,7 @@ class ShowSQLViewModel {
     func fetchShowsFromSupabase() async throws -> [ShowDetails] {
         let response = try await supabaseClient
             .from("show_details")
-            .select("*")
+            .select("*, episodes(*)")
             .execute()
         return try JSONDecoder().decode([ShowDetails].self, from: response.data)
     }
@@ -101,17 +76,65 @@ class ShowSQLViewModel {
         return try await fetchEpisodesByShow(showId: showId)
     }
     
-  
+    func fetchShows(isOnline: Bool) async -> [ShowDetails] {
+        // Load cache
+        let cachedShows = (try? cache.loadLocally()) ?? []
+        let cachedDict = Dictionary(uniqueKeysWithValues: cachedShows.map { ($0.id, $0) })
+
+        if isOnline {
+            do {
+                // Fetch online
+                let onlineShows = try await fetchShowsFromSupabase()
+
+                //  Merge cache + online episodes
+                let mergedShows = onlineShows.map { show -> ShowDetails in
+                    if let cached = cachedDict[show.id] {
+                        let mergedEpisodes = (cached.episodes ?? []) + (show.episodes ?? [])
+                        let uniqueEpisodes = Array(Set(mergedEpisodes))
+                        
+                        return ShowDetails(
+                            schedule: show.schedule,
+                            subtitle: show.subtitle,
+                            genres: show.genres,
+                            year: show.year,
+                            description: show.description,
+                            thumbImageURL: show.thumbImageURL,
+                            cast: show.cast,
+                            title: show.title,
+                            bannerImageURL: show.bannerImageURL,
+                            episodes: uniqueEpisodes
+                        )
+                    } else {
+                        return show
+                    }
+                }
+
+                // Deduplicate and sort
+                let uniqueResults = Array(Set(mergedShows)).sorted { $0.title < $1.title }
+
+                // Save cache
+                try? cache.saveLocally(uniqueResults)
+
+                return uniqueResults
+            } catch {
+                print("❌ Failed to fetch online shows:", error)
+                return cachedShows
+            }
+        } else {
+            return cachedShows
+        }
+    }
+
+
     private func fetchShowsOnline() async -> [ShowDetails] {
         do {
-            let response = try await supabaseClient
-                .from("show_details")
-                .select("*")
-                .execute()
-
-            let decoded = try JSONDecoder().decode([ShowDetails].self, from: response.data)
-            let uniqueResults = Array(Set(decoded)).sorted { $0.title < $1.title }
-
+            // Fetch all shows and their episodes in one query
+            let decodedShows = try await fetchShowsFromSupabase()
+            
+            // Deduplicate + sort
+            let uniqueResults = Array(Set(decodedShows)).sorted { $0.title < $1.title }
+            
+            // Save locally for offline caching
             try? cache.saveLocally(uniqueResults)
             return uniqueResults
         } catch {
@@ -119,21 +142,14 @@ class ShowSQLViewModel {
             return fetchShowsOffline()
         }
     }
+
+
     
     // MARK: - Local Fetch
-
+    
     private func fetchShowsOffline() -> [ShowDetails] {
         (try? cache.loadLocally()) ?? []
     }
-
-    func fetchShows(isOnline: Bool) async {
-        if isOnline {
-            shows = await fetchShowsOnline()
-        } else {
-            shows = fetchShowsOffline()
-        }
-    }
-
     
     
     // MARK: - Upload
