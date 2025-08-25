@@ -7,17 +7,19 @@
 
 import SwiftUI
 
+
 struct CustomTabBarView: View {
-//    @Environment(CombinedViewModel.self) var combinedVM
-    @State private var selectedTab = 0
     let shows: [ShowDisplayable]
+    @Binding var pathStore: PathStore
+    @Environment(CombinedViewModel.self) var combinedVM
+    @State private var selectedTab = 0
     
-    
+
     var body: some View {
         ZStack(alignment: .bottom) {
-            TabBarContentView(selectedTab: selectedTab, shows: shows)
-                .ignoresSafeArea()
-        
+            TabBarContentView(selectedTab:selectedTab, shows: shows,   pathStore: $pathStore)
+                .environment(combinedVM)
+
             HStack {
                 ForEach(AppTab.allCases) { tab in
                     TabBarButtonView(
@@ -26,21 +28,20 @@ struct CustomTabBarView: View {
                         title: tab.title,
                         selectedTab: $selectedTab
                     )
-                    .frame(maxWidth: .infinity) // spread buttons evenly
-                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            .background(Color.black.opacity(0.2))
-            .cornerRadius(15)
-            .padding(.horizontal, 5)
+            .padding(.top, 8)
+            .background(Color.black.opacity(0.7))
             .shadow(radius: 5)
-            .padding(.bottom, 5)
         }
     }
 }
 
 #Preview {
+    @Previewable @State var combinedVM = CombinedViewModel()
+    @Previewable  @State var pathStore = PathStore()
     CustomTabBarView(shows: [
         ShowDetails(
             schedule: "25 Episodes",
@@ -60,5 +61,7 @@ struct CustomTabBarView: View {
                 )
             ]
         )
-    ])
+    ], pathStore: $pathStore)
+    .environment(combinedVM)
 }
+

@@ -15,16 +15,19 @@ struct ContentView: View {
     @State private var isLoading = true
     @State private var isOnline = false
     @State private var isFetchingShows = false
+    @State private var pathStore = PathStore()
     @AppStorage("hasScrapedShows") private var hasScrapedShows: Bool = false
-
     
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path:$pathStore.path) {
             if shows.isEmpty {
                 loadingView
             } else {
-                CustomTabBarView(shows: shows)
+                CustomTabBarView(shows: shows, pathStore: $pathStore)
+                    .navigationDestination(for: ShowDetails.self) {show in
+                        FullScreenDetailView(show: show, pathStore: $pathStore)
+                    }
             }
         }
         .environment(combinedVM)
@@ -64,11 +67,11 @@ struct ContentView: View {
         guard !isFetchingShows else { return }
         isFetchingShows = true
         defer { isFetchingShows = false }
-
+        
         // Merge cached + online shows
         shows = await combinedVM.fetchMergedShows(isOnline: isOnline)
         isLoading = false
-
+        
         // Only scrape TVB once for initial population
         if isOnline && !hasScrapedShows {
             let result = await combinedVM.scrapeAndUploadNewShows(isOnline: true)
@@ -78,14 +81,14 @@ struct ContentView: View {
             case .failure(let error): print("❌ Scrape failed:", error.localizedDescription)
             }
         }
-
+        
         // Always update online shows from Supabase without scraping TVB again
         if isOnline {
             await combinedVM.showSQLVM.loadOnlineShows()
             shows = await combinedVM.fetchMergedShows(isOnline: true) // merge fresh online shows with local
         }
     }
-
+    
     
 }
 

@@ -22,7 +22,7 @@ struct TabBarButtonView: View {
                 Text(title)
                     .font(.system(size: 16, weight: selectedTab == index ? .bold : .regular))
             }
-            .foregroundColor(selectedTab == index ? .white : .gray)
+            .foregroundColor(selectedTab == index ? .white : .white.opacity(0.8))
             .frame(maxWidth: .infinity)
         }
     }

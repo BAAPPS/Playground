@@ -41,7 +41,9 @@ struct CategoryListView: View {
                 }
             }
         }
-        .padding(.top, 70)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.clear)
         .navigationTitle("Shows by Genre")
         .navigationBarTitleDisplayMode(.inline)
         .task(id: networkMonitor.isConnected) {
