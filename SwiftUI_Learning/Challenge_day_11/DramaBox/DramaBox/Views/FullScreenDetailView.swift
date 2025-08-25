@@ -21,7 +21,7 @@ struct FullScreenDetailView: View {
                     }
                 }
                 .resizable()
-                .scaledToFit()
+                .scaledToFill()
                 .frame(maxWidth: .infinity)
                 .bannerSafeArea()
                 .accessibilityLabel("\(show.title) banner image")

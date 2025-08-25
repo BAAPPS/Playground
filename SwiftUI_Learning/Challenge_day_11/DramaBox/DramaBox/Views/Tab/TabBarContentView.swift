@@ -23,7 +23,8 @@ struct TabBarContentView: View {
                 .environment(combinedVM)
             
         case 2:
-            Color.blue.opacity(0.4).ignoresSafeArea()
+            SearchView(path: $pathStore.path)
+                 .environment(combinedVM)
             
         default:
             Color.black.ignoresSafeArea()
@@ -32,6 +33,7 @@ struct TabBarContentView: View {
 }
 
 #Preview {
+    @Previewable @State var combinedVM = CombinedViewModel()
     @Previewable  @State var pathStore = PathStore()
     TabBarContentView(selectedTab: 0, shows: [
         ShowDetails(schedule:"25 Episodes",
@@ -46,4 +48,5 @@ struct TabBarContentView: View {
                     episodes: [Episode( title:"Episode 01",url:"https://tvbanywherena.com/english/videos/365-GoWithTheFloat/1750790321631766971",thumbnailURL:"https://cf-images.us-east-1.prod.boltdns.net/v1/jit/5324042807001/575dee99-bbff-4c18-8da2-ea46bd47f03d/main/1920x1080/21m28s224ms/match/image.jpg") ]
                    )
     ], pathStore: $pathStore)
+    .environment(combinedVM)
 }

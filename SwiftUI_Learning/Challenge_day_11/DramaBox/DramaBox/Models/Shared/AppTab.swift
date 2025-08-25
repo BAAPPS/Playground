@@ -10,12 +10,14 @@ import SwiftUI
 enum AppTab: Int, CaseIterable, Identifiable {
     case newest
     case genres
+    case search
     var id: Int { rawValue }
     
     var title: String {
         switch self {
         case .newest: return "Newest"
         case .genres : return "Genres"
+        case .search: return "Search"
         }
     }
     
@@ -23,6 +25,7 @@ enum AppTab: Int, CaseIterable, Identifiable {
         switch self {
         case .newest: return "film"
         case .genres: return "square.grid.3x2"
+        case .search: return "magnifyingglass"
         }
     }
 }

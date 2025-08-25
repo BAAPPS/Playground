@@ -16,6 +16,10 @@ class CombinedViewModel {
     let tvbShowsVM = TVBShowsVM()
     let showSQLVM = ShowSQLViewModel()
     
+    var showsByGenre: [Genre: [ShowDetails]] = [:]
+    var filteredShows: [ShowDetails] = []
+
+    
     /// Fetch all shows (cached + online) for UI consumption
     func fetchMergedShows(isOnline: Bool) async -> [ShowDisplayable] {
         // Load cached SQL shows
@@ -151,6 +155,29 @@ class CombinedViewModel {
         
         return .success(resultMessage.isEmpty ? "No new shows or episodes" : resultMessage)
     }
+    
+    
+    
+    @MainActor
+    func fetchAndGroupShows(isOnline: Bool = true) async {
+        let fetchedShows = await showSQLVM.fetchShows(isOnline: isOnline)
+        showSQLVM.shows = fetchedShows
+        
+        var grouped: [Genre: [ShowDetails]] = [:]
+        for genre in Genre.allCases {
+            grouped[genre] = fetchedShows.filter { $0.genres.contains(genre.rawValue) }
+        }
+        self.showsByGenre = grouped
+    }
+
+    func filterShows(searchText: String) {
+        let allShows = showSQLVM.shows
+        self.filteredShows = allShows.filter { show in
+            show.title.localizedCaseInsensitiveContains(searchText) ||
+            show.genres.contains(where: { $0.localizedCaseInsensitiveContains(searchText) })
+        }
+    }
+
     
     
     @MainActor
