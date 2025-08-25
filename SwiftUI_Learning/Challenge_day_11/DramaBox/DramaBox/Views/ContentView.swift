@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var isFetchingShows = false
     @State private var pathStore = PathStore()
     @AppStorage("hasScrapedShows") private var hasScrapedShows: Bool = false
+    @AppStorage("hasRequestedNotifications") private var hasRequestedNotifications: Bool = false
     
     
     var body: some View {
@@ -31,11 +32,19 @@ struct ContentView: View {
             }
         }
         .environment(combinedVM)
-        .task { await loadShowsIfNeeded() }
+        .task {
+            await loadShowsIfNeeded()
+            
+            if !hasRequestedNotifications {
+               await combinedVM.requestNotificationPermission()
+                hasRequestedNotifications = true
+            }
+        }
         .onChange(of: networkMonitor.isConnected) { _, newStatus in
             isOnline = newStatus
             if newStatus { Task { await loadShowsIfNeeded() } }
         }
+        
     }
     
     
