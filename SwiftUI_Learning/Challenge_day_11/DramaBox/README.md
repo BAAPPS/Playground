@@ -64,12 +64,40 @@ This challenge is designed to:
 **Problem 5: Managing async workflows with multiple network calls**  
 - **Solution:** Used `async/await` with structured error handling to ensure sequential, reliable uploads while keeping the UI responsive.
 
+**Problem 6: Implementing search across shows and genres**
+
+- **Solution:** Added a SearchView with a live search bar that filters shows by title and genres. Learned to update UI reactively via @Observable view models and @Published/@State bindings.
+
+**Problem 7: Grouping shows by genre for empty search states**
+
+- **Solution:** Implemented fetchAndGroupShows() to categorize shows into a [Genre: [ShowDetails]] dictionary. Learned how to dynamically populate NavigationStack destinations from grouped data.
+
+**Problem 8: Navigation and path management issues in NavigationStack**
+
+- **Solution:** Used a shared PathStore binding to manage navigation paths across tabs and views, avoiding unexpected back navigation errors and cancelled network requests.
 
 
 ---
 
 ## What I Would Do Differently
 
+* **Current issue:** `ContentView` waits for `scrapeAndUploadNewShows()` before showing any content. This means the loading view is displayed for several seconds or more, if theres no data just yet as data is being scrapped.
+* **Proposed solution:** Store actual show data (the merged cached + database data) in the **file system** or **local database**, and display it immediately. Meanwhile, perform scraping or online fetches in the background. This way:
 
----
+  * Users see content instantly (even if slightly outdated).
+  * Background tasks update the view asynchronously when fresh data arrives.
+  * Loading indicators can be minimized to small inline spinners instead of a full-screen block.
+
+**Implementation tips:**
+
+1. Save merged shows (SQL + TVB local) to a JSON file in `FileManager` after every update.
+2. On app launch, load the saved JSON immediately for the initial display.
+3. Kick off background tasks to fetch new online shows and scrape TVB.
+4. When new shows are ready, merge and refresh the UI.
+
+**Benefits:**
+
+* Instant content makes the app feel fast and responsive.
+* Reduces perceived wait time.
+* Users can interact with the app while background tasks run.
 
