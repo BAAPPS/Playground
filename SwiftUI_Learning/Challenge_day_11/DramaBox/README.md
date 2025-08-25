@@ -17,7 +17,7 @@ This project serves as a practical exercise in **full-stack development** using 
 * **SwiftData** – For local persistence and offline mode.
 * **FileManager** – For saving and retrieving local files.
 * **Result Type** – For handling success/failure responses from network calls.
-* **TabView** – For tab-based navigation between views.
+* **Custom TabView** – For tab-based navigation between views.
 * **Swipe Actions** – For quick actions in list rows.
 * **Local Notifications** – For user alerts about new shows or updates.
 * **Web Scraping Tool** – External script (e.g., Puppeteer/Playwright) for initial data extraction from TVB Anywhere.
