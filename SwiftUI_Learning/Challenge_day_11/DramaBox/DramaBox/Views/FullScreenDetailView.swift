@@ -88,17 +88,20 @@ struct FullScreenDetailView: View {
             }
             .padding(.top, 5)
             
-            ScrollView(.vertical, showsIndicators: true) {
-                VStack(alignment: .leading) {
+            ZStack(alignment: .bottom) {
+                ScrollView(.vertical) {
                     Text(show.description)
                         .padding()
                         .font(.subheadline)
                         .foregroundColor(.black.opacity(0.7))
-                        .accessibilityLabel("About Show")
-                        .accessibilityValue(show.description)
                         .multilineTextAlignment(.leading)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.clear, Color.white.opacity(0.5)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 30)
             }
             
             VStack {
@@ -106,34 +109,44 @@ struct FullScreenDetailView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .font(.headline)
                     .padding(.vertical)
-
+                
                 if let episodes = show.episodes {
                     let sortedEpisodes = episodes.dedupAndSort()
-                    List(sortedEpisodes, id: \.title) { episode in
-                        HStack(spacing: 12) {
-                            KFImage.url(from: episode.thumbnailURL)
-                                .placeholder {
-                                    ZStack {
-                                        Color.black.opacity(0.2)
-                                        ProgressView()
+                    
+                    ZStack(alignment: .bottom) {
+                        List(sortedEpisodes, id: \.title) { episode in
+                            HStack(spacing: 12) {
+                                KFImage.url(from: episode.thumbnailURL)
+                                    .placeholder {
+                                        ZStack {
+                                            Color.black.opacity(0.2)
+                                            ProgressView()
+                                        }
                                     }
-                                }
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 150, height: 100)
-                                .clipped()
-                                .cornerRadius(8)
-
-                            Text(episode.title)
-                                .font(.subheadline)
-                                .foregroundColor(.black.opacity(0.8))
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 150, height: 100)
+                                    .clipped()
+                                    .cornerRadius(8)
+                                
+                                Text(episode.title)
+                                    .font(.subheadline)
+                                    .foregroundColor(.black.opacity(0.8))
+                            }
+                            .padding(.vertical, 4)
                         }
-                        .padding(.vertical, 4)
+                        .listStyle(.plain)
+                        
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.clear, Color.white.opacity(0.5)]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 30)
                     }
-                    .listStyle(.plain)
                 }
             }
-
+            
             
             Spacer()
             
