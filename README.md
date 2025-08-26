@@ -63,6 +63,8 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 ### Days 79-94: Controlling UI flow (Incomplete ❌)
 
 - **Day 79-85** – Project 16, part one to seven: [HotProspects](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_16)
+- **Day 86-91** – Project 17, part one to six: [Flashzilla](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_17)
+
 
 
 ---
@@ -230,6 +232,11 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 #### Day 79-85 – Project 16, part one to seven: 
 
 [HotProspects](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_16/HotProspects/README.md)
+
+#### Day 86-91 – Project 17, part one to six:
+
+[Flashzilla](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_17/Flashzilla/README.md)
+
 
 
 ---
