@@ -9,30 +9,23 @@ import SwiftUI
 
 struct CardView: View {
     let card: Card
-    var removal: (() -> Void)? = nil
+    var removal: ((Bool) -> Void)? = nil // true = wrong, false = correct
     @State private var isShowingAnswer = false
     @State private var offset = CGSize.zero
     @Environment(\.accessibilityDifferentiateWithoutColor) var accessibilityDifferentiateWithoutColor
     @Environment(\.accessibilityVoiceOverEnabled) var accessibilityVoiceOverEnabled
-    
-    
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 25)
                 .fill(
                     accessibilityDifferentiateWithoutColor
                     ? .white
-                    : .white
-                        .opacity(1 - Double(abs(offset.width / 50)))
+                    : .white.opacity(1 - Double(abs(offset.width / 50)))
                 )
-                .background(
-                    accessibilityDifferentiateWithoutColor
-                    ? nil
-                    : RoundedRectangle(cornerRadius: 25)
-                        .fill(offset.width > 0 ? .green : .red)
-                )
+                .cardBackground(for: offset, differentiateWithoutColor: accessibilityDifferentiateWithoutColor)
                 .shadow(radius: 10)
-            
+
             VStack {
                 if accessibilityVoiceOverEnabled {
                     Text(isShowingAnswer ? card.answer : card.prompt)
@@ -65,7 +58,8 @@ struct CardView: View {
                 }
                 .onEnded { _ in
                     if abs(offset.width) > 100 {
-                        removal?()
+                        let isWrong = offset.width < 0
+                        removal?(isWrong)
                     } else {
                         offset = .zero
                     }
@@ -75,10 +69,11 @@ struct CardView: View {
             isShowingAnswer.toggle()
         }
         .animation(.bouncy, value: offset)
-
     }
 }
 
 #Preview {
-    CardView(card: .example)
+    CardView(card: .example) {_ in}
 }
+
+

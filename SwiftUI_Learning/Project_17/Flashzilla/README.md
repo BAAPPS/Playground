@@ -1224,3 +1224,474 @@ Instead of fixed sample cards, start with an empty array:
 ## Day 91 – Project 17, part six
 
 ---
+
+## Challenge
+
+### Challenge 1
+
+When adding a card, the text fields keep their current text. Fix that so that the textfields clear themselves after a card is added.
+
+```swift
+func addCard() {
+    let trimmedPrompt = newPrompt.trimmingCharacters(in: .whitespaces)
+    let trimmedAnswer = newAnswer.trimmingCharacters(in: .whitespaces)
+    guard trimmedPrompt.isEmpty == false && trimmedAnswer.isEmpty == false else { return }
+
+    let card = Card(prompt: trimmedPrompt, answer: trimmedAnswer)
+    cards.insert(card, at: 0)
+    saveData()
+    newPrompt = ""
+    newAnswer = "" 
+}
+````
+
+### Challenge 2
+
+If you drag a card to the right but not far enough to remove it, then release, you see it turn red as it slides back to the center.
+
+
+- This happens because we reset the `offset` back to `.zero` immediately, but the card’s animation hasn’t completed yet. While it’s animating back to the center, SwiftUI still evaluates the background color logic — which 
+uses the sign of `offset.width` (positive = green, negative = red). If your drag was to the right, `offset.width` becomes slightly negative during the animation back, causing the red flash.
+
+- The fix is to separate the **visual background logic** into a custom helper instead of nesting shapes inside `.fill()`. That way, the card’s background is always evaluated consistently while animating.
+
+- Here’s the fix:
+
+```swift
+extension View {
+    func cardBackground(for offset: CGSize, differentiateWithoutColor: Bool) -> some View {
+        self.background(
+            RoundedRectangle(cornerRadius: 25)
+                .fill(
+                    differentiateWithoutColor
+                    ? .white
+                    : (offset == .zero
+                       ? .white
+                       : (offset.width > 0 ? .green : .red))
+                )
+        )
+    }
+}
+```
+
+Then apply it inside `CardView`:
+
+```swift
+RoundedRectangle(cornerRadius: 25)
+    .fill(
+        accessibilityDifferentiateWithoutColor
+        ? .white
+        : .white.opacity(1 - Double(abs(offset.width / 50)))
+    )
+    .cardBackground(for: offset, differentiateWithoutColor: accessibilityDifferentiateWithoutColor)
+    .shadow(radius: 10)
+```
+
+Now dragging right keeps the card green, dragging left keeps it red, and returning to center cleanly fades it back to white without flickering.
+
+
+### Challenge 3
+
+For a harder challenge: when the user gets an answer wrong, add that card back into the array so the user can try it again. Doing this successfully means rethinking the `ForEach` loop, because relying on simple integers isn’t enough – your cards need to be uniquely identifiable.
+
+**Step 1 – Update the Card model**
+
+```swift
+struct Card: Codable, Identifiable, Equatable {
+    var id = UUID()
+    var prompt: String
+    var answer: String
+
+    static let example = Card(
+        prompt: "Who played the 13th Doctor in Doctor Who?", 
+        answer: "Jodie Whittaker"
+    )
+}
+```
+
+* `Identifiable` → allows SwiftUI `ForEach` to track each card individually.
+* `Equatable` → lets us find a card’s index to remove or re-add it.
+
+
+**Step 2 – Update the removal logic in `ContentView`**
+
+```swift
+func removeCard(_ card: Card, wrongAnswer: Bool = false) {
+    guard let index = cards.firstIndex(where: { $0.id == card.id }) else { return }
+    let removedCard = cards.remove(at: index)
+
+    if wrongAnswer {
+        // Re-add a fresh card (new instance) to reset its offset
+        var newCard = removedCard
+        newCard.id = UUID() // ensure SwiftUI treats it as a new view
+        cards.insert(newCard, at: 0) // add at the beginning
+    }
+
+    if cards.isEmpty {
+        isActive = false
+    }
+}
+```
+
+* Swiping left marks a card as wrong.
+* A new `UUID()` ensures SwiftUI sees it as a new card.
+* `insert(at: 0)` adds it back at the **top of the deck**, letting the user retry immediately.
+
+**Step 3 – ForEach update**
+
+```swift
+ZStack {
+    ForEach(cards) { card in
+        let cardIndex = index(of: card)
+        let isTopCard = card == cards.last
+
+        CardView(card: card) { wrongAnswer in
+            withAnimation {
+                removeCard(card, wrongAnswer: wrongAnswer)
+            }
+        }
+        .stacked(at: cardIndex, in: cards.count)
+        .allowsHitTesting(isTopCard)
+        .accessibilityHidden(!isTopCard)
+    }
+}
+```
+
+* Using `Identifiable` ensures each card is uniquely tracked.
+* Only the top card allows gestures and is visible to VoiceOver.
+
+Got it! Here’s the **Challenge 3 section rewritten in the same style with just the changes and code**:
+
+
+**Step 3 – CardView closure signature** 
+
+Updated to pass whether the swipe was wrong:
+
+```swift
+struct CardView: View {
+    let card: Card
+    var removal: ((Bool) -> Void)? = nil // true = wrong, false = correct
+```
+
+3. **Gesture handling** now detects left swipe as wrong:
+
+```swift
+.gesture(
+    DragGesture()
+        .onChanged { gesture in
+            offset = gesture.translation
+        }
+        .onEnded { _ in
+            if abs(offset.width) > 100 {
+                let isWrong = offset.width < 0
+                removal?(isWrong)
+            } else {
+                offset = .zero
+            }
+        }
+)
+```
+
+This ensures:
+
+* Swiping **right** removes the card permanently.
+* Swiping **left** removes the card but adds it back at the **front** for retry.
+* Each re-added card is treated as a new view so animations and offsets reset correctly.
+
+---
+
+### Challenge 4:  Data Persistence Challenge: UserDefaults, JSON, and SwiftData
+
+Make it use an alternative approach to saving data, e.g. documents JSON rather than UserDefaults, or SwiftData – this is generally a good idea, so you should get practice with this.
+
+
+#### JSON File Challenge – Using Documents Directory for Data Persistence
+
+**Goal:** Replace `UserDefaults` with JSON-based storage in the app’s Documents directory. This ensures more robust and scalable storage and gives you practice with file-based persistence.
+
+**1. FileManager Extension (for JSON)**
+
+```swift
+extension FileManager {
+    static var documentsDirectory: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+    
+    static func save<T: Encodable>(_ object: T, to filename: String) {
+        let url = documentsDirectory.appendingPathComponent(filename)
+        do {
+            let data = try JSONEncoder().encode(object)
+            try data.write(to: url, options: [.atomic, .completeFileProtection])
+            print("Saved to \(url)")
+        } catch {
+            print("Failed to save JSON:", error)
+        }
+    }
+    
+    static func load<T: Decodable>(_ filename: String, as type: T.Type) -> T? {
+        let url = documentsDirectory.appendingPathComponent(filename)
+        do {
+            let data = try Data(contentsOf: url)
+            let decoded = try JSONDecoder().decode(T.self, from: data)
+            return decoded
+        } catch {
+            print("Failed to load JSON:", error)
+            return nil
+        }
+    }
+}
+```
+
+**2. CardStorage Model**
+
+```swift
+struct CardStorage {
+    static let filename = "cards.json"
+
+    static let sampleCards: [Card] = [
+        // your sample cards here...
+    ]
+
+    static func load() -> [Card] {
+        if let saved = FileManager.load(filename, as: [Card].self) {
+            return saved
+        } else {
+            save(sampleCards)
+            return sampleCards
+        }
+    }
+
+    static func save(_ cards: [Card]) {
+        FileManager.save(cards, to: filename)
+    }
+
+    static func loadData() -> [Card] { load() }
+    static func saveData(_ cards: [Card]) { save(cards) }
+}
+```
+
+**3. ContentView – Reset Cards**
+
+```swift
+func resetCards() {
+    timeRemaining = 100
+    isActive = true
+    
+    // Load cards from storage
+    let loaded = CardStorage.loadData()
+    
+    // Fall back to sampleCards if nothing was loaded
+    cards = loaded.isEmpty ? CardStorage.sampleCards : loaded
+}
+```
+
+**4. EditCardsView – Load Cards on Appear**
+
+```swift
+.onAppear {
+    let loaded = CardStorage.loadData()
+    // Fall back to sampleCards if nothing was loaded
+    cards = loaded.isEmpty ? CardStorage.sampleCards : loaded
+}
+```
+
+**Key Points:**
+
+* This ensures the app never shows an empty state on first launch.
+* The JSON file acts as the single source of truth for both `ContentView` and `EditCardsView`.
+* Using the Documents directory keeps data persistent between app launches, unlike `UserDefaults` which is less flexible for larger or structured datasets.
+
+---
+
+#### SwiftData Challenge
+
+In this challenge, we moved Flashzilla from using JSON files or `UserDefaults` to **SwiftData**, enabling fully persistent storage with real-time UI updates.
+
+
+**1. CardEntity Model**
+
+```swift
+import SwiftData
+import SwiftUI
+
+@Model
+final class CardEntity {
+    @Attribute(.unique) var id: UUID
+    var prompt: String
+    var answer: String
+
+    init(prompt: String, answer: String, id: UUID = UUID()) {
+        self.id = id
+        self.prompt = prompt
+        self.answer = answer
+    }
+}
+````
+
+**2. Loading Sample Data**
+
+```swift
+import Foundation
+import SwiftData
+
+func loadSampleDataIfNeeded(context: ModelContext) {
+    do {
+        // Check if there are any cards already stored
+        let request = FetchDescriptor<CardEntity>()
+        let existingCards = try context.fetch(request)
+        
+        guard existingCards.isEmpty else { return } // Already populated
+        
+        // Insert sample cards
+        for item in CardStorage.sampleCards {
+            let card = CardEntity(prompt: item.prompt, answer: item.answer)
+            context.insert(card)
+        }
+        
+        try context.save() // Persist to disk
+        print("Sample cards saved to SwiftData")
+    } catch {
+        print("Failed to fetch or save sample cards:", error)
+    }
+}
+```
+
+**3. App Setup**
+
+```swift
+import SwiftUI
+import SwiftData
+
+@main
+struct FlashzillaApp: App {
+    @Environment(\.modelContext) private var context
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .modelContainer(for: [CardEntity.self])
+                .onAppear {
+                   loadSampleDataIfNeeded(context: context)
+                }
+        }
+    }
+}
+```
+
+**4. Using SwiftData in `ContentView`**
+
+```swift
+@Environment(\.modelContext) private var context
+@Query(sort: \CardEntity.prompt) private var cardEntities: [CardEntity]
+
+```
+
+**Load cards into UI**
+
+```swift
+if cardEntities.isEmpty {
+    cards = CardStorage.sampleCards
+} else {
+    cards = cardEntities.map { Card(id: $0.id, prompt: $0.prompt, answer: $0.answer) }
+}
+```
+
+**Removing a card**
+
+```swift
+if let entity = cardEntities.first(where: { $0.id == card.id }) {
+    context.delete(entity)
+    do {
+        try context.save()
+    } catch {
+        print("Failed to save context after removing card:", error)
+    }
+}
+        
+```
+
+**5. Using SwiftData in `EditCardsView`**
+
+```swift
+@Environment(\.modelContext) private var context
+@Query(sort: \CardEntity.prompt) private var cardEntities: [CardEntity]
+
+```
+
+```swift
+func addCard() {
+    let cardEntity = CardEntity(prompt: trimmedPrompt, answer: trimmedAnswer)
+    context.insert(cardEntity)
+    do {
+        try context.save()
+        newPrompt = ""
+        newAnswer = ""
+    } catch {
+        print("Failed to save card:", error)
+    }
+}
+```
+
+```swift
+func removeCards(at offsets: IndexSet) {
+    for index in offsets {
+        let entity = cardEntities[index]
+        context.delete(entity)
+    }
+    do {
+        try context.save()
+    } catch {
+        print("Failed to delete card:", error)
+    }
+}
+```
+
+- In this challenge, we explored **three approaches to storing and managing data** in SwiftUI: `UserDefaults`, `JSON + FileManager`, and `SwiftData`.
+
+### 1️⃣ UserDefaults
+
+* Simple key-value storage built into iOS.
+* Best for small datasets or user preferences.
+* Quick read/write operations, but not ideal for large or relational data.
+
+### 2️⃣ JSON + FileManager
+
+* Store data as JSON files in the app’s documents directory.
+* Provides full control and easy inspection or backup.
+* Suitable for medium-sized datasets and allows structured storage outside of the app bundle.
+
+
+### 3️⃣ SwiftData
+
+* Modern, Swift-native persistence solution, designed for SwiftUI.
+* Handles large datasets, relationships, and queries efficiently.
+* Uses declarative data modeling with `@Model`, `@Query`, and `ModelContext` for adding, updating, and deleting entities.
+* Ideal for fully persistent, scalable, and relational data management.
+
+
+✅ **Key takeaways**:
+
+* **UserDefaults** → fast and easy, best for small datasets.
+* **JSON + FileManager** → flexible, inspectable, good for medium datasets.
+* **SwiftData** → scalable, relational, fully persistent, and integrated with SwiftUI.
+
+
+### Challenge 5 - Centralized Card Storage
+
+Try to find a way to centralize the loading and saving code for the cards. You might need to experiment a little to find something you like!
+
+
+- To avoid repeating loading and saving logic across the app, all card persistence is centralized in one place. This includes:
+
+* ** `CardStorage`**: Provides a single source of truth for all cards, including sample data, and functions to load and save them. This can be used for both JSON file storage and SwiftData.
+* ** `FileManager+Documents`**: Handles reading and writing JSON files in the app’s documents directory. This keeps file-handling code separate from your UI logic.
+* ** `loadSampleDataIfNeeded`**: Ensures SwiftData has initial sample cards when the app first launches.
+
+Benefits:
+
+* **Reusable code**: Views just call `CardStorage.loadData()` or `CardStorage.saveData(cards)` without knowing the details of the persistence mechanism.
+* **Flexibility**: Switching between JSON file storage and SwiftData is easy, because the central storage logic handles both.
+* **Clean UI code**: Your views (`ContentView`, `EditCardsView`) only handle displaying and updating cards; all persistence is abstracted.
+
+This centralization makes the app easier to maintain and extend in the future.
+

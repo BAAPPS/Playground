@@ -13,4 +13,19 @@ extension View {
         let offset = Double(total - position)
         return self.offset(y: offset * 10)
     }
+    
+    func cardBackground(for offset: CGSize, differentiateWithoutColor: Bool) -> some View {
+        self.background(
+            RoundedRectangle(cornerRadius: 25)
+                .fill(
+                    differentiateWithoutColor
+                    ? .white
+                    : (offset == .zero
+                       ? .white
+                       : (offset.width > 0 ? .green : .red))
+                )
+        )
+    }
+
+
 }
