@@ -54,17 +54,19 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 53-56** - Project 11, parts one to four: [BookWormm](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_11)
 - **Day 57-59** - Project 12, parts one to three: [SwiftData](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_12)
 
-### Days 62-76: Filters, maps, and more (Completed ✅) (Incomplete ❌)
+### Days 62-76: Filters, maps, and more (Completed ✅)
 
 - **Day 62-67** – Project 13, part one to six: [Instafilter](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_13)
 - **Day 68-73** – Project 14, part one to six: [BucketList](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_14)
 - **Day 74-76** – Project 15, part one to three: [AccessibilityApp](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_15)
 
-### Days 79-94: Controlling UI flow (Incomplete ❌)
+### Days 79-94: Controlling UI flow  (Completed ✅) 
 
 - **Day 79-85** – Project 16, part one to seven: [HotProspects](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_16)
 - **Day 86-91** – Project 17, part one to six: [Flashzilla](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_17)
+- **Day 92-94** – Project 18, part one to three: [LayoutNGeo](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_18)
 
+### Days 96-99: One last project (Incomplete ❌)
 
 
 ---
@@ -227,7 +229,7 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 [AccessibilityApp](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_15/AccessibilityApp/README.md)
 
-### Days 79-94: Controlling UI flow (Incomplete ❌)
+### Days 79-94: Controlling UI flow (Completed ✅) 
 
 #### Day 79-85 – Project 16, part one to seven: 
 
@@ -237,7 +239,11 @@ Thanks to [Paul Hudson](https://www.hackingwithswift.com) for the incredible **1
 
 [Flashzilla](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_17/Flashzilla/README.md)
 
+#### Day 92-94 – Project 18, part one to three: 
 
+[LayoutNGeo](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_18/LayoutNGeo/README.md)
+
+#### Days 96-99: One last project (Incomplete ❌)
 
 ---
 
