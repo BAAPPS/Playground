@@ -29,9 +29,13 @@ layout techniques, new approaches for presenting sheets and alerts, and strategi
 
 ```text
 SnowSeeker/
-├── Views/                 # SwiftUI views for UI components
-├── Assets.xcassets/       # App images, icons, and other assets
-├── SnowSeekerApp.swift    # App entry point
+├── Data/                   # JSON files and other static data sources
+├── Models/                 # Data models representing resorts, facilities, etc.
+├── Utils/                  # Helper functions, extensions, and utilities
+├── ViewModels/             # MVVM view models managing app logic and state
+├── Views/                  # SwiftUI views for UI components
+├── Assets.xcassets/        # App images, icons, and other assets
+├── SnowSeekerApp.swift     # App entry point (main SwiftUI App struct)
 ````
 
 ---
