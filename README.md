@@ -66,8 +66,16 @@ The goal of this project is to reinforce Swift fundamentals through daily, hands
 - **Day 86-91** – Project 17, part one to six: [Flashzilla](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_17)
 - **Day 92-94** – Project 18, part one to three: [LayoutNGeo](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_18)
 
+
 ### Days 96-99: One last project (Incomplete ❌)
 
+### Days 96-99: One last project  (Completed ✅) 
+
+- **Day 96-99** – Project 19, part one to four: [SnowSeeker](https://github.com/BAAPPS/Playground/tree/main/SwiftUI_Learning/Project_19)
+
+### Day 100 – Final exam (Completed ✅) 
+
+![Image](https://github.com/user-attachments/assets/f9471534-1d16-446c-93ab-629fc9ea650a)
 
 ---
 
